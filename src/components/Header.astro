@@ -1,0 +1,54 @@
+---
+import { Icon } from 'astro-icon/components';
+import { SITE } from '../lib/site';
+
+interface Props { active?: string | undefined }
+const { active } = Astro.props;
+---
+<header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-[var(--glass)] backdrop-blur-md">
+  <div class="container-site flex h-20 items-center justify-between gap-4">
+    <a href="/" class="group flex items-center gap-2 font-display text-[1.375rem] font-bold tracking-tight text-fg" aria-label="carlos.nz home">
+      <span>carlos.nz</span>
+      <span class="inline-block size-2 rounded-full bg-cta transition-transform duration-300 group-hover:scale-125" aria-hidden="true"></span>
+    </a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-7 font-display text-sm font-semibold">
+        {SITE.nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={['transition-colors hover:text-fg', active === item.label ? 'text-brand' : 'text-muted']}
+              aria-current={active === item.label ? 'page' : undefined}
+            >{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <button type="button" data-theme-toggle class="grid size-10 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-label="Switch to dark theme">
+        <Icon name="material-symbols:dark-mode-outline" class="size-5 dark:hidden" aria-hidden="true" />
+        <Icon name="material-symbols:light-mode-outline" class="hidden size-5 dark:block" aria-hidden="true" />
+      </button>
+      <a href="/contact/" class="btn btn-primary btn-sm hidden sm:inline-flex">
+        Let's talk
+        <Icon name="material-symbols:arrow-forward" class="size-4" aria-hidden="true" />
+      </a>
+      <button type="button" data-menu-toggle class="grid size-10 place-items-center rounded-lg text-fg hover:bg-surface-2 md:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <Icon name="material-symbols:menu" class="size-6" aria-hidden="true" />
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="hidden border-t border-line bg-surface md:hidden" data-menu>
+    <nav aria-label="Mobile" class="container-site py-4">
+      <ul class="flex flex-col font-display text-base font-semibold">
+        {SITE.nav.map((item) => (
+          <li><a href={item.href} class="block py-3 text-fg">{item.label}</a></li>
+        ))}
+        <li class="pt-3"><a href="/contact/" class="btn btn-primary w-full justify-center">Let's talk</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>

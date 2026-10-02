@@ -1,0 +1,51 @@
+---
+import { Icon } from 'astro-icon/components';
+import SectionHeading from './SectionHeading.astro';
+import { safeIcon } from '../lib/icons';
+import type { SpectrumArea } from '../lib/types';
+
+interface Props { areas: SpectrumArea[] }
+const { areas } = Astro.props;
+---
+<section class="border-y border-line bg-surface py-20 lg:py-24" aria-labelledby="spectrum-title">
+  <div class="container-site">
+    <SectionHeading
+      id="spectrum-title"
+      icon="material-symbols:linear-scale"
+      kicker="Where I can help"
+      title="From the business problem to the database"
+      intro="Most problems don't respect org charts. I work across the whole range, so the requirement, the process and the system end up describing the same thing."
+    />
+
+    <div class="relative mt-14">
+      <!-- The rail: business on the left, technology on the right -->
+      <div class="mb-6 hidden items-center justify-between font-display text-sm font-semibold lg:flex" aria-hidden="true">
+        <span class="text-brand">Business</span>
+        <span class="text-accent">Technology</span>
+      </div>
+      <div class="relative">
+      <div class="absolute inset-x-[10%] top-0 hidden h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-trust via-teal to-teal dark:from-brand dark:via-accent dark:to-accent lg:block" aria-hidden="true"></div>
+
+      <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {areas.map((area, i) => (
+          <li class="spectrum-card card card-interactive relative flex flex-col p-6 lg:pt-12">
+            <span class="spectrum-index spectrum-stop absolute left-6 top-6 grid size-7 place-items-center rounded-full border-2 border-surface bg-brand font-mono text-xs font-semibold text-surface lg:left-1/2 lg:-top-[0.9rem] lg:-translate-x-1/2 dark:bg-accent dark:text-bg">
+              {i + 1}
+            </span>
+            <div class="ml-10 mb-4 grid size-10 place-items-center rounded-lg bg-accent-tint text-accent lg:ml-0">
+              <Icon name={safeIcon(area.icon, 'material-symbols:hub-outline')} class="size-5" aria-hidden="true" />
+            </div>
+            <h3 class="text-h3 font-semibold">{area.title}</h3>
+            <p class="mt-2 flex-1 text-[0.9375rem] leading-6 text-muted">{area.summary}</p>
+            {area.tags.length > 0 && (
+              <ul class="mt-5 flex flex-wrap gap-1.5" aria-label="Tools">
+                {area.tags.map((t) => <li class="chip">{t}</li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ol>
+      </div>
+    </div>
+  </div>
+</section>

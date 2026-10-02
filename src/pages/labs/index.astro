@@ -1,0 +1,98 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import LabCard from '../../components/LabCard.astro';
+import ContactBand from '../../components/ContactBand.astro';
+import { getHomelab, getLabs, getProfile } from '../../lib/content';
+import { safeIcon } from '../../lib/icons';
+
+const [profile, labs, homelab] = await Promise.all([getProfile(), getLabs(), getHomelab()]);
+const categories = [...new Set(labs.map((l) => l.category))].sort();
+const counts = {
+  live: labs.filter((l) => l.status === 'live').length,
+  testing: labs.filter((l) => l.status === 'testing').length,
+};
+---
+<BaseLayout
+  title="Labs"
+  description="Things Carlos is building, testing and breaking in his homelab: self-hosted tools, ERP evaluations, workflow engines and AI experiments."
+  activeNav="Labs"
+>
+  <section class="container-site pb-10 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:science-outline"
+      kicker="Labs"
+      title="Things I'm building, testing and breaking"
+      intro="Where ideas meet real hardware before they meet a client. If something is live, you can open it and try it."
+    />
+
+    <dl class="card mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 px-6 py-4 text-sm">
+      <div class="flex items-center gap-2"><dt class="sr-only">Live</dt><span class="size-2 rounded-full bg-accent" aria-hidden="true"></span><dd><strong class="font-display text-fg">{counts.live}</strong> live</dd></div>
+      <div class="flex items-center gap-2"><dt class="sr-only">Testing</dt><span class="size-2 rounded-full bg-cta" aria-hidden="true"></span><dd><strong class="font-display text-fg">{counts.testing}</strong> in testing</dd></div>
+      <div class="flex items-center gap-2"><dt class="sr-only">Total</dt><Icon name="material-symbols:dns-outline" class="size-4 text-muted" aria-hidden="true" /><dd><strong class="font-display text-fg">{labs.length}</strong> experiments in total</dd></div>
+    </dl>
+  </section>
+
+  <section class="container-site pb-20" aria-label="Experiments">
+    <form class="flex flex-col gap-4" role="search" data-lab-filters>
+      <label class="relative block">
+        <span class="sr-only">Search experiments</span>
+        <Icon name="material-symbols:search" class="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-subtle" aria-hidden="true" />
+        <input type="search" class="field pl-12" placeholder="Search by name, tool or stack (e.g. Proxmox, BPMN, PostgreSQL)" data-lab-search autocomplete="off" />
+      </label>
+      <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by category">
+        <button type="button" class="pill border border-line bg-surface text-muted aria-pressed:border-fg aria-pressed:bg-fg aria-pressed:text-bg" data-lab-category="" aria-pressed="true">All</button>
+        {categories.map((c) => (
+          <button type="button" class="pill border border-line bg-surface text-muted aria-pressed:border-fg aria-pressed:bg-fg aria-pressed:text-bg" data-lab-category={c} aria-pressed="false">{c}</button>
+        ))}
+        <span class="mx-2 hidden h-5 w-px bg-line sm:inline-block" aria-hidden="true"></span>
+        <label class="flex items-center gap-2 text-sm text-muted">
+          Status
+          <select class="field w-auto py-1.5 text-sm" data-lab-status>
+            <option value="">All</option>
+            <option value="live">Live</option>
+            <option value="testing">Testing</option>
+            <option value="archived">Archived</option>
+          </select>
+        </label>
+      </div>
+    </form>
+
+    <p class="mt-6 text-sm text-muted" aria-live="polite" data-lab-count>Showing {labs.length} experiments</p>
+    <ul class="mt-4 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {labs.map((lab) => <li data-lab-item><LabCard lab={lab} headingLevel="h2" /></li>)}
+    </ul>
+    <p class="card mt-4 hidden p-8 text-center text-muted" data-lab-empty>
+      No experiment matches those filters. <button type="button" class="font-semibold text-brand underline dark:text-accent" data-lab-reset>Clear filters</button>
+    </p>
+  </section>
+
+  {homelab.length > 0 && (
+    <section class="container-site pb-20" aria-labelledby="homelab-title">
+      <div class="card p-6 md:p-8">
+        <p class="kicker mb-2"><Icon name="material-symbols:memory-outline" class="size-[18px]" aria-hidden="true" />Under the hood</p>
+        <h2 id="homelab-title" class="text-h3 font-bold md:text-[1.5rem]">The homelab these experiments run on</h2>
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {homelab.map((item) => (
+            <li class="rounded-xl border border-line bg-surface-2/60 p-4">
+              <p class="flex items-center gap-2 font-display font-semibold text-fg">
+                <Icon name={safeIcon(item.icon, 'material-symbols:dns-outline')} class="size-5 text-accent" aria-hidden="true" />{item.title}
+              </p>
+              <ul class="mt-2 space-y-1 font-mono text-xs leading-5 text-muted">
+                {item.lines.map((line) => <li>{line}</li>)}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <ContactBand profile={profile} />
+</BaseLayout>
+
+<script>
+  import '../../scripts/labs-filter';
+</script>

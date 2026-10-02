@@ -1,0 +1,70 @@
+---
+import { Icon } from 'astro-icon/components';
+import { safeIcon } from '../lib/icons';
+import { monthYear } from '../lib/format';
+import type { Lab } from '../lib/types';
+
+interface Props { lab: Lab; showLearned?: boolean; headingLevel?: 'h2' | 'h3' }
+const { lab, showLearned = true, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+const status = {
+  live: { label: 'Live', cls: 'bg-accent-tint text-accent', dot: 'bg-accent' },
+  testing: { label: 'Testing', cls: 'bg-cta/15 text-[#92400e] dark:text-cta', dot: 'bg-cta' },
+  archived: { label: 'Archived', cls: 'bg-surface-2 text-subtle', dot: 'bg-subtle' },
+}[lab.status];
+const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, ''); } catch { return lab.url; } })();
+---
+<article
+  class="card card-interactive flex h-full flex-col p-6"
+  data-lab
+  data-category={lab.category}
+  data-status={lab.status}
+  data-search={[lab.name, lab.summary, lab.category, ...lab.tags].join(' ').toLowerCase()}
+>
+  <header class="flex items-start justify-between gap-3">
+    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-tint text-accent">
+      <Icon name={safeIcon(lab.icon)} class="size-6" aria-hidden="true" />
+    </span>
+    <div class="flex flex-col items-end gap-1">
+      <span class:list={['pill', status.cls]}><span class:list={['size-1.5 rounded-full', status.dot]} aria-hidden="true"></span>{status.label}</span>
+      <span class="text-xs text-subtle">{lab.category}{lab.started_on && ` · since ${monthYear(lab.started_on)}`}</span>
+    </div>
+  </header>
+
+  <H class="mt-5 text-h3 font-bold">{lab.name}</H>
+  {lab.summary && <p class="mt-2 text-[0.9375rem] leading-6 text-muted">{lab.summary}</p>}
+
+  {showLearned && lab.learned && (
+    <div class="mt-4 rounded-xl border border-accent/20 bg-accent-tint p-4 text-sm">
+      <p class="mb-1 flex items-center gap-1.5 font-display font-semibold text-accent">
+        <Icon name="material-symbols:lightbulb-outline" class="size-4" aria-hidden="true" />What I learned
+      </p>
+      <p class="text-fg">{lab.learned}</p>
+    </div>
+  )}
+
+  <div class="mt-auto pt-5">
+    {lab.tags.length > 0 && (
+      <ul class="mb-5 flex flex-wrap gap-1.5" aria-label="Stack">
+        {lab.tags.map((t) => <li class="chip">{t}</li>)}
+      </ul>
+    )}
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4 font-display text-sm font-semibold">
+      <a href={lab.url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-brand hover:underline dark:text-accent">
+        Open {host}
+        <Icon name="material-symbols:open-in-new" class="size-4" aria-hidden="true" />
+        <span class="sr-only">(opens in a new tab)</span>
+      </a>
+      {lab.notes_post_slug && (
+        <a href={`/posts/${lab.notes_post_slug}/`} class="inline-flex items-center gap-1.5 text-muted hover:text-fg">
+          <Icon name="material-symbols:notes" class="size-4" aria-hidden="true" />Read notes
+        </a>
+      )}
+      {lab.repo_url && (
+        <a href={lab.repo_url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-muted hover:text-fg">
+          <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code
+        </a>
+      )}
+    </div>
+  </div>
+</article>

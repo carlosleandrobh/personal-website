@@ -1,0 +1,29 @@
+---
+import type { Profile } from '../lib/types';
+interface Props { profile: Profile }
+const { profile } = Astro.props;
+const year = new Date().getFullYear();
+const links = [
+  profile.linkedin_url && { href: profile.linkedin_url, label: 'LinkedIn', external: true },
+  profile.github_username && { href: `https://github.com/${profile.github_username}`, label: 'GitHub', external: true },
+  { href: '/rss.xml', label: 'RSS', external: false },
+  { href: '/privacy/', label: 'Privacy', external: false },
+].filter(Boolean) as { href: string; label: string; external: boolean }[];
+---
+<footer class="border-t border-line">
+  <div class="container-site flex flex-col gap-4 py-10 text-sm text-muted md:flex-row md:items-center md:justify-between">
+    <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <a href="/" class="font-display text-base font-bold text-fg">carlos.nz</a>
+      <span>© {year} {profile.display_name}. Made in Auckland, Aotearoa New Zealand.</span>
+    </p>
+    <nav aria-label="Footer">
+      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+        {links.map((l) => (
+          <li>
+            <a class="link-quiet" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer me' } : {})}>{l.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</footer>

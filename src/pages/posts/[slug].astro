@@ -1,0 +1,137 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { Image } from 'astro:assets';
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Portrait from '../../components/Portrait.astro';
+import { getPosts, getProfile } from '../../lib/content';
+import { renderMarkdown } from '../../lib/markdown';
+import { absolute, fullDate, postUrl } from '../../lib/format';
+import type { Post } from '../../lib/types';
+
+export const getStaticPaths = (async () => {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}) satisfies GetStaticPaths;
+
+interface Props { post: Post }
+const { post } = Astro.props;
+const [profile, posts] = await Promise.all([getProfile(), getPosts()]);
+const { html, headings, readingMinutes } = await renderMarkdown(post.body_md);
+const url = absolute(postUrl(post.slug));
+const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+const related = [
+  ...posts.filter((p) => p.slug !== post.slug && p.category === post.category),
+  ...posts.filter((p) => p.slug !== post.slug && p.category !== post.category),
+].slice(0, 3);
+const articleLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.seo_description ?? post.excerpt,
+  datePublished: post.published_at,
+  dateModified: post.updated_at ?? post.published_at,
+  url,
+  image: absolute(`/og/${post.slug}.png`),
+  author: { '@type': 'Person', name: profile.display_name, url: 'https://carlos.nz' },
+};
+---
+<BaseLayout
+  title={post.title}
+  description={post.seo_description ?? post.excerpt}
+  ogImage={`/og/${post.slug}.png`}
+  type="article"
+  publishedTime={post.published_at}
+  noindex={post.status !== 'published'}
+  activeNav="Posts"
+>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleLd)} />
+
+  <article class="container-site pb-16 pt-10 md:pt-14">
+    <a href="/posts/" class="inline-flex items-center gap-1.5 font-display text-sm font-semibold text-muted hover:text-fg">
+      <Icon name="material-symbols:arrow-back" class="size-4" aria-hidden="true" />All posts
+    </a>
+
+    <header class="mt-8 max-w-3xl">
+      <p class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted">
+        <span class="pill bg-accent-tint text-accent">{post.category}</span>
+        {post.status === 'draft' && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Draft preview — not public</span>}
+        <time datetime={post.published_at ?? undefined}>{fullDate(post.published_at)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingMinutes} min read</span>
+      </p>
+      <h1 class="mt-5 text-display-m font-extrabold sm:text-[2.75rem] sm:leading-[1.15]">{post.title}</h1>
+      <p class="mt-5 text-lg leading-8 text-muted">{post.excerpt}</p>
+    </header>
+
+    {post.cover_image_url && (
+      <figure class="mt-10 overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+        {post.cover_image_url.startsWith('/media/')
+          ? <img src={post.cover_image_url} alt={post.cover_alt ?? ''} class="w-full" decoding="async" />
+          : <Image src={post.cover_image_url} alt={post.cover_alt ?? ''} inferSize widths={[640, 960, 1280]} sizes="(min-width: 1200px) 1104px, 100vw" class="w-full" />}
+      </figure>
+    )}
+
+    <div class="mt-12 grid gap-12 lg:grid-cols-[15rem_1fr] lg:gap-16">
+      <aside class="order-2 lg:order-1">
+        <div class="space-y-6 lg:sticky lg:top-28">
+          <div class="card p-5">
+            <p class="mb-3 font-display text-sm font-semibold text-fg">Share this post</p>
+            <a href={shareUrl} target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm w-full justify-center">
+              <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />Share on LinkedIn
+            </a>
+            <button type="button" class="btn btn-secondary btn-sm mt-2 w-full justify-center" data-copy={url}>
+              <Icon name="material-symbols:content-copy" class="size-4" aria-hidden="true" /><span data-copy-label>Copy link</span>
+            </button>
+          </div>
+          {headings.length > 1 && (
+            <nav class="card p-5" aria-labelledby="toc-title">
+              <p id="toc-title" class="mb-3 flex items-center gap-2 font-display text-sm font-semibold text-fg">
+                <Icon name="material-symbols:format-list-bulleted" class="size-4 text-accent" aria-hidden="true" />In this post
+              </p>
+              <ol class="space-y-2 text-sm">
+                {headings.map((h) => (
+                  <li class:list={[h.depth === 3 && 'pl-3']}><a href={`#${h.id}`} class="link-quiet">{h.text}</a></li>
+                ))}
+              </ol>
+            </nav>
+          )}
+        </div>
+      </aside>
+
+      <div class="order-1 lg:order-2">
+        <div class="prose-post" set:html={html} />
+
+        {post.tags.length > 0 && (
+          <ul class="mt-10 flex flex-wrap gap-1.5" aria-label="Tags">
+            {post.tags.map((t) => <li class="chip">{t}</li>)}
+          </ul>
+        )}
+
+        <aside class="card mt-12 flex flex-col gap-5 p-6 sm:flex-row sm:items-center" aria-label="About the author">
+          <div class="size-20 shrink-0 overflow-hidden rounded-full border border-line">
+            <Portrait alt={profile.portrait_alt} widths={[160, 240]} sizes="80px" loading="lazy" class="rounded-full" />
+          </div>
+          <div class="flex-1">
+            <p class="font-display text-lg font-bold text-brand">{profile.display_name}</p>
+            <p class="text-sm text-muted">{profile.role_line} · {profile.location}</p>
+            <p class="mt-2 text-[0.9375rem] text-muted">{profile.subheadline}</p>
+          </div>
+          <a href="/contact/" class="btn btn-primary btn-sm shrink-0">Let's talk</a>
+        </aside>
+      </div>
+    </div>
+  </article>
+
+  {related.length > 0 && (
+    <section class="border-t border-line bg-surface py-16" aria-labelledby="related-title">
+      <div class="container-site">
+        <h2 id="related-title" class="text-h2-m font-bold">Keep reading</h2>
+        <ul class="mt-8 grid gap-5 md:grid-cols-3">
+          {related.map((p) => <li><PostCard post={p} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+</BaseLayout>

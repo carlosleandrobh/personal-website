@@ -1,0 +1,95 @@
+---
+import { Icon } from 'astro-icon/components';
+import SectionHeading from './SectionHeading.astro';
+import { dateRange, duration, monthYear } from '../lib/format';
+import type { Education, Experience } from '../lib/types';
+
+interface Props { experiences: Experience[]; education: Education[] }
+const { experiences, education } = Astro.props;
+const earliest = experiences.reduce((min, e) => (e.start_date < min ? e.start_date : min), new Date().toISOString());
+const years = new Date().getFullYear() - new Date(earliest).getFullYear();
+---
+<section id="experience" class="container-site py-20 lg:py-24" aria-labelledby="experience-title">
+  <SectionHeading
+    id="experience-title"
+    icon="material-symbols:history-edu-outline"
+    kicker="Experience"
+    title={`${years} years of making systems fit the business`}
+    intro="Retail at scale, my own consultancy, and now New Zealand. The thread is the same: understand the work, then make the technology serve it."
+  >
+    <a href="/contact/?topic=cv" class="btn btn-secondary btn-sm shrink-0">
+      <Icon name="material-symbols:mail-outline" class="size-4" aria-hidden="true" />
+      Request my full CV
+    </a>
+  </SectionHeading>
+
+  <ol class="relative mt-14 space-y-6 border-l-2 border-accent/25 pl-8 md:pl-10">
+    {experiences.map((job) => {
+      const current = job.end_date === null;
+      return (
+        <li class="relative">
+          <span
+            class:list={[
+              'absolute -left-[2.7rem] top-7 grid size-5 place-items-center rounded-full border-4 border-bg md:-left-[3.2rem]',
+              current ? 'bg-cta' : 'bg-accent',
+            ]}
+            aria-hidden="true"
+          ></span>
+          <article class="card card-interactive p-6 md:p-8">
+            <header class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <h3 class="text-h3 font-bold md:text-[1.375rem]">{job.role}</h3>
+                <p class="mt-1 font-display text-[0.9375rem] font-semibold text-accent">
+                  {job.company}{job.context && <span class="font-normal text-muted"> — {job.context}</span>}
+                </p>
+              </div>
+              <p class="flex shrink-0 flex-col items-start gap-1 md:items-end">
+                <span class:list={['pill font-mono font-medium', current ? 'bg-cta/15 text-[#92400e] dark:text-cta' : 'bg-surface-2 text-muted']}>
+                  {dateRange(job.start_date, job.end_date)}
+                </span>
+                <span class="text-xs text-subtle">{duration(job.start_date, job.end_date)}{job.location && ` · ${job.location}`}</span>
+              </p>
+            </header>
+            <p class="mt-4 text-muted">{job.summary}</p>
+            {job.highlights.length > 0 && (
+              <ul class="mt-4 space-y-2">
+                {job.highlights.map((h) => (
+                  <li class="flex gap-3 text-[0.9375rem] leading-6">
+                    <Icon name="material-symbols:check-circle-outline" class="mt-0.5 size-[18px] shrink-0 text-accent" aria-hidden="true" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {job.tags.length > 0 && (
+              <ul class="mt-5 flex flex-wrap gap-1.5" aria-label="Tools and domains">
+                {job.tags.map((t) => <li class="chip">{t}</li>)}
+              </ul>
+            )}
+          </article>
+        </li>
+      );
+    })}
+
+    {education.length > 0 && (
+      <li class="relative">
+        <span class="absolute -left-[2.7rem] top-7 grid size-5 place-items-center rounded-full border-4 border-bg bg-brand md:-left-[3.2rem]" aria-hidden="true"></span>
+        <article class="rounded-[var(--radius-card)] border border-dashed border-line-strong p-6 md:p-8">
+          <h3 class="flex items-center gap-2 text-h3 font-semibold">
+            <Icon name="material-symbols:school-outline" class="size-5 text-accent" aria-hidden="true" />
+            Education
+          </h3>
+          <ul class="mt-5 grid gap-6 md:grid-cols-2">
+            {education.map((e) => (
+              <li>
+                <p class="font-display font-semibold text-fg">{e.degree}{e.in_progress && <span class="pill ml-2 bg-cta/15 align-middle text-[#92400e] dark:text-cta">In progress</span>}</p>
+                <p class="text-sm text-muted">{e.institution}{e.location && ` · ${e.location}`}</p>
+                <p class="mt-1 font-mono text-xs text-subtle">{monthYear(e.start_date)} – {e.in_progress ? 'Present' : monthYear(e.end_date)}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+      </li>
+    )}
+  </ol>
+</section>

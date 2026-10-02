@@ -1,0 +1,59 @@
+---
+/**
+ * "About" — Carlos's own words (profile.about_md, edited with `uv run cms content pull/push`)
+ * plus quick facts built only from data that already exists (profile, current role, current study).
+ */
+import { Icon } from 'astro-icon/components';
+import { renderMarkdown } from '../lib/markdown';
+import type { Education, Experience, Profile } from '../lib/types';
+
+interface Props { profile: Profile; experiences: Experience[]; education: Education[] }
+const { profile, experiences, education } = Astro.props;
+
+const about = profile.about_md?.trim() ? await renderMarkdown(profile.about_md) : null;
+const current = experiences.find((e) => e.end_date === null);
+const studying = education.find((e) => e.in_progress);
+const facts = [
+  { icon: 'material-symbols:location-on-outline', label: 'Based in', value: profile.location },
+  current && { icon: 'material-symbols:work-outline', label: 'Currently', value: `${current.role} · ${current.company}` },
+  studying && { icon: 'material-symbols:school-outline', label: 'Studying', value: `${studying.degree} · ${studying.institution}` },
+  { icon: 'material-symbols:hub-outline', label: 'Experience', value: `${profile.years_experience}+ years across business and technology` },
+].filter(Boolean) as { icon: string; label: string; value: string }[];
+---
+{about && (
+  <section id="about" class="container-site pb-20 lg:pb-24" aria-labelledby="about-title">
+    <div class="grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+      <div>
+        <p class="kicker mb-3"><Icon name="material-symbols:person-outline" class="size-[18px]" aria-hidden="true" />About</p>
+        <h2 id="about-title" class="text-h2-m font-bold md:text-h2">A bit about me</h2>
+        <div class="prose-about mt-6 max-w-[62ch] text-lg leading-8 text-muted" set:html={about.html} />
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a href="/contact/?topic=cv" class="btn btn-secondary btn-sm">
+            <Icon name="material-symbols:description-outline" class="size-4" aria-hidden="true" />Request my full CV
+          </a>
+          {profile.linkedin_url && (
+            <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me" class="inline-flex items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
+              <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />See my LinkedIn profile
+            </a>
+          )}
+        </div>
+      </div>
+
+      <aside class="card p-6 md:p-8" aria-label="Quick facts">
+        <ul class="space-y-6">
+          {facts.map((fact) => (
+            <li class="flex gap-4">
+              <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-tint text-accent">
+                <Icon name={fact.icon} class="size-5" aria-hidden="true" />
+              </span>
+              <span>
+                <span class="block text-sm text-subtle">{fact.label}</span>
+                <span class="block font-display font-semibold leading-snug text-fg">{fact.value}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  </section>
+)}

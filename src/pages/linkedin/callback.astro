@@ -1,0 +1,67 @@
+---
+/**
+ * LinkedIn OAuth redirect target. Static: it only shows the one-time code so
+ * Carlos can paste it into `uv run cms linkedin connect` on his computer.
+ * The code is useless without the client secret, which never leaves that computer.
+ */
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Connect LinkedIn" description="One-time step to connect LinkedIn sharing for carlos.nz." noindex>
+  <section class="container-site flex min-h-[60vh] flex-col justify-center py-16">
+    <div class="card mx-auto w-full max-w-xl p-6 md:p-8">
+      <p class="kicker mb-3"><Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />LinkedIn</p>
+      <h1 class="text-h2-m font-bold">Connection code</h1>
+
+      <div data-callback-ok class="hidden">
+        <p class="mt-3 text-muted">Copy this code and paste it into the terminal where <code class="font-mono text-sm">cms linkedin connect</code> is waiting. It works once and expires in a few minutes.</p>
+        <label class="mt-6 block">
+          <span class="sr-only">Connection code</span>
+          <input class="field font-mono text-sm" readonly data-callback-code />
+        </label>
+        <button type="button" class="btn btn-primary mt-4" data-callback-copy>
+          <Icon name="material-symbols:content-copy" class="size-5" aria-hidden="true" /><span data-callback-copy-label>Copy code</span>
+        </button>
+        <p class="mt-6 text-sm text-subtle">You can close this tab afterwards. The code has already been removed from the address bar.</p>
+      </div>
+
+      <p data-callback-error class="mt-4 hidden rounded-lg border border-red-700/30 bg-red-700/10 p-4 text-sm text-fg" role="alert"></p>
+      <p data-callback-empty class="mt-3 text-muted">This page is only used while connecting LinkedIn sharing for carlos.nz. There's nothing to see here otherwise.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const code = params.get('code');
+  const state = params.get('state');
+  const error = params.get('error');
+
+  // Remove the code from the address bar and from this history entry straight away.
+  if (location.search) history.replaceState(null, '', location.pathname);
+
+  const show = (selector: string) => document.querySelector(selector)?.classList.remove('hidden');
+  const hide = (selector: string) => document.querySelector(selector)?.classList.add('hidden');
+
+  if (error) {
+    hide('[data-callback-empty]');
+    const box = document.querySelector<HTMLElement>('[data-callback-error]');
+    if (box) box.textContent = `LinkedIn didn't grant access (${error}). Run the connect command again.`;
+    show('[data-callback-error]');
+  } else if (code && state && /^[\w-]{1,128}$/.test(state) && code.length < 2048) {
+    hide('[data-callback-empty]');
+    const input = document.querySelector<HTMLInputElement>('[data-callback-code]');
+    if (input) input.value = `${state}:${code}`;
+    show('[data-callback-ok]');
+    document.querySelector('[data-callback-copy]')?.addEventListener('click', async () => {
+      const label = document.querySelector('[data-callback-copy-label]');
+      try {
+        await navigator.clipboard.writeText(input?.value ?? '');
+        if (label) label.textContent = 'Copied';
+      } catch {
+        input?.select();
+        if (label) label.textContent = 'Press Ctrl+C / ⌘C';
+      }
+    });
+  }
+</script>

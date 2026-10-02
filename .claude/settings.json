@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run check)",
+      "Bash(uv run ruff check carlos_cms tests)",
+      "Bash(uv run ruff format --check carlos_cms tests)"
+    ]
+  }
+}

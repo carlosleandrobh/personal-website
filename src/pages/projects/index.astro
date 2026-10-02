@@ -1,0 +1,41 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import RepoCard from '../../components/RepoCard.astro';
+import ContactBand from '../../components/ContactBand.astro';
+import { getProfile, getRepos } from '../../lib/content';
+
+const [profile, repos] = await Promise.all([getProfile(), getRepos()]);
+const githubUrl = profile.github_username ? `https://github.com/${profile.github_username}` : null;
+---
+<BaseLayout title="Projects" description="Carlos's public repositories on GitHub, synced daily." activeNav="Projects">
+  <section class="container-site pb-20 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:folder-code-outline"
+      kicker="Projects"
+      title="Code I've made public"
+      intro="A read-only showcase, synced from GitHub every day. Every card opens the repository on GitHub."
+    >
+      {githubUrl && (
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer me" class="btn btn-secondary btn-sm shrink-0">
+          <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />Profile on GitHub
+        </a>
+      )}
+    </SectionHeading>
+
+    {repos.length > 0 ? (
+      <ul class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {repos.map((repo) => <li><RepoCard repo={repo} /></li>)}
+      </ul>
+    ) : (
+      <div class="card mt-12 flex flex-col items-start gap-3 p-8">
+        <Icon name="simple-icons:github" class="size-8 text-fg" aria-hidden="true" />
+        <p class="font-display text-lg font-semibold text-fg">Repositories appear here after the first GitHub sync.</p>
+        <p class="text-muted">The sync runs with every deploy and once a day.</p>
+      </div>
+    )}
+  </section>
+  <ContactBand profile={profile} />
+</BaseLayout>

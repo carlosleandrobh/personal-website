@@ -1,0 +1,35 @@
+---
+import { Icon } from 'astro-icon/components';
+import { monthYear } from '../lib/format';
+import type { GithubRepo } from '../lib/types';
+
+interface Props { repo: GithubRepo }
+const { repo } = Astro.props;
+---
+<article class="card card-interactive group relative flex h-full flex-col p-6">
+  <header class="flex items-center justify-between gap-3">
+    <span class="inline-flex items-center gap-2 font-mono text-xs text-subtle">
+      <Icon name="simple-icons:github" class="size-4 text-fg" aria-hidden="true" />{repo.full_name.split('/')[0]}
+    </span>
+    {repo.featured && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Featured</span>}
+  </header>
+  <h3 class="mt-4 font-display text-lg font-bold">
+    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="after:absolute after:inset-0 after:rounded-[var(--radius-card)] focus-visible:outline-none">
+      {repo.name}<span class="sr-only"> on GitHub (opens in a new tab)</span>
+    </a>
+  </h3>
+  <p class="mt-2 line-clamp-3 flex-1 text-[0.9375rem] leading-6 text-muted">{repo.description ?? 'No description yet.'}</p>
+  {repo.topics.length > 0 && (
+    <ul class="mt-4 flex flex-wrap gap-1.5" aria-label="Topics">
+      {repo.topics.slice(0, 4).map((t) => <li class="chip">{t}</li>)}
+    </ul>
+  )}
+  <p class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-subtle">
+    {repo.language && <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>{repo.language}</span>}
+    <span class="inline-flex items-center gap-1"><Icon name="material-symbols:star-outline" class="size-4" aria-hidden="true" />{repo.stargazers_count}<span class="sr-only"> stars</span></span>
+    {repo.pushed_at && <span>Updated {monthYear(repo.pushed_at)}</span>}
+    <span class="ml-auto inline-flex items-center gap-1 font-display text-sm font-semibold text-brand group-hover:underline dark:text-accent">
+      View on GitHub <Icon name="material-symbols:open-in-new" class="size-4" aria-hidden="true" />
+    </span>
+  </p>
+</article>

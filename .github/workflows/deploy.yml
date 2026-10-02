@@ -1,0 +1,130 @@
+# Build the static site, deploy to GitHub Pages, then share new posts on LinkedIn.
+# Stage 1 (no Supabase secrets yet): builds from supabase/seed/content.json and skips the Python steps.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  repository_dispatch:
+    types: [content-updated]        # sent by the database when content changes
+  schedule:
+    - cron: '0 17 * * *'            # daily ~05:00–06:00 NZ: GitHub repo sync + scheduled posts go live
+  workflow_dispatch:
+
+permissions: {}                     # every job declares the minimum it needs
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    environment: production         # secrets live in this environment, restricted to the main branch
+    concurrency:                    # a newer content change supersedes an in-flight build
+      group: build-${{ github.ref }}
+      cancel-in-progress: true
+    env:
+      CONTENT_SOURCE: auto          # Supabase when its secrets exist, otherwise the seed file
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      PUBLIC_CONTACT_ENDPOINT: ${{ vars.PUBLIC_CONTACT_ENDPOINT }}
+      PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.PUBLIC_TURNSTILE_SITE_KEY }}
+      ASTRO_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Report content source
+        run: |
+          if [ -n "$SUPABASE_SECRET_KEY" ]; then echo "::notice::Building from Supabase."
+          else echo "::warning::Supabase secrets not set — building from supabase/seed/content.json (stage 1)."; fi
+
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        if: env.SUPABASE_SECRET_KEY != ''
+      - name: Sync GitHub repositories (Python)
+        if: env.SUPABASE_SECRET_KEY != ''
+        run: |
+          uv sync --locked --no-dev
+          uv run cms github sync
+        env:
+          GITHUB_USERNAME: ${{ vars.GH_USERNAME }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install (no install scripts)
+        run: npm ci --ignore-scripts
+      - name: Build
+        run: npm run build
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+          include-hidden-files: true  # keep /.well-known/security.txt and tdmrep.json
+      - name: Keep share images for the LinkedIn job
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: og-images
+          path: dist/og
+          retention-days: 1
+          if-no-files-found: ignore
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false     # never interrupt a deployment half-way
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  linkedin:
+    # Runs only after the new version is live, so the shared link works immediately.
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    environment: production
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      LINKEDIN_TOKEN_KEY: ${{ secrets.LINKEDIN_TOKEN_KEY }}
+      LINKEDIN_API_VERSION: ${{ vars.LINKEDIN_API_VERSION }}
+    steps:
+      - name: Skip until LinkedIn is configured
+        if: env.LINKEDIN_TOKEN_KEY == '' || env.SUPABASE_SECRET_KEY == ''
+        run: echo "::notice::LinkedIn sharing not configured yet (stage 2) — skipping."
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            carlos_cms
+            pyproject.toml
+            uv.lock
+            .python-version
+            README.md
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
+        continue-on-error: true
+        with:
+          name: og-images
+          path: dist/og
+      - name: Share newly published posts (Python)
+        if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
+        run: |
+          uv sync --locked --no-dev
+          uv run cms linkedin share --og-dir dist/og

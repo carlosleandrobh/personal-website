@@ -1,0 +1,81 @@
+# Checks for every pull request and branch push (no secrets needed: builds from fixtures).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CONTENT_SOURCE: fixtures
+      ASTRO_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Dependency audit (fails on high/critical)
+        run: npm audit --audit-level=high
+      - name: Type check
+        run: npm run check
+      - name: Build
+        run: npm run build
+      - name: No secrets or personal data in the output
+        env:
+          # Regex of private data that must never be published (phone, personal email, suburb…).
+          # Stored as a repository secret so the patterns themselves stay out of this public repo.
+          PRIVATE_DATA_PATTERNS: ${{ secrets.PRIVATE_DATA_PATTERNS }}
+        run: |
+          ! grep -rIlE "sb_secret_|service_role|SUPABASE_SECRET_KEY|eyJhbGciOi" dist/ || (echo "::error::Secret-like string found in dist/"; exit 1)
+          if [ -n "$PRIVATE_DATA_PATTERNS" ]; then
+            ! grep -rIlE "$PRIVATE_DATA_PATTERNS" dist/ || (echo "::error::Private data found in dist/"; exit 1)
+          else
+            echo "::notice::PRIVATE_DATA_PATTERNS secret not set; personal-data check skipped."
+          fi
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      - run: uv sync --locked
+      - name: Lint and format
+        run: |
+          uv run ruff check carlos_cms tests
+          uv run ruff format --check carlos_cms tests
+      - name: Tests
+        run: uv run pytest -q
+
+  edge-function:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        with:
+          deno-version: v2.x
+      - working-directory: supabase/functions
+        run: |
+          deno fmt --check
+          deno lint
+          deno check contact/index.ts

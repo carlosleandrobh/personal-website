@@ -1,0 +1,117 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { getProfile } from '../lib/content';
+import { SITE } from '../lib/site';
+import { PUBLIC_CONTACT_ENDPOINT, PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+
+const profile = await getProfile();
+const configured = Boolean(PUBLIC_CONTACT_ENDPOINT && PUBLIC_TURNSTILE_SITE_KEY);
+const topics = [
+  { value: 'project', label: 'A project or consulting work' },
+  { value: 'job', label: 'A job opportunity' },
+  { value: 'cv', label: 'Request my full CV' },
+  { value: 'collaboration', label: 'Collaboration, talk or study group' },
+  { value: 'privacy', label: 'A privacy request about my data' },
+  { value: 'other', label: 'Something else' },
+];
+---
+<BaseLayout title="Contact" description="Get in touch with Carlos about a project, a role or a problem worth solving." activeNav="Contact">
+  <section class="container-site grid gap-12 pb-24 pt-12 md:pt-16 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+    <div>
+      <SectionHeading
+        level="h1"
+        icon="material-symbols:mail-outline"
+        kicker="Contact"
+        title="Tell me about the problem"
+        intro="Projects, roles, collaborations or just a question about something I wrote — I read every message and reply personally."
+      />
+      <ul class="mt-10 space-y-5 text-[0.9375rem]">
+        <li class="flex gap-3">
+          <Icon name="material-symbols:schedule-outline" class="mt-0.5 size-5 shrink-0 text-accent" aria-hidden="true" />
+          <span><strong class="font-display text-fg">Replies within a few working days</strong><br /><span class="text-muted">I'm in Auckland (NZ time).</span></span>
+        </li>
+        <li class="flex gap-3">
+          <Icon name="material-symbols:lock-outline" class="mt-0.5 size-5 shrink-0 text-accent" aria-hidden="true" />
+          <span><strong class="font-display text-fg">Your details stay private</strong><br /><span class="text-muted">Used only to reply to you, never shared or added to a mailing list, and deleted after 12 months. <a class="underline underline-offset-4 hover:text-fg" href="/privacy/">Privacy notice</a>.</span></span>
+        </li>
+        {profile.linkedin_url && (
+          <li class="flex gap-3">
+            <Icon name="simple-icons:linkedin" class="mt-0.5 size-5 shrink-0 text-accent" aria-hidden="true" />
+            <span><strong class="font-display text-fg">Prefer LinkedIn?</strong><br /><a class="text-muted underline underline-offset-4 hover:text-fg" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">Message me there</a></span>
+          </li>
+        )}
+      </ul>
+    </div>
+
+    <div class="card p-6 md:p-8">
+      {!configured && (
+        <p class="mb-6 rounded-lg border border-cta/40 bg-cta/10 p-4 text-sm text-fg" role="note">
+          The contact form is being set up.{profile.linkedin_url && <> In the meantime, <a class="font-semibold underline underline-offset-4" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">message me on LinkedIn</a>.</>}
+        </p>
+      )}
+      <form
+        class="space-y-5"
+        novalidate
+        data-contact-form
+        data-endpoint={PUBLIC_CONTACT_ENDPOINT ?? ''}
+        data-sitekey={PUBLIC_TURNSTILE_SITE_KEY ?? ''}
+        data-privacy-version={SITE.privacyVersion}
+      >
+        <div class="grid gap-5 sm:grid-cols-2">
+          <label class="block">
+            <span class="mb-1.5 block font-display text-sm font-semibold text-fg">Your name</span>
+            <input class="field" name="name" autocomplete="name" required maxlength="120" />
+          </label>
+          <label class="block">
+            <span class="mb-1.5 block font-display text-sm font-semibold text-fg">Email</span>
+            <input class="field" name="email" type="email" autocomplete="email" required maxlength="254" />
+          </label>
+        </div>
+        <label class="block">
+          <span class="mb-1.5 block font-display text-sm font-semibold text-fg">What's it about?</span>
+          <select class="field" name="topic" required data-topic>
+            {topics.map((t) => <option value={t.value}>{t.label}</option>)}
+          </select>
+        </label>
+        <label class="block">
+          <span class="mb-1.5 flex justify-between font-display text-sm font-semibold text-fg">Message <span class="font-sans text-xs font-normal text-subtle" data-counter>0 / 5000</span></span>
+          <textarea class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?"></textarea>
+        </label>
+
+        <!-- Honeypot: invisible to people, tempting to bots. -->
+        <div class="absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
+          <label>Leave this empty <input name="company_website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <label class="flex gap-3 text-sm text-muted">
+          <input type="checkbox" name="consent" required class="mt-0.5 size-4 shrink-0 accent-[var(--accent)]" />
+          <span>I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</span>
+        </label>
+
+        <div data-turnstile class="min-h-[65px]"></div>
+
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <button type="submit" class="btn btn-primary justify-center" data-submit disabled={!configured}>
+            <Icon name="material-symbols:send-outline" class="size-5" aria-hidden="true" /><span data-submit-label>Send message</span>
+          </button>
+          <p class="text-xs text-subtle">Spam protection by Cloudflare Turnstile loads when you start typing.</p>
+        </div>
+        <p class="hidden rounded-lg p-4 text-sm" role="status" aria-live="polite" data-status></p>
+      </form>
+
+      <div class="hidden text-center" data-success tabindex="-1">
+        <span class="mx-auto grid size-14 place-items-center rounded-full bg-accent-tint text-accent">
+          <Icon name="material-symbols:check-circle-outline" class="size-8" aria-hidden="true" />
+        </span>
+        <h2 class="mt-5 text-h3 font-bold">Message sent</h2>
+        <p class="mt-2 text-muted">Thanks — I'll reply to the email you gave within a few working days.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import '../scripts/contact-form';
+</script>

@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { SITE } from '../lib/site';
+import { fullDate } from '../lib/format';
+
+// Keep these in sync with supabase/migrations/*_automation.sql and the provider setup.
+const RETENTION_MESSAGES = '12 months';
+const RETENTION_RATE_LIMIT = '24 hours';
+const DATABASE_REGION = 'Sydney, Australia';
+const updated = fullDate(`${SITE.privacyVersion}T12:00:00+13:00`);
+---
+<BaseLayout title="Privacy notice" description="How carlos.nz handles personal information, under the New Zealand Privacy Act 2020 and the EU GDPR.">
+  <section class="container-site pb-24 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:shield-outline"
+      kicker="Privacy"
+      title="Privacy notice"
+      intro={`Plain-language summary first, details below. Version ${SITE.privacyVersion}, last updated ${updated}.`}
+    />
+
+    <div class="card mt-10 max-w-3xl p-6 md:p-8">
+      <h2 class="text-h3 font-bold">The short version</h2>
+      <ul class="mt-4 list-disc space-y-2 pl-5 text-muted marker:text-accent">
+        <li>This site has <strong class="text-fg">no analytics, no advertising and no tracking cookies</strong>.</li>
+        <li>The only personal information I collect is what you type into the <a class="text-accent underline" href="/contact/">contact form</a>, and I use it only to reply to you.</li>
+        <li>Messages are deleted automatically after {RETENTION_MESSAGES}. You can ask me to delete yours sooner, see it, or correct it at any time.</li>
+        <li>I never sell, rent or share your details for marketing.</li>
+      </ul>
+    </div>
+
+    <div class="prose-post mt-12">
+      <h2 id="who">Who is responsible</h2>
+      <p>
+        This website is run by Carlos Leandro da Cunha Moreira, an individual based in Auckland, New Zealand ("I", "me").
+        I am the agency responsible for your personal information under the New Zealand Privacy Act 2020 and the controller
+        under the EU General Data Protection Regulation (GDPR), to the extent it applies.
+        To contact me about privacy, use the <a href="/contact/?topic=privacy">contact form</a> and choose
+        "A privacy request about my data".
+      </p>
+
+      <h2 id="what">What I collect and why</h2>
+      <table>
+        <thead><tr><th>Information</th><th>Why</th><th>Legal basis (GDPR)</th><th>Kept for</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Name, email, topic and message you send through the contact form, plus the date you agreed to this notice and which version you agreed to</td>
+            <td>To read and reply to your message</td>
+            <td>Your consent (art. 6(1)(a)); you can withdraw it at any time</td>
+            <td>{RETENTION_MESSAGES}, then deleted automatically</td>
+          </tr>
+          <tr>
+            <td>A one-way, salted hash of your IP address (not the address itself)</td>
+            <td>To limit how many messages one connection can send, so the form isn't abused</td>
+            <td>Legitimate interest in keeping the service secure (art. 6(1)(f))</td>
+            <td>{RETENTION_RATE_LIMIT}</td>
+          </tr>
+          <tr>
+            <td>Technical request data (IP address, browser user agent) processed by the hosting and security providers listed below</td>
+            <td>To deliver the pages and protect the site from attacks and abusive bots</td>
+            <td>Legitimate interest (art. 6(1)(f))</td>
+            <td>Under each provider's own retention policy</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Your theme choice (light or dark) is saved in your own browser's local storage. It never leaves your device and
+        I can't see it. I don't use cookies.
+      </p>
+      <p>
+        I collect information directly from you (Privacy Act, IPP 2) and only what I need to reply (IPP 1). The form is
+        not directed at children; please don't use it if you are under 16.
+      </p>
+
+      <h2 id="who-else">Who else processes it</h2>
+      <p>I use a small number of service providers. Each acts on my instructions and only for the purposes above.</p>
+      <ul>
+        <li><strong>Supabase</strong> stores contact-form messages, in a database hosted in {DATABASE_REGION}.</li>
+        <li><strong>Cloudflare</strong> provides DNS, security and the Turnstile spam check on the contact form. Turnstile loads only after you start filling in the form, and it checks signals from your browser to tell people from bots without tracking cookies.</li>
+        <li><strong>GitHub Pages</strong> hosts the website files and, like any web server, processes your IP address to deliver them.</li>
+      </ul>
+      <p>
+        "Share on LinkedIn" buttons are plain links. LinkedIn receives nothing from this site unless you click one.
+      </p>
+
+      <h2 id="overseas">Sending information overseas</h2>
+      <p>
+        These providers store or process information outside New Zealand, including in Australia, the United States and
+        other countries where they operate. Under IPP 12, I rely on providers that are subject to privacy laws offering
+        comparable safeguards, and on their contractual commitments (data processing agreements). For visitors in the
+        European Economic Area or the UK, transfers rely on the providers' Standard Contractual Clauses or, where they
+        are certified, the EU–US Data Privacy Framework. New Zealand also has an EU adequacy decision.
+      </p>
+
+      <h2 id="rights">Your rights</h2>
+      <p>You can ask me to:</p>
+      <ul>
+        <li>confirm whether I hold information about you and give you a copy (Privacy Act IPP 6; GDPR art. 15);</li>
+        <li>correct it (IPP 7; art. 16);</li>
+        <li>delete it, restrict its use, or object to it being used (art. 17, 18, 21);</li>
+        <li>give it to you in a portable format (art. 20);</li>
+        <li>withdraw your consent, without affecting anything done before you withdrew it (art. 7(3)).</li>
+      </ul>
+      <p>
+        I'll respond within 20 working days (the Privacy Act limit), and in any case within one month. There is no charge.
+        I may need to confirm it's really you before handing over information.
+      </p>
+
+      <h2 id="security">How I protect it</h2>
+      <p>
+        The public website is a set of static files: visitors' browsers never connect to the database. The database
+        refuses all access from the public internet except through a single, validated contact endpoint, which checks
+        the spam token, limits how often it can be used and rejects malformed input. Connections are encrypted (HTTPS),
+        access to the data is limited to me, and secrets are kept out of the code.
+      </p>
+      <p>
+        If a privacy breach ever happens that is likely to cause serious harm, I will notify the Office of the Privacy
+        Commissioner and the people affected as soon as practicable, as Part 6 of the Privacy Act requires, and, where
+        the GDPR applies, the relevant supervisory authority within 72 hours.
+      </p>
+
+      <h2 id="complaints">Complaints</h2>
+      <p>
+        Please contact me first so I can put things right. If you're not satisfied, you can complain to the
+        <a href="https://www.privacy.org.nz/your-rights/making-a-complaint/">Office of the Privacy Commissioner</a> in
+        New Zealand or, if you are in the EEA or UK, to your local data protection authority.
+      </p>
+
+      <h2 id="content-use">Use of this site's content</h2>
+      <p>
+        The writing, images and code samples on this site are my own work. I reserve the rights to text and data mining
+        of this content, including for training artificial intelligence systems (EU Directive 2019/790, art. 4(3)).
+        Quoting with attribution and a link is welcome.
+      </p>
+
+      <h2 id="changes">Changes to this notice</h2>
+      <p>
+        If I change how I handle personal information, I'll update this page and its version number. Messages are always
+        stored with the version you agreed to.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

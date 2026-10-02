@@ -1,0 +1,33 @@
+# --- Secrets: NEVER commit (the repository is public on GitHub Pages Free) ---
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
+
+# --- Personal, unpublished material ---
+# Local working copies of posts (Supabase is the source of truth)
+drafts/
+# Original photos WITH metadata: run `uv run cms portrait` or `uv run cms media add`
+private-assets/
+
+# --- Build output and tooling ---
+node_modules/
+dist/
+.astro/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+*.log
+
+# --- Python ---
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# --- Content backups (may contain unpublished drafts) ---
+backups/

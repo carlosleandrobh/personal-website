@@ -1,0 +1,71 @@
+---
+import { Icon } from 'astro-icon/components';
+import { safeIcon } from '../lib/icons';
+import type { Certification, NowItem } from '../lib/types';
+
+interface Props { items: NowItem[]; certifications: Certification[] }
+const { items, certifications } = Astro.props;
+const certLabel = { planned: 'Planned', studying: 'Studying', achieved: 'Achieved' } as const;
+const [first, ...rest] = items;
+---
+<section class="container-site py-20 lg:py-24" aria-labelledby="now-title">
+  <div class="card overflow-hidden">
+    <div class="flex flex-col gap-3 border-b border-line bg-surface-2/60 px-6 py-6 md:flex-row md:items-end md:justify-between md:px-8">
+      <div>
+        <p class="kicker mb-2"><span class="status-dot" aria-hidden="true"></span>Right now</p>
+        <h2 id="now-title" class="text-h2-m font-bold md:text-h2">What I'm working on</h2>
+      </div>
+      <p class="max-w-sm text-sm text-muted">Studying, building and testing — updated whenever something changes.</p>
+    </div>
+
+    <div class="grid divide-y divide-line md:grid-cols-2 md:divide-y-0 lg:grid-cols-4 lg:divide-x">
+      {first && (
+        <article class="flex flex-col p-6 md:p-7">
+          <p class="kicker mb-4"><Icon name={safeIcon(first.icon)} class="size-[18px]" aria-hidden="true" />{first.label}</p>
+          <h3 class="text-h3 font-semibold">{first.title}</h3>
+          <p class="mt-2 flex-1 text-[0.9375rem] leading-6 text-muted">{first.description}</p>
+          <p class="mt-5 flex items-center justify-between gap-2 text-sm">
+            {first.status_text && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">{first.status_text}</span>}
+            {first.meta_text && <span class="font-mono text-xs text-subtle">{first.meta_text}</span>}
+          </p>
+        </article>
+      )}
+
+      {certifications.length > 0 && (
+        <article class="flex flex-col p-6 md:p-7">
+          <p class="kicker mb-4"><Icon name="material-symbols:workspace-premium-outline" class="size-[18px]" aria-hidden="true" />Certifications</p>
+          <ul class="flex flex-1 flex-col gap-4">
+            {certifications.map((c) => (
+              <li>
+                <div class="flex items-baseline justify-between gap-3">
+                  {c.credential_url
+                    ? <a href={c.credential_url} target="_blank" rel="noopener noreferrer" class="font-display text-[0.9375rem] font-semibold text-fg underline-offset-4 hover:underline">{c.name}</a>
+                    : <span class="font-display text-[0.9375rem] font-semibold text-fg">{c.name}</span>}
+                  <span class:list={['shrink-0 font-mono text-xs', c.status === 'achieved' ? 'text-accent' : 'text-subtle']}>
+                    {c.progress !== null ? `${c.progress}%` : certLabel[c.status]}
+                  </span>
+                </div>
+                {c.issuer && <p class="text-xs text-subtle">{c.issuer}{c.target_label ? ` · ${c.target_label}` : ''}</p>}
+                {c.progress !== null && (
+                  <progress class="meter mt-2" max="100" value={c.progress} aria-label={`${c.name} progress`}>{c.progress}%</progress>
+                )}
+              </li>
+            ))}
+          </ul>
+        </article>
+      )}
+
+      {rest.map((item) => (
+        <article class="flex flex-col p-6 md:p-7">
+          <p class="kicker mb-4"><Icon name={safeIcon(item.icon)} class="size-[18px]" aria-hidden="true" />{item.label}</p>
+          <h3 class="text-h3 font-semibold">{item.title}</h3>
+          <p class="mt-2 flex-1 text-[0.9375rem] leading-6 text-muted">{item.description}</p>
+          <p class="mt-5 flex items-center justify-between gap-2 text-sm">
+            {item.status_text && <span class="pill bg-accent-tint text-accent">{item.status_text}</span>}
+            {item.meta_text && <span class="font-mono text-xs text-subtle">{item.meta_text}</span>}
+          </p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

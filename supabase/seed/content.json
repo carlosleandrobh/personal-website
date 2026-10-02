@@ -1,0 +1,129 @@
+{
+  "$comment": "Initial content, written from Carlos's CV. Used by `uv run cms seed` (pushes to Supabase) and by the site in fixtures mode (local dev without credentials). After seeding, Supabase is the source of truth: edit there, not here.",
+  "profile": {
+    "display_name": "Carlos",
+    "full_name": "Carlos Leandro da Cunha Moreira",
+    "greeting": "Kia ora, I'm Carlos.",
+    "headline": "I turn business problems into working solutions.",
+    "subheadline": "Business analyst, data professional and AI builder with 15+ years connecting people, processes and technology — from the requirements workshop to the database.",
+    "role_line": "Business Analyst, Data & AI",
+    "location": "Auckland, New Zealand",
+    "availability_text": "Open to opportunities",
+    "is_available": true,
+    "years_experience": 15,
+    "about_md": "I'm passionate about how business analysis and IT help organisations get better results: more productivity, better processes, problems actually solved. I enjoy challenges — a new project, a new process, or an old problem nobody has untangled yet.\n\nI'm equally comfortable with a Python developer, a database administrator, a payroll analyst, an end user or a company director. That range is the point: I'm the person who makes sure the business need and the technical solution are talking about the same thing.",
+    "linkedin_url": "https://www.linkedin.com/in/carlosleandrobh",
+    "github_username": null,
+    "portrait_alt": "Carlos smiling, in Auckland"
+  },
+  "spectrum_areas": [
+    { "position": 1, "title": "Business analysis & processes", "summary": "Turning stakeholder pain into clear requirements, mapped processes (AS-IS / TO-BE) and decisions people can act on.", "icon": "material-symbols:account-tree-outline", "tags": ["BABOK", "BPMN", "Jira", "Miro"] },
+    { "position": 2, "title": "Data & reporting", "summary": "Reliable reporting cycles, validated data and dashboards that leadership actually opens.", "icon": "material-symbols:query-stats", "tags": ["Power BI", "DAX", "SSRS", "Excel"] },
+    { "position": 3, "title": "ERP, HRIS & CRM", "summary": "Implementing and tuning the systems that run payroll, HR, compliance and customer pipelines.", "icon": "material-symbols:developer-board-outline", "tags": ["Totvs RM", "Zoho CRM", "IBM Maximo", "Q-Pulse"] },
+    { "position": 4, "title": "AI & automation", "summary": "Agents and workflows that remove manual work, designed with governance rather than for the demo.", "icon": "material-symbols:neurology-outline", "tags": ["Copilot Studio", "n8n", "Claude", "Ollama"] },
+    { "position": 5, "title": "Databases & infrastructure", "summary": "SQL Server administration, query tuning, and a homelab where I test ideas before I recommend them.", "icon": "material-symbols:dns-outline", "tags": ["SQL Server", "T-SQL", "PostgreSQL", "Proxmox"] }
+  ],
+  "now_items": [
+    { "position": 1, "label": "Studying", "title": "Master of Business Analytics", "description": "Yoobee Colleges, Auckland. Analytics, machine learning for business decisions and the data storytelling that goes with it.", "icon": "material-symbols:school-outline", "status_text": "In progress", "meta_text": "Since Apr 2026" },
+    { "position": 3, "label": "Homelab", "title": "Four Proxmox nodes", "description": "Grew from one node to four. Backups with Proxmox Backup Server, Kopia and rclone offsite; Traefik v3 on Oracle Cloud behind Cloudflare; Technitium for internal DNS and DHCP.", "icon": "material-symbols:terminal", "status_text": "Self-hosted", "meta_text": "Always changing" },
+    { "position": 4, "label": "Building", "title": "A Microsoft 365 Copilot agent", "description": "Designing and running a Copilot Studio agent: conversation state, a lifecycle (ALM) strategy for production, and answers that render well inside Microsoft 365.", "icon": "material-symbols:smart-toy-outline", "status_text": "Ongoing", "meta_text": "Copilot Studio" }
+  ],
+  "certifications": [
+    { "position": 1, "name": "CBAP — Certified Business Analysis Professional", "issuer": "IIBA", "status": "studying", "progress": null, "target_label": null, "credential_url": null },
+    { "position": 2, "name": "DP-300 — Azure Database Administrator", "issuer": "Microsoft", "status": "studying", "progress": null, "target_label": null, "credential_url": null },
+    { "position": 3, "name": "Professional Scrum Master", "issuer": "Scrum.org", "status": "planned", "progress": null, "target_label": null, "credential_url": null }
+  ],
+  "experiences": [
+    {
+      "role": "Business Analyst — HSQE & Reporting",
+      "company": "Redvespa Consultants",
+      "context": "Placed at Northpower Limited",
+      "location": "Auckland, NZ",
+      "start_date": "2026-07-01",
+      "end_date": null,
+      "summary": "Supporting the HSQE team across audit management, compliance and reporting in Ideagen Q-Pulse (QMS).",
+      "highlights": [
+        "Support the monthly HSQE reporting cycle, run the data validations behind it and help maintain the Power BI dashboards.",
+        "Handle Jira requests, incident follow-ups, document reviews and helpdesk support across Teams, email and phone."
+      ],
+      "tags": ["Q-Pulse", "Power BI", "Jira", "HSQE"]
+    },
+    {
+      "role": "Founder & Senior Business Analyst",
+      "company": "SETHOS Information Technology",
+      "context": "Boutique ERP & HRIS consultancy",
+      "location": "Brazil (remote)",
+      "start_date": "2017-12-01",
+      "end_date": "2026-07-31",
+      "summary": "Led full-cycle implementations of a Tier-1 Latin American ERP & HRIS suite (Totvs RM) — payroll, occupational health, HR and time tracking — from client engagement and requirements to go-live and support.",
+      "highlights": [
+        "Cut manual rework by 30–40% by re-engineering and automating core HR processes.",
+        "Improved payroll data integrity and reporting accuracy by 20%.",
+        "Saved clients 10+ hours of manual reporting a month with SQL Server, Power BI and SSRS.",
+        "Kept mission-critical ERP systems at 99.9% uptime through proactive SQL Server administration."
+      ],
+      "tags": ["Totvs RM", "SQL Server", "Power BI", "SSRS", "BPMN"]
+    },
+    {
+      "role": "Senior Business Analyst",
+      "company": "Drogaria Araujo",
+      "context": "Pharmacy chain · 11,000+ employees, 340+ stores",
+      "location": "Brazil",
+      "start_date": "2008-09-01",
+      "end_date": "2017-12-31",
+      "summary": "Business and data analysis for People Management at one of Brazil's leading retail pharmacy chains.",
+      "highlights": [
+        "Increased recruitment efficiency by 70% with a system that focused hiring on valid, approved vacancies.",
+        "Delivered departmental headcount reports 50% faster, with better data accuracy.",
+        "Led the IBM Maximo rollout to automate approval workflows for personnel movements.",
+        "Designed the data framework behind People Management metrics such as turnover and absenteeism.",
+        "Rolled out Zoho CRM to track recruitment and personnel requests across the hiring pipeline."
+      ],
+      "tags": ["SQL Server", "IBM Maximo", "Zoho CRM", "HR analytics"]
+    }
+  ],
+  "education": [
+    { "degree": "Master of Business Analytics", "institution": "Yoobee Colleges", "location": "Auckland, NZ", "start_date": "2026-04-01", "end_date": null, "in_progress": true },
+    { "degree": "Bachelor of Business", "institution": "Pontifical Catholic University of Minas Gerais (PUC Minas)", "location": "Brazil", "start_date": "2011-02-01", "end_date": "2014-07-31", "in_progress": false }
+  ],
+  "labs": [
+    { "slug": "bentopdf", "name": "BentoPDF", "url": "https://pdf.carlos.nz", "summary": "Self-hosted, privacy-first PDF toolkit: merge, split, compress and convert files without uploading them to a third-party service.", "status": "live", "category": "Self-hosted", "tags": ["Docker", "Self-hosted", "PDF"], "icon": "material-symbols:picture-as-pdf-outline", "featured": true, "position": 1 },
+    { "slug": "odoo-community", "name": "Odoo Community", "url": "https://odoo.carlos.nz", "summary": "Evaluating the open-source ERP: modules, configuration effort, and how its processes compare with the ERPs I've implemented.", "status": "testing", "category": "ERP/CRM", "tags": ["Odoo", "PostgreSQL", "ERP"], "icon": "material-symbols:storefront-outline", "featured": true, "position": 2 },
+    { "slug": "proxmox-cluster", "name": "Four-node Proxmox homelab", "url": "https://www.proxmox.com/en/products/proxmox-virtual-environment/overview", "summary": "The base for every experiment here: four Proxmox VE nodes, with Proxmox Backup Server, Kopia and rclone keeping offsite copies.", "status": "live", "category": "Infra", "tags": ["Proxmox VE", "PBS", "Kopia", "rclone"], "icon": "material-symbols:dns-outline", "featured": true, "position": 3 },
+    { "slug": "flowable-bpmn", "name": "Flowable BPMN engine", "url": "https://www.flowable.com/open-source", "summary": "Running Flowable in Docker to compare BPMN 2.0 process orchestration with Camunda for approval-style workflows.", "status": "testing", "category": "Workflow & BPM", "tags": ["BPMN 2.0", "Docker", "Java"], "icon": "material-symbols:flowsheet-outline", "featured": true, "position": 4 },
+    { "slug": "traefik-edge", "name": "Traefik edge on Oracle Cloud", "url": "https://doc.traefik.io/traefik/", "summary": "Traefik v3 reverse proxy on an Oracle Cloud VM, fronted by Cloudflare, routing traffic to self-hosted services.", "status": "live", "category": "Infra", "tags": ["Traefik v3", "Oracle Cloud", "Cloudflare"], "icon": "material-symbols:lan-outline", "featured": false, "position": 5 }
+  ],
+  "homelab_items": [
+    { "position": 1, "title": "Compute", "icon": "material-symbols:memory-outline", "lines": ["Proxmox VE", "Four nodes, grown from one"] },
+    { "position": 2, "title": "Backups", "icon": "material-symbols:backup-outline", "lines": ["Proxmox Backup Server", "Kopia + rclone offsite copies"] },
+    { "position": 3, "title": "Edge", "icon": "material-symbols:lan-outline", "lines": ["Traefik v3 on Oracle Cloud", "Cloudflare in front of public services"] },
+    { "position": 4, "title": "Network services", "icon": "material-symbols:router-outline", "lines": ["Technitium DNS", "Internal DNS and DHCP"] }
+  ],
+  "posts": [
+    {
+      "slug": "how-this-site-works",
+      "title": "How this site works: a static portfolio with a database behind it",
+      "excerpt": "Astro builds every page ahead of time, Supabase holds the content, and publishing a post rebuilds the site and shares it on LinkedIn — without exposing the database to the browser.",
+      "category": "Engineering",
+      "tags": ["Astro", "Supabase", "GitHub Actions", "Security"],
+      "status": "draft",
+      "published_at": "2026-10-01T09:00:00+13:00",
+      "share_to_linkedin": true,
+      "linkedin_commentary": null,
+      "body_md": "I wanted a personal site that behaves like a small LinkedIn I control: a profile, my experience, what I'm testing in my homelab, and posts I can share. I also wanted it to be boring to operate and hard to abuse.\n\n## The shape of it\n\nEvery page is generated ahead of time by **Astro** and served as plain files from **GitHub Pages**, behind **Cloudflare**. There is no application server to patch and nothing to log into on the public site.\n\nThe content lives in **Supabase** (PostgreSQL). When I change something — a new post, a new lab, an updated role — a database trigger asks GitHub Actions to rebuild. A few minutes later the site is live again.\n\n## Why the browser never talks to the database\n\nThe tempting design is to fetch content from Supabase in the browser. I did the opposite: the public key can't read anything. Content is read only at build time, with a key that lives in GitHub's secret store.\n\n```sql\n-- every content table: RLS on, no policies, no grants for client roles\nalter table public.posts enable row level security;\nrevoke all on table public.posts from anon, authenticated;\n```\n\nThat removes a whole class of problems: there's no public data API to scrape, and a mistake in a policy can't leak a draft.\n\n## Sharing to LinkedIn\n\nWhen a post is published, the deploy workflow waits for the new version to go live and then calls the LinkedIn Posts API with the title, a summary and a thumbnail generated from the post itself. Each share is claimed in the database first, so a post can never be shared twice.\n\n## The contact form\n\nIt's the only place the site collects personal data, so it collects as little as possible: name, email, message, and the fact that you agreed to the privacy notice. Spam protection uses Cloudflare Turnstile, rate limits use a salted hash of the IP that's deleted after a day, and messages are deleted automatically after twelve months.\n\nIf you're building something similar and want to compare notes, the contact form works."
+    },
+    {
+      "slug": "homelab-from-one-to-four-nodes",
+      "title": "From one to four Proxmox nodes: what my homelab is for",
+      "excerpt": "A business analyst with a server rack sounds like a hobby that got out of hand. Here's why it's part of how I work.",
+      "category": "Homelab",
+      "tags": ["Proxmox", "Backups", "Self-hosted"],
+      "status": "draft",
+      "published_at": "2026-09-20T09:00:00+12:00",
+      "share_to_linkedin": true,
+      "linkedin_commentary": null,
+      "body_md": "My homelab started as one Proxmox node. It's four now.\n\n## Why a business analyst runs a homelab\n\nWhen I recommend a tool, I like to have broken it first. Running ERP trials, workflow engines and AI models on my own hardware lets me answer the questions that matter to a business: how hard is this to operate, what happens when it fails, and what does it really cost?\n\n## What's running\n\n- **Compute:** Proxmox VE across four nodes.\n- **Backups:** Proxmox Backup Server for the VMs, Kopia and rclone for offsite copies.\n- **Edge:** Traefik v3 on an Oracle Cloud VM, with Cloudflare in front of anything public.\n- **Network:** Technitium for internal DNS and DHCP.\n\n## What I've learned so far\n\nBackups aren't done until you've restored from them. The edge is where most of the interesting decisions are. And documenting a setup as you build it is the same discipline as writing good requirements: if you can't explain it, you don't understand it yet.\n\nI'll share the individual experiments in the Labs section as they mature."
+    }
+  ],
+  "github_repos": []
+}

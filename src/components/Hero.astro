@@ -1,0 +1,66 @@
+---
+import { Icon } from 'astro-icon/components';
+import Portrait from './Portrait.astro';
+import type { Profile } from '../lib/types';
+
+interface Props { profile: Profile }
+const { profile } = Astro.props;
+const initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('');
+---
+<section class="container-site grid items-center gap-12 pb-20 pt-10 md:pt-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:pb-28">
+  <div class="max-w-[38rem]">
+    {profile.is_available && profile.availability_text && (
+      <p class="pill mb-7 border border-accent/25 bg-accent-tint text-accent">
+        <span class="status-dot" aria-hidden="true"></span>
+        {profile.availability_text} · {profile.location.split(',')[0]}, NZ
+      </p>
+    )}
+    <p class="mb-3 font-display text-xl font-semibold text-muted">{profile.greeting}</p>
+    <h1 class="text-display-m font-extrabold sm:text-display">{profile.headline}</h1>
+    <p class="mt-6 max-w-[34rem] text-lg leading-8 text-muted">{profile.subheadline}</p>
+    <div class="mt-9 flex flex-wrap gap-3">
+      <a href="#labs" class="btn btn-primary">
+        See my work
+        <Icon name="material-symbols:arrow-forward" class="size-5" aria-hidden="true" />
+      </a>
+      <a href="/posts/" class="btn btn-secondary">Read my posts</a>
+    </div>
+  </div>
+
+  <!-- The Bridge: Business on one side, Technology on the other, Carlos at the keystone. -->
+  <figure class="relative mx-auto aspect-[46/54] w-full max-w-[25rem] sm:max-w-[28rem]" aria-label="Carlos, bridging business and technology">
+    <svg class="absolute inset-0 size-full overflow-visible" viewBox="0 0 460 540" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="bridge-gradient" x1="0" y1="0" x2="460" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0" class="[stop-color:var(--brand)]" />
+          <stop offset="1" class="[stop-color:var(--accent)]" />
+        </linearGradient>
+      </defs>
+      <path class="bridge-arch-path" d="M25 540 V230 A205 205 0 0 1 435 230 V540" stroke="url(#bridge-gradient)" stroke-width="3" stroke-linecap="round" />
+      <path d="M8 540 V230 A222 222 0 0 1 452 230 V540" class="stroke-line-strong" stroke-width="1" stroke-dasharray="3 7" />
+      <circle class="bridge-keystone-pulse fill-none stroke-cta" cx="230" cy="25" r="9" stroke-width="2" opacity="0" />
+      <circle class="bridge-keystone fill-cta" cx="230" cy="25" r="9" />
+    </svg>
+
+    <div class="portrait-arch absolute inset-x-[10.9%] top-[9.3%] bottom-[3.7%] overflow-hidden border border-line bg-surface shadow-lift">
+      <Portrait alt={profile.portrait_alt} initials={initials} class="portrait-arch" />
+    </div>
+
+    <span class="bridge-end bridge-end--business pill absolute left-0 top-[56%] sm:-translate-x-1/4 border border-line bg-surface text-brand shadow-card">
+      <span class="size-2 rounded-full bg-trust dark:bg-brand" aria-hidden="true"></span> Business
+    </span>
+    <span class="bridge-end bridge-end--tech pill absolute right-0 top-[38%] sm:translate-x-1/4 border border-line bg-surface text-accent shadow-card">
+      <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span> Technology
+    </span>
+
+    <figcaption class="card absolute -left-2 bottom-[9%] flex items-center gap-3 px-4 py-3 sm:-left-8">
+      <span class="grid size-10 place-items-center rounded-full bg-accent-tint text-accent">
+        <Icon name="material-symbols:hub-outline" class="size-5" aria-hidden="true" />
+      </span>
+      <span class="leading-tight">
+        <strong class="block font-display text-base text-brand">{profile.years_experience}+ years</strong>
+        <span class="text-sm text-muted">bridging business &amp; tech</span>
+      </span>
+    </figcaption>
+  </figure>
+</section>

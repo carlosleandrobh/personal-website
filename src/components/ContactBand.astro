@@ -1,0 +1,33 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { Profile } from '../lib/types';
+interface Props { profile: Profile }
+const { profile } = Astro.props;
+---
+<section class="container-site pb-24" aria-labelledby="contact-band-title">
+  <div class="relative overflow-hidden rounded-[1.5rem] border border-accent/20 bg-accent-tint px-6 py-12 md:px-14 md:py-16">
+    <svg class="pointer-events-none absolute -right-24 -top-24 size-[26rem] text-accent/15" viewBox="0 0 400 400" fill="none" aria-hidden="true">
+      <path d="M40 400 V200 A160 160 0 0 1 360 200 V400" stroke="currentColor" stroke-width="2" />
+      <path d="M0 400 V200 A200 200 0 0 1 400 200 V400" stroke="currentColor" stroke-width="1" stroke-dasharray="3 8" />
+    </svg>
+    <div class="relative grid gap-10 md:grid-cols-[1.4fr_1fr] md:items-end">
+      <div>
+        <p class="kicker mb-4"><Icon name="material-symbols:location-on-outline" class="size-[18px]" aria-hidden="true" />Auckland &amp; remote</p>
+        <h2 id="contact-band-title" class="text-h2-m font-bold md:text-h2">Have a problem to solve? Let's figure it out together.</h2>
+        <p class="mt-4 max-w-xl text-lg text-muted">
+          A process that needs untangling, data nobody trusts, an ERP that fights its users, or an automation idea you want to test — I'm happy to talk it through.
+        </p>
+      </div>
+      <div class="flex flex-col items-start gap-4 md:items-end">
+        <a href="/contact/" class="btn btn-primary">
+          Get in touch <Icon name="material-symbols:send-outline" class="size-5" aria-hidden="true" />
+        </a>
+        {profile.linkedin_url && (
+          <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me" class="inline-flex items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
+            <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />Or connect on LinkedIn
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</section>

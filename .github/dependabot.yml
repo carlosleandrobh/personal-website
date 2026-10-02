@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly, day: monday, timezone: Pacific/Auckland }
+    open-pull-requests-limit: 5
+    groups:
+      astro: { patterns: ['astro', '@astrojs/*', 'astro-icon'] }
+      minor-and-patch: { update-types: [minor, patch] }
+  - package-ecosystem: uv
+    directory: /
+    schedule: { interval: weekly, day: monday, timezone: Pacific/Auckland }
+    groups:
+      python: { patterns: ['*'] }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday, timezone: Pacific/Auckland }
+    groups:
+      actions: { patterns: ['*'] }

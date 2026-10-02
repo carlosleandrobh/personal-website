@@ -1,0 +1,346 @@
+/* Self-hosted fonts: no request ever goes to Google (GDPR — see privacy docs). */
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ---------------------------------------------------------------------------
+   Design tokens — "Warm Tech Leadership" (Google Stitch DESIGN.md)
+   Trust Blue #1E3A8A · Bridge Teal #0F766E · Optimism Amber #F59E0B
+   Warm White #FAFAF7 · Ink #0F172A · Slate #475569
+   --------------------------------------------------------------------------- */
+:root {
+  --bg: #fafaf7;
+  --surface: #ffffff;
+  --surface-2: #f3f6f9;
+  --fg: #0f172a;
+  --muted: #475569;
+  --subtle: #64748b;
+  --brand: #1e3a8a;
+  --accent: #0f766e;
+  --accent-tint: #e6f4f1;
+  --cta: #f59e0b;
+  --on-cta: #0f172a;
+  --line: rgb(15 23 42 / 0.08);
+  --line-strong: rgb(15 23 42 / 0.16);
+  --input-line: #cbd5e1;
+  --shadow-1: 0 4px 20px -2px rgb(15 23 42 / 0.04);
+  --shadow-2: 0 12px 32px -4px rgb(15 23 42 / 0.09);
+  --glass: rgb(250 250 247 / 0.85);
+  --code-bg: #0f172a;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #0b1220;
+  --surface: #111a2e;
+  --surface-2: #16213a;
+  --fg: #e2e8f0;
+  --muted: #a3b1c6;
+  --subtle: #8796ad;
+  --brand: #dbe4ff;
+  --accent: #2dd4bf;
+  --accent-tint: rgb(45 212 191 / 0.12);
+  --cta: #f59e0b;
+  --on-cta: #0f172a;
+  --line: rgb(148 163 184 / 0.14);
+  --line-strong: rgb(148 163 184 / 0.28);
+  --input-line: #334155;
+  --shadow-1: 0 4px 20px -2px rgb(0 0 0 / 0.3);
+  --shadow-2: 0 12px 32px -4px rgb(0 0 0 / 0.45);
+  --glass: rgb(17 26 46 / 0.85);
+  --code-bg: #0a1020;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-accent-tint: var(--accent-tint);
+  --color-cta: var(--cta);
+  --color-on-cta: var(--on-cta);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-input-line: var(--input-line);
+  --shadow-card: var(--shadow-1);
+  --shadow-lift: var(--shadow-2);
+}
+
+@theme {
+  --color-trust: #1e3a8a;
+  --color-teal: #0f766e;
+  --color-amber: #f59e0b;
+  --color-ink: #0f172a;
+
+  --font-display: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale from DESIGN.md */
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-display-m: 2.375rem;
+  --text-display-m--line-height: 1.2;
+  --text-display-m--letter-spacing: -0.02em;
+  --text-h2: 2.25rem;
+  --text-h2--line-height: 1.22;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h2-m: 1.75rem;
+  --text-h2-m--line-height: 1.28;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.4;
+
+  --radius-card: 1rem;
+  --radius-control: 0.5rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--brand);
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  ::selection { background: var(--accent-tint); color: var(--accent); }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  .container-site {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) { .container-site { padding-inline: 2rem; } }
+  @media (min-width: 1024px) { .container-site { padding-inline: 3rem; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-1);
+  }
+  .card-interactive {
+    transition: box-shadow 200ms var(--ease-out-soft), border-color 200ms, transform 200ms var(--ease-out-soft);
+  }
+  .card-interactive:hover {
+    box-shadow: var(--shadow-2);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    line-height: 1.25rem;
+    padding: 0.75rem 1.25rem;
+    transition: transform 160ms var(--ease-out-soft), box-shadow 160ms, background-color 160ms, color 160ms;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--cta); color: var(--on-cta); }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px -6px rgb(245 158 11 / 0.55); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary { border: 1.5px solid var(--brand); color: var(--brand); }
+  [data-theme='dark'] .btn-secondary { border-color: var(--accent); color: var(--accent); }
+  .btn-secondary:hover { background: color-mix(in srgb, var(--brand) 6%, transparent); }
+  .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.875rem; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9999px;
+    padding: 0.2rem 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    background: var(--accent-tint);
+    color: var(--accent);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1rem;
+  }
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .link-quiet {
+    color: var(--muted);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 4px;
+    transition: color 150ms, text-decoration-color 150ms;
+  }
+  .link-quiet:hover { color: var(--fg); text-decoration-color: currentColor; }
+
+  .field {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--input-line);
+    border-radius: var(--radius-control);
+    padding: 0.75rem 0.9rem;
+    color: var(--fg);
+    font: inherit;
+    transition: border-color 150ms, box-shadow 150ms;
+  }
+  .field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .field[aria-invalid='true'] { border-color: #b91c1c; }
+
+  /* Native <progress> styled as the Stitch certification bar */
+  .meter { appearance: none; width: 100%; height: 6px; border: 0; border-radius: 9999px; background: var(--surface-2); overflow: hidden; }
+  .meter::-webkit-progress-bar { background: var(--surface-2); border-radius: 9999px; }
+  .meter::-webkit-progress-value { background: var(--accent); border-radius: 9999px; }
+  .meter::-moz-progress-bar { background: var(--accent); border-radius: 9999px; }
+}
+
+/* ---------------------------------------------------------------------------
+   Article typography (post bodies rendered from Markdown)
+   --------------------------------------------------------------------------- */
+.prose-post {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--fg);
+  max-width: 68ch;
+}
+.prose-post > * + * { margin-top: 1.25em; }
+.prose-post h2 { font-size: 1.625rem; font-weight: 700; line-height: 1.3; margin-top: 2.2em; letter-spacing: -0.01em; }
+.prose-post h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin-top: 1.8em; }
+.prose-post h2 + *, .prose-post h3 + * { margin-top: 0.75em; }
+.prose-post a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.prose-post strong { color: var(--fg); font-weight: 650; }
+.prose-post ul, .prose-post ol { padding-left: 1.25rem; }
+.prose-post ul { list-style: disc; }
+.prose-post ol { list-style: decimal; }
+.prose-post li + li { margin-top: 0.4em; }
+.prose-post li::marker { color: var(--accent); }
+.prose-post blockquote {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-tint);
+  padding: 1rem 1.25rem;
+  border-radius: 0 0.75rem 0.75rem 0;
+  color: var(--fg);
+}
+.prose-post :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 0.1em 0.35em;
+  border-radius: 0.35rem;
+}
+.prose-post pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  padding: 1.25rem;
+  border-radius: 0.875rem;
+  overflow-x: auto;
+  background: var(--code-bg) !important;
+  border: 1px solid var(--line);
+}
+.prose-post table { width: 100%; border-collapse: collapse; font-size: 0.95rem; display: block; overflow-x: auto; }
+.prose-post th, .prose-post td { border-bottom: 1px solid var(--line); padding: 0.6rem 0.75rem; text-align: left; }
+.prose-post th { font-family: var(--font-display); color: var(--brand); }
+.prose-post img { border-radius: 0.875rem; border: 1px solid var(--line); }
+.prose-post hr { border: 0; border-top: 1px solid var(--line); margin: 2.5em 0; }
+.prose-post h2 > a.anchor, .prose-post h3 > a.anchor { color: inherit; text-decoration: none; }
+
+/* About section text (sanitised Markdown from profile.about_md) */
+.prose-about > * + * { margin-top: 1em; }
+.prose-about strong { color: var(--fg); font-weight: 650; }
+.prose-about a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------------------------------------------------------------------------
+   Hero — "The Bridge"
+   One orchestrated moment on load: the arch draws itself from the Business
+   side to the Technology side, and the amber keystone (Carlos) lands on top.
+   --------------------------------------------------------------------------- */
+.bridge-arch-path {
+  stroke-dasharray: 1300;
+  stroke-dashoffset: 0;
+}
+.bridge-keystone { transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .bridge-arch-path { stroke-dashoffset: 1300; animation: bridge-draw 1.6s var(--ease-out-soft) 0.25s forwards; }
+  .js .bridge-end { opacity: 0; animation: bridge-fade 0.5s ease-out forwards; }
+  .js .bridge-end--business { animation-delay: 0.15s; }
+  .js .bridge-end--tech { animation-delay: 1.35s; }
+  .js .bridge-keystone { opacity: 0; transform: scale(0.4); animation: keystone-land 0.6s var(--ease-out-soft) 1.05s forwards; }
+  .js .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 2; }
+}
+@keyframes bridge-draw { to { stroke-dashoffset: 0; } }
+@keyframes bridge-fade { to { opacity: 1; } }
+@keyframes keystone-land { to { opacity: 1; transform: scale(1); } }
+@keyframes keystone-pulse {
+  0% { r: 9; opacity: 0.55; }
+  100% { r: 26; opacity: 0; }
+}
+
+.portrait-arch { border-radius: 999px 999px 1.5rem 1.5rem; }
+
+.status-dot { position: relative; display: inline-flex; width: 0.5rem; height: 0.5rem; }
+.status-dot::before, .status-dot::after { content: ''; position: absolute; inset: 0; border-radius: 9999px; background: #10b981; }
+@media (prefers-reduced-motion: no-preference) {
+  .status-dot::before { animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0.6; }
+}
+@keyframes ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+
+/* Spectrum rail: hovering/focusing a domain lights its stop on the rail */
+.spectrum-stop { transition: transform 200ms var(--ease-out-soft), background-color 200ms, box-shadow 200ms; }
+.spectrum-card:hover .spectrum-index,
+.spectrum-card:focus-within .spectrum-index { background: var(--cta); color: var(--on-cta); }
+
+@media print {
+  header, footer, .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
+}

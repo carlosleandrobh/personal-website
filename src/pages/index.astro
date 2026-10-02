@@ -1,0 +1,93 @@
+---
+import { Icon } from 'astro-icon/components';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Spectrum from '../components/Spectrum.astro';
+import NowSection from '../components/NowSection.astro';
+import ExperienceTimeline from '../components/ExperienceTimeline.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import LabCard from '../components/LabCard.astro';
+import PostCard from '../components/PostCard.astro';
+import RepoCard from '../components/RepoCard.astro';
+import ContactBand from '../components/ContactBand.astro';
+import {
+  getProfile, getSpectrum, getNowItems, getCertifications, getExperiences, getEducation, getLabs, getPosts, getRepos,
+} from '../lib/content';
+
+const [profile, spectrum, now, certs, experiences, education, labs, posts, repos] = await Promise.all([
+  getProfile(), getSpectrum(), getNowItems(), getCertifications(), getExperiences(), getEducation(), getLabs(), getPosts(), getRepos(),
+]);
+
+const featuredLabs = (labs.filter((l) => l.featured).length ? labs.filter((l) => l.featured) : labs).slice(0, 4);
+const latestPosts = posts.slice(0, 3);
+const topRepos = repos.slice(0, 3);
+---
+<BaseLayout title="carlos.nz" description={`${profile.headline} ${profile.subheadline}`} activeNav="About">
+  <Hero profile={profile} />
+  <About profile={profile} experiences={experiences} education={education} />
+  <Spectrum areas={spectrum} />
+  <NowSection items={now} certifications={certs} />
+  <div class="border-t border-line bg-surface/50">
+    <ExperienceTimeline experiences={experiences} education={education} />
+  </div>
+
+  <section id="labs" class="container-site py-20 lg:py-24" aria-labelledby="labs-title">
+    <SectionHeading
+      id="labs-title"
+      icon="material-symbols:science-outline"
+      kicker="Labs"
+      title="What I'm testing in my homelab"
+      intro="Tools I host, ERPs I evaluate and workflows I try before I'd recommend them to anyone. Some are open for you to try."
+    >
+      <a href="/labs/" class="btn btn-secondary btn-sm shrink-0">
+        See all experiments <Icon name="material-symbols:arrow-forward" class="size-4" aria-hidden="true" />
+      </a>
+    </SectionHeading>
+    <ul class="mt-12 grid gap-5 md:grid-cols-2">
+      {featuredLabs.map((lab) => <li><LabCard lab={lab} /></li>)}
+    </ul>
+  </section>
+
+  {topRepos.length > 0 && (
+    <section class="border-y border-line bg-surface py-20 lg:py-24" aria-labelledby="projects-title">
+      <div class="container-site">
+        <SectionHeading
+          id="projects-title"
+          icon="material-symbols:folder-code-outline"
+          kicker="Projects on GitHub"
+          title="Code I've made public"
+          intro="Synced from GitHub every day. Each card opens the repository on GitHub."
+        >
+          <a href="/projects/" class="btn btn-secondary btn-sm shrink-0">All repositories</a>
+        </SectionHeading>
+        <ul class="mt-12 grid gap-5 md:grid-cols-3">
+          {topRepos.map((repo) => <li><RepoCard repo={repo} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section id="posts" class="container-site py-20 lg:py-24" aria-labelledby="posts-title">
+    <SectionHeading
+      id="posts-title"
+      icon="material-symbols:rss-feed"
+      kicker="Posts"
+      title="Notes from the work"
+      intro="Practical write-ups on business analysis, data, ERPs and AI — the same posts I share on LinkedIn."
+    >
+      <a href="/posts/" class="btn btn-secondary btn-sm shrink-0">
+        View all posts <Icon name="material-symbols:arrow-forward" class="size-4" aria-hidden="true" />
+      </a>
+    </SectionHeading>
+    {latestPosts.length > 0 ? (
+      <ul class="mt-12 grid gap-5 md:grid-cols-3">
+        {latestPosts.map((post) => <li><PostCard post={post} /></li>)}
+      </ul>
+    ) : (
+      <p class="card mt-12 p-8 text-muted">The first post is on its way. Follow me on LinkedIn to see it when it lands.</p>
+    )}
+  </section>
+
+  <ContactBand profile={profile} />
+</BaseLayout>

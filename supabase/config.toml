@@ -1,0 +1,10 @@
+# Supabase CLI config. Only what this project needs; everything else uses CLI defaults.
+project_id = "carlos-nz"
+
+[db]
+major_version = 17
+
+# The contact form does its own protection (Origin allow-list, Turnstile, rate limit),
+# so the gateway JWT check is off. It rejects anything else.
+[functions.contact]
+verify_jwt = false

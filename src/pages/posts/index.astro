@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import PostCard from '../../components/PostCard.astro';
+import ContactBand from '../../components/ContactBand.astro';
+import { getPosts, getProfile } from '../../lib/content';
+
+const [profile, posts] = await Promise.all([getProfile(), getPosts()]);
+const categories = [...new Set(posts.map((p) => p.category))].sort();
+---
+<BaseLayout title="Posts" description="Practical write-ups by Carlos on business analysis, data, ERPs, AI and his homelab." activeNav="Posts">
+  <section class="container-site pb-20 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:rss-feed"
+      kicker="Posts"
+      title="Notes from the work"
+      intro="What I learn on projects, in my studies and in the homelab — written down so it's useful to someone else."
+    >
+      <a href="/rss.xml" class="btn btn-secondary btn-sm shrink-0">RSS feed</a>
+    </SectionHeading>
+
+    {categories.length > 1 && (
+      <p class="mt-8 flex flex-wrap gap-2 text-sm text-muted">
+        Topics: {categories.map((c) => <span class="pill bg-accent-tint text-accent">{c}</span>)}
+      </p>
+    )}
+
+    {posts.length > 0 ? (
+      <ul class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {posts.map((post) => <li><PostCard post={post} headingLevel="h2" /></li>)}
+      </ul>
+    ) : (
+      <p class="card mt-10 p-8 text-muted">No posts yet. The first one is in the works.</p>
+    )}
+  </section>
+  <ContactBand profile={profile} />
+</BaseLayout>
