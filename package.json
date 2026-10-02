@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "description": "carlos.nz \u2014 personal portfolio. Astro (static) + Supabase + GitHub Pages + Cloudflare. Operations CLI in Python (`uv run cms`).",
   "engines": {
