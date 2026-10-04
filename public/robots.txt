@@ -1,7 +1,7 @@
 # carlos.nz
 # Search engines and link previews (LinkedIn, Slack, etc.) are welcome.
 # AI training and bulk-scraping crawlers are not: the rights to text and data
-# mining of this content are reserved (EU Directive 2019/790, art. 4(3)).
+# mining of this content are reserved.
 # Enforcement happens at the Cloudflare edge; this file is the polite notice.
 
 User-agent: GPTBot

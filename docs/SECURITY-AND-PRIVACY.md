@@ -1,6 +1,6 @@
 # Security and privacy — carlos.nz
 
-This document records the site's security and privacy decisions (an individual's version of the GDPR article 30 record of processing). It is not legal advice. If the site starts collecting more data, have it reviewed by a professional.
+This document records the site's security and privacy decisions. It is not legal advice. If the site starts collecting more data, have it reviewed by a professional.
 
 ## 1. What needs protecting
 
@@ -40,69 +40,55 @@ This document records the site's security and privacy decisions (an individual's
 | 3 — Transparency | Notice beside the form and a `/privacy/` page covering purpose, recipients and rights |
 | 4 — Manner of collection | No hidden tracking, cookies or analytics; Turnstile loads only when someone starts filling in the form |
 | 5 — Storage and security | Section 2 above |
-| 6 — Access | Runbook in section 6; reply within 20 working days |
-| 7 — Correction | Runbook in section 6 |
+| 6 — Access | Runbook in section 5; reply within 20 working days |
+| 7 — Correction | Runbook in section 5 |
 | 8 — Accuracy | Data comes from the person themselves; corrected on request |
 | 9 — Retention | Messages deleted after 12 months; IP hashes after 24 hours (pg_cron) |
 | 10 — Use | Only to reply; never for marketing |
 | 11 — Disclosure | None, except to the listed providers (processors) |
 | 12 — Cross-border disclosure | Supabase (Australia), Cloudflare and GitHub (United States and global), declared in the notice and covered by DPAs |
 | 13 — Unique identifiers | None assigned |
-| Part 6 — Notifiable privacy breaches | Runbook in section 7 |
+| Part 6 — Notifiable privacy breaches | Runbook in section 6 |
 
-## 4. GDPR (European Union)
+Fonts are self-hosted, so no request from this site sends a visitor's IP address to Google.
 
-| Article | How the site complies |
-|---|---|
-| 5 — Principles | Data minimisation, purpose limitation and storage limitation (section 3) |
-| 6 — Lawful basis | Consent (form); legitimate interest (security and abuse prevention) |
-| 7 — Proof of consent | Every message stores `consent_at` and `privacy_version` |
-| 13 — Information | The `/privacy/` page |
-| 15–21 — Rights | Runbooks in section 6 |
-| 25 — Data protection by design | Browser has no database access, no cookies, notification email without visitor data |
-| 28 — Processors | Accept the DPAs for Supabase, Cloudflare and GitHub (and Resend, if used) |
-| 32 — Security | Section 2 |
-| 33/34 — Breaches | Runbook in section 7 (supervisory authority within 72 hours) |
-
-Fonts are self-hosted. Loading Google Fonts sends the visitor's IP address to Google, which a German court (LG München, 2022) found unlawful without consent. No request from this site goes to Google.
-
-## 5. Web scraping — what can and can't be done
+## 4. Web scraping — what can and can't be done
 
 Public content can always be copied by a determined person. The aim is to make automated collection expensive and to make it clear that it isn't authorised.
 
 1. **No sensitive personal data in the HTML.** No phone number, personal email, suburb or visa status; contact only through the form.
 2. **No public data API.** Supabase's public key can't read anything.
 3. **Cloudflare edge:** Bot Fight Mode, AI-crawler blocking, AI Labyrinth and WAF rules (SETUP.md, Cloudflare security settings).
-4. **Legal and technical signals:** `robots.txt` blocking 20+ AI crawlers; `<meta name="robots" content="noai, noimageai">`; a text-and-data-mining reservation (`tdm-reservation` and `/.well-known/tdmrep.json`, EU Directive 2019/790 art. 4(3)); a statement in the privacy notice.
+4. **Legal and technical signals:** `robots.txt` blocking 20+ AI crawlers; `<meta name="robots" content="noai, noimageai">`; a text-and-data-mining reservation (`tdm-reservation` and `/.well-known/tdmrep.json`); a statement in the privacy notice.
 5. **Images:** served optimised and without metadata; the original photo is never published.
 6. **GitHub repositories:** only public ones appear; making a repository private removes it from the site at the next sync.
 
-## 6. Runbook — requests from individuals (access, correction, deletion)
+## 5. Runbook — requests from individuals (access, correction, deletion)
 
 Requests arrive through the form with the topic "A privacy request about my data". Confirm identity by replying to the same email address.
 
 ```sql
--- Access / portability: everything held about an email address
+-- Access: everything held about an email address
 select created_at, name, email, topic, message, consent_at, privacy_version, status
 from public.contact_messages where email = 'person@example.com';
 
 -- Correction
 update public.contact_messages set name = 'Correct Name' where email = 'person@example.com';
 
--- Deletion (also covers withdrawal of consent)
+-- Deletion (not required by the Privacy Act, but offered in the privacy notice)
 delete from public.contact_messages where email = 'person@example.com';
 ```
 
 Reply within 20 working days, free of charge. Keep only a record that the request was handled (date and type), not the data itself.
 
-## 7. Runbook — security incident
+## 6. Runbook — security incident
 
 1. **Contain:** rotate the secret involved (Supabase secret key under *API Keys*; `LINKEDIN_TOKEN_KEY` (then run `uv run cms linkedin connect` again); the LinkedIn client secret in the developer portal; the GitHub dispatch token in Vault; disconnect the app under LinkedIn *Settings → Data privacy → Permitted services*).
 2. **Assess:** which data, how many people, for how long? Logs: Supabase (*Logs Explorer*), GitHub (*Security log*), Cloudflare (*Security Events*).
-3. **Notify** if serious harm is likely: the Office of the Privacy Commissioner through [NotifyUs](https://www.privacy.org.nz/responsibilities/privacy-breaches/notify-us/) as soon as practicable, and the people affected; if anyone in the EU is affected, the relevant supervisory authority within 72 hours.
+3. **Notify** if serious harm is likely: the Office of the Privacy Commissioner through [NotifyUs](https://www.privacy.org.nz/responsibilities/privacy-breaches/notify-us/) as soon as practicable, and the people affected.
 4. **Record** what happened and what changed, even if it isn't notifiable.
 
-## 8. Regular maintenance
+## 7. Regular maintenance
 
 | When | What |
 |---|---|

@@ -3,7 +3,7 @@ export const SITE = {
   name: 'carlos.nz',
   locale: 'en_NZ',
   // Bump when the privacy policy changes; stored with each contact-form consent.
-  privacyVersion: '2026-10-01',
+  privacyVersion: '2026-10-04',
   nav: [
     { href: '/#about', label: 'About' },
     { href: '/#experience', label: 'Experience' },

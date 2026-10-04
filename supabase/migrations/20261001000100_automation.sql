@@ -92,7 +92,7 @@ begin
 end $$;
 
 -- -----------------------------------------------------------------------------
--- 2. Retention (NZ Privacy Act 2020 IPP 9 / GDPR art. 5(1)(e) storage limitation)
+-- 2. Retention (NZ Privacy Act 2020 IPP 9)
 -- Adjust the intervals here AND in the privacy notice (src/pages/privacy.astro).
 -- -----------------------------------------------------------------------------
 select cron.schedule(

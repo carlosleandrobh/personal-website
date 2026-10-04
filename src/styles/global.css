@@ -1,4 +1,4 @@
-/* Self-hosted fonts: no request ever goes to Google (GDPR — see privacy docs). */
+/* Self-hosted fonts: no request ever goes to Google (see privacy docs). */
 @import '@fontsource-variable/plus-jakarta-sans/wght.css';
 @import '@fontsource-variable/inter/wght.css';
 @import '@fontsource-variable/jetbrains-mono/wght.css';
