@@ -19,7 +19,9 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
-    environment: production         # secrets live in this environment, restricted to the main branch
+    environment:
+      name: production
+      deployment: false
     concurrency:                    # a newer content change supersedes an in-flight build
       group: build-${{ github.ref }}
       cancel-in-progress: true
@@ -95,7 +97,9 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-    environment: production
+    environment:
+      name: production
+      deployment: false
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
