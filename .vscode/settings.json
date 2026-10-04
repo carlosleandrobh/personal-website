@@ -2,5 +2,8 @@
   "deno.enablePaths": ["supabase/functions"],
   "deno.lint": true,
   "editor.formatOnSave": true,
-  "files.associations": { "*.css": "tailwindcss" }
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "deno.enable": true
 }
