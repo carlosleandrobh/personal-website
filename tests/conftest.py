@@ -92,12 +92,26 @@ class _Query:
         return _Result(found[0] if self.is_single else found, len(found))
 
 
+class _Rpc:
+    def __init__(self, result: Any):
+        self.result = result
+
+    def execute(self) -> _Result:
+        return _Result(self.result)
+
+
 class FakeSupabase:
     def __init__(self, tables: dict[str, list[dict[str, Any]]]):
         self.tables, self.writes = tables, []
+        self.rpc_handlers: dict[str, Any] = {}  # name -> callable(params) returning the RPC's data
+        self.rpc_calls: list[tuple[str, dict[str, Any]]] = []
 
     def table(self, name: str) -> _Query:
         return _Query(self, name)
+
+    def rpc(self, name: str, params: dict[str, Any] | None = None) -> _Rpc:
+        self.rpc_calls.append((name, params or {}))
+        return _Rpc(self.rpc_handlers[name](params or {}))
 
 
 @pytest.fixture

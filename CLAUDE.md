@@ -47,7 +47,7 @@ uv run cms media add photo.jpg --name cover-x      # strips metadata -> public/m
 uv run cms portrait path/to/photo.jpg              # strips EXIF/GPS -> src/assets/portrait.jpg
 uv run cms messages [--mark-read]
 uv run cms linkedin connect | status               # connect about every 60 days
-uv run cms rebuild
+uv run cms rebuild                         # reports whether GitHub accepted the request (401/403/404 = fix the Vault token)
 uv run cms backup [--to PATH]                # posts (Markdown) + site text -> backups/<date>/ (git-ignored)
 uv run cms restore backups/<folder> [--dry-run]  # never deletes; keeps LinkedIn share records
 npm run dev                                # local site (seed content if no .env)

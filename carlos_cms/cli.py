@@ -7,6 +7,7 @@ import typer
 
 from carlos_cms import backup as backups
 from carlos_cms import content, github_sync, labs, linkedin, media, posts
+from carlos_cms import rebuild as rebuilds
 from carlos_cms.db import db
 from carlos_cms.out import fail, info, ok, warn
 
@@ -284,5 +285,11 @@ def restore(
 @app.command()
 def rebuild() -> None:
     """Ask GitHub Actions to rebuild the site now (normally automatic)."""
-    _guard(lambda: db().rpc('request_rebuild', {'p_source': 'cli'}).execute())
-    ok('Rebuild requested. Follow it in the Actions tab on GitHub.')
+    outcome, message = _guard(rebuilds.request, db())
+    if outcome == 'rejected':
+        fail(message)
+    if outcome == 'unknown':
+        warn(message)
+        return
+    ok(message)
+    info('Follow it in the Actions tab on GitHub.')
