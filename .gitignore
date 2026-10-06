@@ -4,6 +4,7 @@
 !.env.example
 supabase/.temp/
 supabase/.branches/
+.mcp.json
 
 # --- Personal, unpublished material ---
 # Local working copies of posts (Supabase is the source of truth)
