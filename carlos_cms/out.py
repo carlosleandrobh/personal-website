@@ -1,11 +1,23 @@
 """Terminal output. In GitHub Actions, warnings become annotations on the run."""
 
 import os
+import sys
 from typing import NoReturn
 
 import typer
 
 IN_CI = os.environ.get('GITHUB_ACTIONS') == 'true'
+
+
+def use_utf8_output() -> None:
+    """Windows consoles default to cp1252, which can't print ✔ ⚠ ✖; never let a symbol crash a command."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, 'reconfigure', None)
+        if reconfigure:
+            reconfigure(encoding='utf-8', errors='replace')
+
+
+use_utf8_output()
 
 
 def ok(message: str) -> None:
