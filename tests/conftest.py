@@ -148,6 +148,7 @@ def fake_db() -> FakeSupabase:
                     'id': 7,
                     'role': 'Business Analyst',
                     'company': 'Redvespa',
+                    'company_url': None,
                     'context': None,
                     'location': None,
                     'start_date': '2026-07-01',

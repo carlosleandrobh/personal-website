@@ -49,6 +49,7 @@ export interface Certification {
 export interface Experience {
   role: string;
   company: string;
+  company_url: string | null;
   context: string | null;
   location: string | null;
   start_date: string;

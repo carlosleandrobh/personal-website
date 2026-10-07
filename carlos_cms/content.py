@@ -41,6 +41,7 @@ TABLES: dict[str, list[str]] = {
     'experiences': [
         'role',
         'company',
+        'company_url',
         'context',
         'location',
         'start_date',

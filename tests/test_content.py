@@ -89,6 +89,18 @@ def test_pull_then_push_only_writes_what_changed(fake_db, tmp_path):
     assert fake_db.tables['profile'][0]['about_md'] == 'Para one.\n\nPara two.'  # untouched, no false change
 
 
+def test_experience_company_url_can_be_pushed(fake_db, tmp_path):
+    path = tmp_path / 'site-content.yaml'
+    content.pull(fake_db, path)
+    doc = content.load_yaml(path.read_text())
+    assert doc['experiences'][0]['company_url'] is None
+    doc['experiences'][0]['company_url'] = 'https://example.com'
+    path.write_text(content.dump_yaml(doc))
+    log, writes = content.push(fake_db, path=path)
+    assert writes == 1 and log == ['experiences #7: update company_url']
+    assert fake_db.tables['experiences'][0]['company_url'] == 'https://example.com'
+
+
 def test_removed_rows_are_kept_unless_pruned(fake_db, tmp_path):
     path = tmp_path / 'site-content.yaml'
     content.pull(fake_db, path)

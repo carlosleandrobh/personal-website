@@ -37,6 +37,7 @@
     {
       "role": "Business Analyst — HSQE & Reporting",
       "company": "Redvespa Consultants",
+      "company_url": null,
       "context": "Placed at Northpower Limited",
       "location": "Auckland, NZ",
       "start_date": "2026-07-01",
@@ -51,6 +52,7 @@
     {
       "role": "Founder & Senior Business Analyst",
       "company": "SETHOS Information Technology",
+      "company_url": null,
       "context": "Boutique ERP & HRIS consultancy",
       "location": "Brazil (remote)",
       "start_date": "2017-12-01",
@@ -67,6 +69,7 @@
     {
       "role": "Senior Business Analyst",
       "company": "Drogaria Araujo",
+      "company_url": null,
       "context": "Pharmacy chain · 11,000+ employees, 340+ stores",
       "location": "Brazil",
       "start_date": "2008-09-01",
