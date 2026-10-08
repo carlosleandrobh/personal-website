@@ -8,7 +8,7 @@
  *   4. Rate limit per salted IP hash (the IP itself is never stored)
  *   5. Cloudflare Turnstile verification (action + hostname bound)
  *   6. Insert the message (data minimisation: no IP, no user agent)
- *   7. Optional notification email that contains NO visitor data
+ *   7. Optional emails via Resend: the submission to Carlos, and a confirmation to the visitor
  */
 import { adminClient } from '../_shared/db.ts';
 import { corsHeaders, env, json, readJson } from '../_shared/http.ts';
@@ -52,23 +52,57 @@ async function verifyTurnstile(token: string, ip: string | null): Promise<boolea
   return out.success === true && out.action === 'contact' && !!out.hostname && hosts.includes(out.hostname);
 }
 
-async function notify(topic: string) {
+const TOPIC_LABELS: Record<string, string> = {
+  project: 'A project or piece of work',
+  job: 'A job opportunity',
+  cv: 'Requesting my CV',
+  collaboration: 'A collaboration',
+  privacy: 'A privacy request about my data',
+  other: 'Something else',
+};
+
+async function sendEmail(apiKey: string, mail: Record<string, unknown>) {
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(mail),
+  }).catch(() => undefined);
+}
+
+/**
+ * Two plain-text emails via Resend, both best-effort (a failure never loses the message, which is already stored):
+ *   1. to Carlos: what the visitor submitted, with Reply-To set to the visitor
+ *   2. to the visitor: a short confirmation that the message arrived
+ * Name, topic and message only ever appear in the body, never in a subject or header, so they can't inject headers.
+ */
+async function notify(m: { name: string; email: string; topic: string; message: string }) {
   const apiKey = Deno.env.get('RESEND_API_KEY');
   const to = Deno.env.get('NOTIFY_EMAIL_TO');
   const from = Deno.env.get('NOTIFY_EMAIL_FROM');
   if (!apiKey || !to || !from) return;
-  // Deliberately contains no name, email or message: those stay in the database.
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
+  const topicLabel = TOPIC_LABELS[m.topic] ?? m.topic;
+
+  await Promise.all([
+    sendEmail(apiKey, {
       from,
       to: [to],
-      subject: `New message on carlos.nz (${topic})`,
-      text:
-        'You have a new contact-form message. Open the contact_messages table in Supabase (or ask Claude Code) to read it.',
+      reply_to: m.email,
+      subject: `New message on carlos.nz (${m.topic})`,
+      text: `Name: ${m.name}\nEmail: ${m.email}\nTopic: ${topicLabel}\n\n${m.message}\n`,
     }),
-  }).catch(() => undefined);
+    sendEmail(apiKey, {
+      from,
+      to: [m.email],
+      subject: 'Thanks for your message',
+      text: `Hi ${m.name},\n\n` +
+        `Thanks for getting in touch. Your message has arrived and I'll reply as soon as I can.\n\n` +
+        `Topic: ${topicLabel}\n\n` +
+        `Your message:\n${m.message}\n\n` +
+        `Carlos\ncarlos.nz\n\n` +
+        `You are getting this one-off email because you used the contact form on carlos.nz. ` +
+        `I only use your details to reply to you; see https://carlos.nz/privacy/ for how they are handled.`,
+    }),
+  ]);
 }
 
 Deno.serve(async (req) => {
@@ -136,7 +170,7 @@ Deno.serve(async (req) => {
     });
     if (error) throw new Error(`insert: ${error.code}`);
 
-    await notify(topic);
+    await notify({ name, email, topic, message });
     return json({ ok: true }, 201, cors);
   } catch (err) {
     // Log the failure class only — never the visitor's details.

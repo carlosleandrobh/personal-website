@@ -154,7 +154,7 @@ The full CSP, with a hash for every script, is already in each page's `<meta>` t
 
 ### Optional
 - **Email Routing:** `hello@carlos.nz` → your Gmail (a professional address without exposing your personal one).
-- **Resend** for new-message notifications (the email contains no visitor data): verify the domain in Resend and fill in `RESEND_API_KEY`, `NOTIFY_EMAIL_TO` and `NOTIFY_EMAIL_FROM`. Then redeploy with `npx supabase@latest functions deploy contact`. If you turn it on, add Resend to the list of providers in `src/pages/privacy.astro`.
+- **Resend** sends two emails per contact-form message: the submitted details to you (Reply-To is the visitor) and a confirmation to the visitor. Verify the domain in Resend and fill in `RESEND_API_KEY`, `NOTIFY_EMAIL_TO` and `NOTIFY_EMAIL_FROM`. Then redeploy with `npx supabase@latest functions deploy contact`. If you turn it on, add Resend to the list of providers in `src/pages/privacy.astro`.
 
 # Claude Code + Supabase MCP
 

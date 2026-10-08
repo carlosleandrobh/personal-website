@@ -75,6 +75,7 @@ const updated = fullDate(`${SITE.privacyVersion}T12:00:00+13:00`);
       <ul>
         <li><strong>Supabase</strong> stores contact-form messages, in a database hosted in {DATABASE_REGION}.</li>
         <li><strong>Cloudflare</strong> provides DNS, security and the Turnstile spam check on the contact form. Turnstile loads only after you start filling in the form, and it checks signals from your browser to tell people from bots without tracking cookies.</li>
+        <li><strong>Resend</strong> sends the emails triggered by the contact form: a copy of your message to me, and a confirmation to the address you entered. It therefore processes your name, email address and message, and keeps a log of sent emails under its own retention policy.</li>
         <li><strong>GitHub Pages</strong> hosts the website files and, like any web server, processes your IP address to deliver them.</li>
       </ul>
       <p>
