@@ -27,6 +27,26 @@ function init(form: HTMLFormElement) {
   let token = '';
   let widgetId: string | undefined;
   let loading: Promise<void> | undefined;
+  let widgetError = '';
+  let waiter: (() => void) | undefined;
+
+  const SPAM_CHECK_FAILED =
+    'The spam check could not run, so the message was not sent. Reload the page and try again, or reach me on LinkedIn.';
+
+  function setToken(value: string, error = '') {
+    token = value;
+    widgetError = error;
+    if (value || error) waiter?.();
+  }
+
+  // Resolves once Turnstile hands back a token or reports an error, or after 20 s.
+  function waitForToken(): Promise<void> {
+    if (token || widgetError) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const timer = setTimeout(() => { waiter = undefined; resolve(); }, 20_000);
+      waiter = () => { clearTimeout(timer); waiter = undefined; resolve(); };
+    });
+  }
 
   // Pre-select the topic from ?topic=cv etc.
   const topic = new URLSearchParams(location.search).get('topic');
@@ -53,9 +73,13 @@ function init(form: HTMLFormElement) {
           sitekey: siteKey,
           action: 'contact',
           theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light',
-          callback: (t: string) => { token = t; },
-          'expired-callback': () => { token = ''; },
-          'error-callback': () => { token = ''; },
+          callback: (t: string) => setToken(t),
+          'expired-callback': () => setToken(''),
+          'error-callback': () => {
+            setToken('', SPAM_CHECK_FAILED);
+            show('error', SPAM_CHECK_FAILED);
+            return true; // we've handled it; stops Turnstile logging to the console
+          },
         });
         resolve();
       };
@@ -82,9 +106,22 @@ function init(form: HTMLFormElement) {
     }
     if (!endpoint || !siteKey) { show('error', 'The form is not connected in this build.'); return; }
     if (!token) {
-      await loadTurnstile()?.catch(() => undefined);
-      show('info', 'Completing the spam check… press "Send message" again in a moment.');
-      return;
+      submit.disabled = true;
+      show('info', 'Completing the spam check…');
+      try {
+        await loadTurnstile();
+        await waitForToken();
+      } catch {
+        show('error', 'The spam check could not load. Check your connection or content blocker, then reload the page.');
+        submit.disabled = false;
+        return;
+      }
+      submit.disabled = false;
+      if (!token) {
+        show('error', widgetError || 'The spam check did not finish, so the message was not sent. Wait a moment and press "Send message" again.');
+        return;
+      }
+      statusEl.className = 'hidden';
     }
 
     const data = new FormData(form);
@@ -121,7 +158,9 @@ function init(form: HTMLFormElement) {
       else if (res.status === 400 && body?.field) {
         form.querySelector(`[name="${body.field}"]`)?.setAttribute('aria-invalid', 'true');
         show('error', body.error ?? 'Check the highlighted field and try again.');
-      } else show('error', 'The message was not sent. Try again in a few minutes, or reach me on LinkedIn.');
+      } else if (res.status === 403) {
+        show('error', 'The message was not sent: this site is not allowed to use the form. Reach me on LinkedIn instead.');
+      } else show('error', `The message was not sent (error ${res.status}). Try again in a few minutes, or reach me on LinkedIn.`);
     } catch {
       show('error', 'The message was not sent: the connection failed. Check your internet connection and try again.');
     } finally {
