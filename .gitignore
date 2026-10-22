@@ -32,3 +32,5 @@ __pycache__/
 
 # --- Content backups (may contain unpublished drafts) ---
 backups/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/
