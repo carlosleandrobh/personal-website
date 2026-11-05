@@ -2,19 +2,17 @@
 import { Icon } from 'astro-icon/components';
 import SectionHeading from './SectionHeading.astro';
 import { dateRange, duration, monthYear } from '../lib/format';
-import type { Education, Experience } from '../lib/types';
+import type { Education, Experience, Profile } from '../lib/types';
 
-interface Props { experiences: Experience[]; education: Education[] }
-const { experiences, education } = Astro.props;
-const earliest = experiences.reduce((min, e) => (e.start_date < min ? e.start_date : min), new Date().toISOString());
-const years = new Date().getFullYear() - new Date(earliest).getFullYear();
+interface Props { profile: Profile; experiences: Experience[]; education: Education[] }
+const { profile, experiences, education } = Astro.props;
 ---
 <section id="experience" class="container-site py-20 lg:py-24" aria-labelledby="experience-title">
   <SectionHeading
     id="experience-title"
     icon="material-symbols:history-edu-outline"
     kicker="Experience"
-    title={`${years} years of making systems fit the business`}
+    title={`${profile.years_experience}+ years of making systems fit the business`}
     intro="Retail at scale, my own consultancy, and now New Zealand. The thread is the same: understand the work, then make the technology serve it."
   >
     <a href="/contact/?topic=cv" class="btn btn-secondary btn-sm shrink-0">
