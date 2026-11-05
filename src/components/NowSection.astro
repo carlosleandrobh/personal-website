@@ -7,6 +7,18 @@ interface Props { items: NowItem[]; certifications: Certification[] }
 const { items, certifications } = Astro.props;
 const certLabel = { planned: 'Planned', studying: 'Studying', achieved: 'Achieved' } as const;
 const [first, ...rest] = items;
+
+// Visible cards: first item, certifications (if any) and the remaining items. The grid adapts to
+// this count so hiding a card never leaves an empty column. Class names stay literal for Tailwind.
+const cardCount = (first ? 1 : 0) + (certifications.length > 0 ? 1 : 0) + rest.length;
+const gridClass =
+  cardCount <= 1
+    ? ''
+    : cardCount === 2
+      ? 'md:grid-cols-2 md:divide-x md:divide-y-0'
+      : cardCount === 3
+        ? 'md:grid-cols-3 md:divide-x md:divide-y-0'
+        : 'md:grid-cols-2 md:divide-y-0 lg:grid-cols-4 lg:divide-x';
 ---
 <section class="container-site py-20 lg:py-24" aria-labelledby="now-title">
   <div class="card overflow-hidden">
@@ -18,7 +30,7 @@ const [first, ...rest] = items;
       <p class="max-w-sm text-sm text-muted">Studying, building and testing — updated whenever something changes.</p>
     </div>
 
-    <div class="grid divide-y divide-line md:grid-cols-2 md:divide-y-0 lg:grid-cols-4 lg:divide-x">
+    <div class:list={['grid divide-y divide-line', gridClass]}>
       {first && (
         <article class="flex flex-col p-6 md:p-7">
           <p class="kicker mb-4"><Icon name={safeIcon(first.icon)} class="size-[18px]" aria-hidden="true" />{first.label}</p>
