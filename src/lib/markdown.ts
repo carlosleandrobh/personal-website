@@ -13,6 +13,7 @@ import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import rehypeSlug from 'rehype-slug';
 import rehypeShiki from '@shikijs/rehype';
 import rehypeStringify from 'rehype-stringify';
+import { SITE } from './site';
 
 export interface Heading { depth: 2 | 3; id: string; text: string }
 export interface RenderedMarkdown { html: string; headings: Heading[]; readingMinutes: number }
@@ -39,12 +40,25 @@ function collectHeadings(target: Heading[]) {
   };
 }
 
+const SITE_ORIGIN = new URL(SITE.url).origin;
+
+/** True for http(s) links that leave this site. Compares parsed origins, not string prefixes
+ *  (so `https://carlos.nz.example.com` and `https://carlos.nz@example.com` count as external). */
+function isExternalLink(href: string) {
+  try {
+    const url = new URL(href, SITE.url);
+    return (url.protocol === 'https:' || url.protocol === 'http:') && url.origin !== SITE_ORIGIN;
+  } catch {
+    return /^(https?:)?\/\//i.test(href); // malformed absolute URL: harden it, harmlessly
+  }
+}
+
 function hardenLinks() {
   return (tree: Node) => {
     walk(tree, (n) => {
       if (n.type !== 'element' || n.tagName !== 'a') return;
       const href = String(n.properties?.href ?? '');
-      if (/^https?:\/\//.test(href) && !href.startsWith('https://carlos.nz')) {
+      if (isExternalLink(href)) {
         n.properties = { ...n.properties, target: '_blank', rel: ['noopener', 'noreferrer'] };
       }
     });
