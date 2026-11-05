@@ -126,7 +126,8 @@ export async function renderOg(input: OgInput): Promise<Buffer> {
     // Amber edge
     h('div', { position: 'absolute', left: 0, top: 0, width: 10, height: 627, backgroundColor: '#F59E0B' }),
 
-    h('div', { display: 'flex', flexDirection: 'column', width: '100%', padding: '64px 96px 56px' }, [
+    // position: relative keeps the content above the absolutely positioned glow and rings (satori ≥ 0.40 follows CSS paint order).
+    h('div', { display: 'flex', flexDirection: 'column', width: '100%', padding: '64px 96px 56px', position: 'relative' }, [
       // Header row
       h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between' }, [
         h('div', { display: 'flex', alignItems: 'center', gap: 18 }, [
@@ -160,7 +161,7 @@ export async function renderOg(input: OgInput): Promise<Buffer> {
       // Author row
       h('div', { display: 'flex', alignItems: 'center', justifyContent: 'space-between' }, [
         h('div', { display: 'flex', alignItems: 'center', gap: 22 }, [
-          h('div', { display: 'flex', width: 88, height: 88, borderRadius: 9999, border: '2px solid #2DD4BF', padding: 4 }, [
+          h('div', { display: 'flex', width: 88, height: 88, boxSizing: 'border-box', borderRadius: 9999, border: '2px solid #2DD4BF', padding: 4 }, [
             img
               ? h('img', { width: 76, height: 76, borderRadius: 9999, objectFit: 'cover' }, undefined, { src: img, width: 76, height: 76 })
               : h('div', { width: 76, height: 76, borderRadius: 9999, backgroundColor: '#1E3A8A', display: 'flex', alignItems: 'center', justifyContent: 'center',
