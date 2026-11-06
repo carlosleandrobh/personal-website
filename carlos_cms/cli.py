@@ -101,6 +101,8 @@ def post_push(
     """Save a post to Supabase (as a draft unless --publish)."""
     saved = _guard(posts.push, db(), file, publish=publish)
     ok(f'{saved["slug"]} saved as {saved["status"]}.')
+    for problem in saved.get('accessibility_problems', []):
+        warn(f'Accessibility: {problem}')
     if saved['status'] == 'published':
         info(f'The site rebuilds in a few minutes: {saved["url"]}')
         if saved.get('share_to_linkedin'):
