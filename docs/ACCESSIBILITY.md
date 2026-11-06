@@ -69,7 +69,10 @@ Automated checks find only part of the barriers. For a change to layout or a com
     (`overflow-wrap: anywhere`), and grid columns that hold form fields use `minmax(0, 1fr)`.
 12. **Never detect or infer assistive technology or disability.** Do not read `prefers-*` or `forced-colors` into
     logs, analytics or the database.
-13. **Speech is opt-in.** "Listen to this post" (`src/scripts/listen.ts`) uses the browser's speech synthesis, only when
+13. **The first Tab stops are fixed:** "Skip to content", "Display settings", "Accessibility statement" (in `BaseLayout.astro`).
+    The home page also shows a welcome note (`Hero.astro`) that points to the display settings, Easy Read and the
+    statement. It is always visible, never a pop-up, and stores nothing. Do not add audio that plays by itself.
+14. **Speech is opt-in.** "Listen to this post" (`src/scripts/listen.ts`) uses the browser's speech synthesis, only when
     the visitor presses the button. It never uses the microphone.
 
 ## Rules for content

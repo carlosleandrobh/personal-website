@@ -100,7 +100,18 @@ const personLd = {
     <slot name="head" />
   </head>
   <body class="min-h-dvh flex flex-col">
+    <!-- The first three Tab stops: skip ahead, adjust how the site looks, or read how it was made accessible.
+         Each one appears only while it has focus. "Display settings" is revealed once its script has loaded. -->
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Skip to content</a>
+    <button
+      type="button"
+      data-display-settings-open
+      data-reveal="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary"
+      aria-haspopup="dialog"
+      aria-controls="display-settings"
+      class="hidden"
+    >Display settings</button>
+    <a href="/accessibility/" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Accessibility statement</a>
     <Header active={activeNav} />
     <main id="main" tabindex="-1" class="flex-1 overflow-x-clip pt-[80px] focus:outline-none">
       <slot />

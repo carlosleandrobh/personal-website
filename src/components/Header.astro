@@ -31,8 +31,9 @@ const { active } = Astro.props;
         <Icon name="material-symbols:dark-mode-outline" class="size-[20px] dark:hidden" aria-hidden="true" />
         <Icon name="material-symbols:light-mode-outline" class="hidden size-[20px] dark:block" aria-hidden="true" />
       </button>
-      <button type="button" data-display-settings-open class="hidden size-[40px] place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-haspopup="dialog" aria-controls="display-settings" aria-label="Display settings">
+      <button type="button" data-display-settings-open data-reveal="flex" class="hidden h-[40px] min-w-[40px] items-center justify-center gap-[6px] rounded-lg px-[10px] text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-haspopup="dialog" aria-controls="display-settings" aria-label="Display settings">
         <Icon name="material-symbols:tune" class="size-[20px]" aria-hidden="true" />
+        <span class="hidden font-display text-[14px] font-semibold xl:inline" aria-hidden="true">Display settings</span>
       </button>
       <a href="/contact/" class="btn btn-primary btn-sm hidden sm:inline-flex">
         Let's talk
