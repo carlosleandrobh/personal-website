@@ -31,9 +31,12 @@ const facts = [
           <a href="/contact/?topic=cv" class="btn btn-secondary btn-sm">
             <Icon name="material-symbols:description-outline" class="size-4" aria-hidden="true" />Request my full CV
           </a>
+          <a href="/about/easy-read/" class="inline-flex items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
+            <Icon name="material-symbols:menu-book-outline" class="size-4" aria-hidden="true" />Read this in Easy Read
+          </a>
           {profile.linkedin_url && (
             <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me" class="inline-flex items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
-              <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />See my LinkedIn profile
+              <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />See my LinkedIn profile<span class="sr-only"> (opens in a new tab)</span>
             </a>
           )}
         </div>

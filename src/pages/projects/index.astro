@@ -20,7 +20,7 @@ const githubUrl = profile.github_username ? `https://github.com/${profile.github
     >
       {githubUrl && (
         <a href={githubUrl} target="_blank" rel="noopener noreferrer me" class="btn btn-secondary btn-sm shrink-0">
-          <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />Profile on GitHub
+          <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />Profile on GitHub<span class="sr-only"> (opens in a new tab)</span>
         </a>
       )}
     </SectionHeading>

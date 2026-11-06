@@ -7,6 +7,8 @@ const links = [
   profile.linkedin_url && { href: profile.linkedin_url, label: 'LinkedIn', external: true },
   profile.github_username && { href: `https://github.com/${profile.github_username}`, label: 'GitHub', external: true },
   { href: '/rss.xml', label: 'RSS', external: false },
+  { href: '/glossary/', label: 'Glossary', external: false },
+  { href: '/accessibility/', label: 'Accessibility', external: false },
   { href: '/privacy/', label: 'Privacy', external: false },
 ].filter(Boolean) as { href: string; label: string; external: boolean }[];
 ---
@@ -20,7 +22,7 @@ const links = [
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
         {links.map((l) => (
           <li>
-            <a class="link-quiet" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer me' } : {})}>{l.label}</a>
+            <a class="link-quiet" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer me' } : {})}>{l.label}{l.external && <span class="sr-only"> (opens in a new tab)</span>}</a>
           </li>
         ))}
       </ul>

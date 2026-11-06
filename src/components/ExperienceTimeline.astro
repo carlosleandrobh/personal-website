@@ -39,7 +39,7 @@ const { profile, experiences, education } = Astro.props;
                 <h3 class="text-h3 font-bold md:text-[1.375rem]">{job.role}</h3>
                 <p class="mt-1 font-display text-[0.9375rem] font-semibold text-accent">
                   {job.company_url
-                    ? <a href={job.company_url} target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">{job.company}</a>
+                    ? <a href={job.company_url} target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">{job.company}<span class="sr-only"> (opens in a new tab)</span></a>
                     : job.company}{job.context && <span class="font-normal text-muted"> — {job.context}</span>}
                 </p>
               </div>

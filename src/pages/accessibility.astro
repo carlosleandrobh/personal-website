@@ -1,0 +1,82 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { getProfile } from '../lib/content';
+import { fullDate } from '../lib/format';
+
+const profile = await getProfile();
+
+// Update this date, and the test list below, whenever the site is re-tested. Never claim more than was tested.
+const REVIEWED = '2026-11-06';
+const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
+---
+<BaseLayout title="Accessibility" description="How carlos.nz aims to work for everyone, what has been tested, what is known to be missing, and how to report a barrier.">
+  <section class="container-site pb-24 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:accessibility-new"
+      kicker="Accessibility"
+      title="Accessibility statement"
+      intro={`I want this site to work whatever device, settings or assistive technology you use. Last reviewed on ${reviewed}.`}
+    />
+
+    <div class="card mt-10 max-w-3xl p-6 md:p-8">
+      <h2 class="text-h3 font-bold">The short version</h2>
+      <ul class="mt-4 list-disc space-y-2 pl-5 text-muted marker:text-accent">
+        <li>I aim to meet the <strong class="text-fg">Web Content Accessibility Guidelines (WCAG) 2.2, level AA</strong>.</li>
+        <li>Automated checks run on every change. Screen reader testing is <strong class="text-fg">not done yet</strong>, so treat the site as a work in progress.</li>
+        <li>If something does not work for you, tell me. I will fix it or give you the information another way.</li>
+      </ul>
+    </div>
+
+    <div class="prose-post mt-12">
+      <h2 id="what-works">What you can do on this site</h2>
+      <ul>
+        <li>Use the whole site with a keyboard, starting with the "Skip to content" link.</li>
+        <li>Open <strong>Display settings</strong> from the header to choose a light, dark or high-contrast theme, larger text, wider text spacing, a narrower line length, or reduced motion. They are saved only in your browser and never sent to me. The site also follows your device's own contrast and reduced motion settings.</li>
+        <li>Zoom the page to 400% without losing content or scrolling sideways.</li>
+        <li>Read a simpler version of my About section in <a href="/about/easy-read/">Easy Read</a>, and look up an abbreviation in the <a href="/glossary/">glossary</a>.</li>
+        <li>Have a post read aloud with the "Listen to this post" button, which uses your browser's own voices. The site never turns the microphone on.</li>
+        <li>See where you are in a post from the breadcrumb at the top, and which page you are on in the main menu.</li>
+        <li>Read post images through their text descriptions. Alt text is checked before a post is published.</li>
+        <li>Send a message through a form that explains each problem next to the field and in a summary at the top.</li>
+      </ul>
+
+      <h2 id="testing">How it has been tested</h2>
+      <p>On {reviewed}:</p>
+      <ul>
+        <li>Automated checks with axe-core on every page, in light, dark and Windows high-contrast (forced colours) modes.</li>
+        <li>Automated keyboard checks: the skip link, the mobile menu and the contact form errors.</li>
+        <li>A check that the page reflows at a 320 pixel width, and that animation stops when reduced motion is requested.</li>
+        <li>A check of the colour contrast of text, form field borders and focus rings in the light, dark and high-contrast themes.</li>
+        <li>Automated checks of the Display settings: they open and close with the keyboard, are remembered, and the pages still pass axe and reflow at 200% text size with wide spacing.</li>
+      </ul>
+      <p>
+        Automated tools find only part of the barriers that exist. I have <strong>not yet</strong> tested with
+        screen readers such as NVDA or VoiceOver, or with disabled users. When I do, I will list it here.
+      </p>
+
+      <h2 id="known-issues">Known issues</h2>
+      <ul>
+        <li>The contact form needs JavaScript and the Cloudflare Turnstile spam check. If you cannot use it, contact me on LinkedIn instead.</li>
+        <li>Posts published before {reviewed} may have images without good descriptions. Tell me which one and I will fix it.</li>
+        <li>The Easy Read page has not been checked by people who use Easy Read. Tell me if it is unclear.</li>
+        <li>"Listen to this post" depends on the voices your device has, so the quality varies. Code examples are skipped.</li>
+        <li>I do not aim to meet every level AAA criterion, such as sign language for video or a reading level for all text.</li>
+      </ul>
+
+      <h2 id="feedback">Report a barrier</h2>
+      <p>
+        Use the <a href="/contact/?topic=other">contact form</a> and choose "Something else", or
+        {profile.linkedin_url
+          ? <>message me on <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">LinkedIn<span class="sr-only"> (opens in a new tab)</span></a></>
+          : 'reach me through the contact page'}.
+        Say which page and what you were trying to do. I read every message, and I treat a barrier as a bug, not a feature request.
+      </p>
+      <p>
+        This statement was last reviewed on {reviewed}. The privacy side of the site is explained in the
+        <a href="/privacy/">privacy notice</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

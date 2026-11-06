@@ -105,7 +105,8 @@ Inter (body), JetBrains Mono (tech tags only). Use semantic utilities (`bg-surfa
 
 ## Before you finish any change
 
-- Site: `npm run check` (0 errors) → `npm run build`
+- Site: `npm run check` (0 errors) → `npm run build` → `npm run test:contrast` → `npm run test:a11y`
+  (build first; the accessibility rules are in `docs/ACCESSIBILITY.md`)
 - Python: `uv run ruff check carlos_cms tests` → `uv run ruff format --check carlos_cms tests` → `uv run pytest`
 - Edge Function: `cd supabase/functions && deno fmt --check && deno lint && deno check contact/index.ts`
 - SQL: pgTAP tests

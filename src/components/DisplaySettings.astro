@@ -1,0 +1,43 @@
+---
+// Display settings: a native <dialog> opened from the header. The choices only change CSS (data-* attributes on <html>),
+// are saved in this browser's localStorage and are never sent anywhere. See src/scripts/prefs.ts.
+const groups = [
+  { name: 'theme', legend: 'Colour theme', options: [['system', 'Match my device'], ['light', 'Light'], ['dark', 'Dark'], ['high-contrast', 'High contrast']] },
+  { name: 'text', legend: 'Text size', options: [['100', '100%'], ['125', '125%'], ['150', '150%'], ['175', '175%'], ['200', '200%']] },
+  { name: 'spacing', legend: 'Text spacing', options: [['normal', 'Normal'], ['wide', 'Wide']] },
+  { name: 'measure', legend: 'Line length', options: [['standard', 'Standard'], ['narrow', 'Narrow']] },
+  { name: 'motion', legend: 'Motion', options: [['system', 'Match my device'], ['reduce', 'Reduce motion']] },
+] as const;
+---
+<dialog
+  id="display-settings"
+  data-display-settings
+  aria-labelledby="display-settings-title"
+  class="m-auto max-h-[calc(100dvh-2rem)] w-[min(40rem,calc(100%-2rem))] overflow-y-auto rounded-[1rem] border-2 border-input-line bg-surface p-0 text-fg backdrop:bg-black/60"
+>
+  <form method="dialog" class="p-6 md:p-8">
+    <h2 id="display-settings-title" class="text-h3 font-bold">Display settings</h2>
+    <p class="mt-2 text-sm text-muted">
+      These change how this site looks on this device only. They are saved in your browser and never sent to me.
+    </p>
+
+    <div class="mt-6 grid gap-5 sm:grid-cols-2">
+      {groups.map((group) => (
+        <fieldset class="rounded-lg border border-input-line p-4">
+          <legend class="px-1 font-display text-sm font-semibold text-fg">{group.legend}</legend>
+          {group.options.map(([value, label]) => (
+            <label class="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+              <input type="radio" name={group.name} value={value} class="size-5 shrink-0 accent-[var(--accent)]" />
+              {label}
+            </label>
+          ))}
+        </fieldset>
+      ))}
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <button type="button" class="btn btn-secondary btn-sm" data-reset>Reset to my device settings</button>
+      <button value="close" class="btn btn-primary btn-sm">Close</button>
+    </div>
+  </form>
+</dialog>

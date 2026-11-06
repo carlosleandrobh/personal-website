@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import DisplaySettings from '../components/DisplaySettings.astro';
 import { SITE } from '../lib/site';
 import { getProfile } from '../lib/content';
 
@@ -64,15 +65,35 @@ const personLd = {
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Theme before first paint (no flash). Preference stays in this browser only. -->
+    <!-- Display settings before first paint (no flash). They stay in this browser only; keep in step with src/scripts/prefs.ts. -->
     <script is:inline>
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
-        var t = null;
-        try { t = localStorage.getItem('theme'); } catch (e) {}
-        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        d.dataset.theme = t;
+        var A = {
+          theme: ['system', 'light', 'dark', 'high-contrast'],
+          text: ['100', '125', '150', '175', '200'],
+          spacing: ['normal', 'wide'],
+          measure: ['standard', 'narrow'],
+          motion: ['system', 'reduce']
+        };
+        var p = {};
+        try { p = JSON.parse(localStorage.getItem('a11y-prefs') || '{}') || {}; } catch (e) {}
+        if (typeof p !== 'object') p = {};
+        var theme = A.theme.indexOf(p.theme) > -1 ? p.theme : null;
+        if (!theme) {
+          try {
+            var legacy = localStorage.getItem('theme');
+            if (legacy === 'light' || legacy === 'dark') theme = legacy;
+          } catch (e) {}
+        }
+        var dark = theme === 'dark' || theme === 'high-contrast' ||
+          ((!theme || theme === 'system') && matchMedia('(prefers-color-scheme: dark)').matches);
+        d.dataset.theme = dark ? 'dark' : 'light';
+        if (theme === 'high-contrast') d.dataset.contrast = 'high';
+        ['text', 'spacing', 'measure', 'motion'].forEach(function (k) {
+          if (A[k].indexOf(p[k]) > 0) d.dataset[k] = p[k];
+        });
       })();
     </script>
     {type !== 'article' && <script type="application/ld+json" set:html={JSON.stringify(personLd)} />}
@@ -81,12 +102,14 @@ const personLd = {
   <body class="min-h-dvh flex flex-col">
     <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Skip to content</a>
     <Header active={activeNav} />
-    <main id="main" class="flex-1 overflow-x-clip pt-20">
+    <main id="main" tabindex="-1" class="flex-1 overflow-x-clip pt-[80px] focus:outline-none">
       <slot />
     </main>
     <Footer profile={profile} />
+    <DisplaySettings />
     <script>
       import '../scripts/ui';
+      import '../scripts/display-settings';
     </script>
   </body>
 </html>

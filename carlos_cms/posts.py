@@ -1,5 +1,6 @@
 """Posts: write Markdown in VS Code, push to Supabase, publish."""
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -82,10 +83,51 @@ def row_from_file(path: Path, *, publish: bool = False, restore: bool = False) -
     return row
 
 
+MAX_ALT_LENGTH = 250
+_CODE = re.compile(r'(```|~~~).*?\1|`[^`\n]*`', re.DOTALL)
+_IMAGE = re.compile(r'!\[(?P<alt>[^\]]*)\]\((?P<src>[^)\s]+)(?:\s+"[^"]*")?\)')
+_FILE_NAME = re.compile(r'[\w\-. ]+\.(png|jpe?g|gif|webp|avif|svg)', re.IGNORECASE)
+_EMPTY_ALT_WORDS = {'image', 'img', 'photo', 'picture', 'screenshot', 'diagram', 'figure', 'graphic'}
+
+
+def accessibility_problems(row: dict[str, Any]) -> list[str]:
+    """Things that stop a post being usable with a screen reader (WCAG 1.1.1). Pure: nothing is read or saved.
+
+    A cover that is purely decorative is marked with `cover_alt: ""`; leaving `cover_alt` out is a mistake.
+    """
+    problems = []
+    if row.get('cover_image_url') and row.get('cover_alt') is None:
+        problems.append(
+            'The cover image needs cover_alt: describe it, or write cover_alt: "" if it is purely decorative.'
+        )
+    elif row.get('cover_alt') and len(str(row['cover_alt'])) > MAX_ALT_LENGTH:
+        problems.append(f'cover_alt is over {MAX_ALT_LENGTH} characters: keep it short.')
+
+    body = _CODE.sub('', row.get('body_md') or '')
+    for number, match in enumerate(_IMAGE.finditer(body), start=1):
+        alt, src = match['alt'].strip(), match['src']
+        where = f'Image {number} ({src})'
+        if not alt:
+            problems.append(f'{where} has no alt text: describe it, or leave it out if decorative.')
+        elif _FILE_NAME.fullmatch(alt) or alt.lower() in _EMPTY_ALT_WORDS:
+            problems.append(f'{where} has alt text "{alt}", which says nothing: describe what it shows.')
+        elif len(alt) > MAX_ALT_LENGTH:
+            problems.append(
+                f'{where} has alt text over {MAX_ALT_LENGTH} characters: keep the alt short and put the '
+                'detail in the text next to the image.'
+            )
+    return problems
+
+
 def push(client: Any, path: Path, *, publish: bool = False) -> dict[str, Any]:
     row = row_from_file(path, publish=publish)
+    problems = accessibility_problems(row)
+    if publish and problems:
+        listed = '\n  - '.join(problems)
+        raise ValueError(f'Not published: fix these accessibility problems first.\n  - {listed}')
     saved = client.table('posts').upsert(row, on_conflict='slug').execute().data[0]
     saved['url'] = f'{SITE_URL}/posts/{saved["slug"]}/'
+    saved['accessibility_problems'] = problems  # drafts are saved anyway; the CLI shows these as warnings
     return saved
 
 

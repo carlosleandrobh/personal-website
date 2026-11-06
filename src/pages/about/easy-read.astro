@@ -1,0 +1,69 @@
+---
+/**
+ * Easy Read version of "About": short sentences, one idea per line, large text.
+ * It only restates what is already on the site (the profile and the About section).
+ * Re-read it whenever the profile changes, so the two never disagree.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import { getProfile } from '../../lib/content';
+
+const profile = await getProfile();
+
+const sections = [
+  { title: 'Who I am', lines: [`My name is ${profile.display_name}.`, `I live in ${profile.location}.`] },
+  {
+    title: 'What I do',
+    lines: [
+      `I am a ${profile.role_line}.`,
+      'I help people who run a business and people who build computer systems understand each other.',
+      `I have done this for more than ${profile.years_experience} years.`,
+    ],
+  },
+  {
+    title: 'What I do at home',
+    lines: [
+      'I have a homelab.',
+      'A homelab is a small set of computers at home.',
+      'I use it to try out tools and to learn.',
+      'I write posts about what I learn.',
+    ],
+  },
+  {
+    title: 'Get in touch',
+    lines: ['You can send me a message.', 'I read every message.', 'I will use your details only to reply to you.'],
+  },
+] as const;
+---
+<BaseLayout title="About me, in Easy Read" description="A short, simple version of the About section: who Carlos is and what he does.">
+  <section class="container-site pb-24 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:person-outline"
+      kicker="Easy Read"
+      title="About me, in Easy Read"
+      intro="This page uses short sentences and simple words."
+    />
+
+    <div class="mt-10 max-w-2xl space-y-10 text-xl leading-9">
+      <p class="font-display text-2xl font-bold text-brand"><span lang="mi">Kia ora</span>!</p>
+
+      {sections.map((section, index) => (
+        <section aria-labelledby={`easy-${index}`}>
+          <h2 id={`easy-${index}`} class="text-h3 font-bold">{section.title}</h2>
+          <ul class="mt-4 space-y-3">
+            {section.lines.map((line) => (
+              <li>{line}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <p class="mt-12 flex flex-wrap gap-x-6 gap-y-3">
+      <a href="/contact/" class="btn btn-primary">Send me a message</a>
+      <a href="/#about" class="btn btn-secondary">Read the full About section</a>
+      <a href="/glossary/" class="btn btn-secondary">Look up a word</a>
+    </p>
+  </section>
+</BaseLayout>

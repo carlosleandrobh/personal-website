@@ -23,6 +23,8 @@ function init(form: HTMLFormElement) {
   const success = document.querySelector<HTMLElement>('[data-success]');
   const message = form.elements.namedItem('message') as HTMLTextAreaElement;
   const counter = form.querySelector<HTMLElement>('[data-counter]');
+  const summary = form.querySelector<HTMLElement>('[data-error-summary]')!;
+  const summaryList = summary.querySelector('ul')!;
 
   let token = '';
   let widgetId: string | undefined;
@@ -57,6 +59,79 @@ function init(form: HTMLFormElement) {
     if (counter) counter.textContent = `${message.value.length} / 5000`;
   });
 
+  interface FormError { field?: string | undefined; message: string }
+
+  /** Show or clear the message under one field, and its aria-invalid flag. */
+  function setFieldError(name: string, message: string) {
+    const input = form.elements.namedItem(name);
+    const line = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+    const text = line?.querySelector('[data-error-text]');
+    if (input instanceof HTMLElement) {
+      if (message) input.setAttribute('aria-invalid', 'true');
+      else input.removeAttribute('aria-invalid');
+    }
+    if (line && text) {
+      text.textContent = message;
+      line.classList.toggle('hidden', !message);
+    }
+  }
+
+  function clearErrors() {
+    summary.classList.add('hidden');
+    summaryList.replaceChildren();
+    form.querySelectorAll<HTMLElement>('[data-error-for]').forEach((line) => setFieldError(line.dataset.errorFor ?? '', ''));
+  }
+
+  /** GOV.UK-style error summary: it receives focus and links to each field with a problem. */
+  function showErrors(errors: FormError[]) {
+    clearErrors();
+    statusEl.className = 'hidden';
+    for (const { field, message: text } of errors) {
+      const item = document.createElement('li');
+      const input = field ? form.elements.namedItem(field) : null;
+      if (field && input instanceof HTMLElement && input.id) {
+        const link = document.createElement('a');
+        link.href = `#${input.id}`;
+        link.textContent = text;
+        link.addEventListener('click', (event) => { event.preventDefault(); input.focus(); });
+        item.append(link);
+        setFieldError(field, text);
+      } else {
+        item.textContent = text;
+      }
+      summaryList.append(item);
+    }
+    summary.classList.remove('hidden');
+    summary.focus();
+  }
+
+  /** Client-side checks: one message per field, in the order the fields appear. */
+  function validate(): FormError[] {
+    const errors: FormError[] = [];
+    const value = (name: string) => String((form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? '').trim();
+    if (!value('name')) errors.push({ field: 'name', message: 'Enter your name.' });
+    if (!value('email')) errors.push({ field: 'email', message: 'Enter your email address.' });
+    else if (!(form.elements.namedItem('email') as HTMLInputElement).checkValidity()) {
+      errors.push({ field: 'email', message: 'Enter an email address in the format name@example.com.' });
+    }
+    if (!value('topic')) errors.push({ field: 'topic', message: 'Choose what your message is about.' });
+    if (!value('message')) errors.push({ field: 'message', message: 'Enter your message.' });
+    else if (value('message').length < 10) errors.push({ field: 'message', message: 'Write at least 10 characters so I have something to reply to.' });
+    if (!(form.elements.namedItem('consent') as HTMLInputElement).checked) {
+      errors.push({ field: 'consent', message: 'Tick the box to agree before sending.' });
+    }
+    return errors;
+  }
+
+  // Fixing a field clears its own message straight away; the summary is rebuilt on the next send.
+  form.addEventListener('input', (event) => {
+    const target = event.target;
+    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) {
+      if (target.getAttribute('aria-invalid') === 'true') setFieldError(target.name, '');
+    }
+  });
+
+  // Used for messages that arrive on their own (not after pressing Send): the spam check loading or failing.
   function show(kind: 'error' | 'info', text: string) {
     statusEl.textContent = text;
     statusEl.className = `rounded-lg p-4 text-sm ${kind === 'error' ? 'border border-red-700/30 bg-red-700/10 text-fg' : 'bg-accent-tint text-fg'}`;
@@ -94,17 +169,11 @@ function init(form: HTMLFormElement) {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     statusEl.className = 'hidden';
-    form.querySelectorAll('[aria-invalid]').forEach((el) => el.removeAttribute('aria-invalid'));
+    clearErrors();
 
-    const invalid = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('input[required], textarea[required], select[required]')]
-      .filter((el) => !el.checkValidity());
-    if (invalid.length) {
-      invalid.forEach((el) => el.setAttribute('aria-invalid', 'true'));
-      invalid[0]!.focus();
-      show('error', 'Fill in your name, a valid email and a message of at least 10 characters, and tick the consent box.');
-      return;
-    }
-    if (!endpoint || !siteKey) { show('error', 'The form is not connected in this build.'); return; }
+    const problems = validate();
+    if (problems.length) { showErrors(problems); return; }
+    if (!endpoint || !siteKey) { showErrors([{ message: 'The form is not connected in this build.' }]); return; }
     if (!token) {
       submit.disabled = true;
       show('info', 'Completing the spam check…');
@@ -112,13 +181,13 @@ function init(form: HTMLFormElement) {
         await loadTurnstile();
         await waitForToken();
       } catch {
-        show('error', 'The spam check could not load. Check your connection or content blocker, then reload the page.');
+        showErrors([{ message: 'The spam check could not load. Check your connection or content blocker, then reload the page.' }]);
         submit.disabled = false;
         return;
       }
       submit.disabled = false;
       if (!token) {
-        show('error', widgetError || 'The spam check did not finish, so the message was not sent. Wait a moment and press "Send message" again.');
+        showErrors([{ message: widgetError || 'The spam check did not finish, so the message was not sent. Wait a moment and press "Send message" again.' }]);
         return;
       }
       statusEl.className = 'hidden';
@@ -154,15 +223,14 @@ function init(form: HTMLFormElement) {
         return;
       }
       const body = await res.json().catch(() => ({}));
-      if (res.status === 429) show('error', 'Too many messages from this connection. Try again in an hour, or reach me on LinkedIn.');
+      if (res.status === 429) showErrors([{ message: 'Too many messages from this connection. Try again in an hour, or reach me on LinkedIn.' }]);
       else if (res.status === 400 && body?.field) {
-        form.querySelector(`[name="${body.field}"]`)?.setAttribute('aria-invalid', 'true');
-        show('error', body.error ?? 'Check the highlighted field and try again.');
+        showErrors([{ field: String(body.field), message: body.error ?? 'Check this field and try again.' }]);
       } else if (res.status === 403) {
-        show('error', 'The message was not sent: this site is not allowed to use the form. Reach me on LinkedIn instead.');
-      } else show('error', `The message was not sent (error ${res.status}). Try again in a few minutes, or reach me on LinkedIn.`);
+        showErrors([{ message: 'The message was not sent: this site is not allowed to use the form. Reach me on LinkedIn instead.' }]);
+      } else showErrors([{ message: `The message was not sent (error ${res.status}). Try again in a few minutes, or reach me on LinkedIn.` }]);
     } catch {
-      show('error', 'The message was not sent: the connection failed. Check your internet connection and try again.');
+      showErrors([{ message: 'The message was not sent: the connection failed. Check your internet connection and try again.' }]);
     } finally {
       token = '';
       if (window.turnstile) window.turnstile.reset(widgetId);

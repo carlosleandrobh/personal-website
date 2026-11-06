@@ -76,6 +76,7 @@ class _Query:
             rows.extend(self.payload if isinstance(self.payload, list) else [self.payload])
             return _Result([])
         if self.mode == 'upsert':
+            saved = []
             for item in self.payload if isinstance(self.payload, list) else [self.payload]:
                 match = next(
                     (r for r in rows if r.get(self.conflict_key) == item.get(self.conflict_key)), None
@@ -83,8 +84,10 @@ class _Query:
                 if match:
                     match.update(item)
                 else:
-                    rows.append({'id': f'gen-{len(rows) + 1}', **item})  # the database generates ids
-            return _Result([])
+                    match = {'id': f'gen-{len(rows) + 1}', **item}  # the database generates ids
+                    rows.append(match)
+                saved.append(copy.deepcopy(match))
+            return _Result(saved)  # like Supabase, which returns the saved rows
         if self.mode == 'delete':
             self.store.tables[self.table_name] = [r for r in rows if not self._match(r)]
             return _Result([])
