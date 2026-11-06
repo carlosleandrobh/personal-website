@@ -1,4 +1,4 @@
-// The "Display settings" dialog. Everything works without it: the button stays hidden until this script runs.
+// The "Display settings" dialog. Everything works without it: every opener stays hidden until this script runs.
 import { OPTIONS, getPrefs, isPrefKey, resetPrefs, setPref, type PrefKey } from './prefs';
 
 const dialog = document.querySelector<HTMLDialogElement>('[data-display-settings]');
@@ -17,8 +17,9 @@ if (dialog && typeof dialog.showModal === 'function' && openers.length) {
   };
 
   openers.forEach((opener) => {
+    // `data-reveal` lists the classes that show this opener (each place it appears looks different).
     opener.classList.remove('hidden');
-    opener.classList.add('grid');
+    opener.classList.add(...(opener.dataset.reveal ?? 'grid').split(/\s+/).filter(Boolean));
     opener.addEventListener('click', () => {
       lastOpener = opener;
       sync();

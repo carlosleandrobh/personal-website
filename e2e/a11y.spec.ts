@@ -90,6 +90,22 @@ test('Labs filter shows which category is selected in forced-colours mode', asyn
   expect(pressed).not.toEqual(notPressed);
 });
 
+test('the first three Tab stops are skip to content, display settings and the accessibility statement', async ({ page }) => {
+  await page.goto('/');
+  const focused = () => page.evaluate(() => (document.activeElement as HTMLElement).textContent?.trim());
+  await page.keyboard.press('Tab');
+  expect(await focused()).toBe('Skip to content');
+  await page.keyboard.press('Tab');
+  expect(await focused()).toBe('Display settings');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#display-settings')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#display-settings')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Display settings' }).first()).toBeFocused();
+  await page.keyboard.press('Tab');
+  expect(await focused()).toBe('Accessibility statement');
+});
+
 test('skip link is the first focus stop and moves focus to main', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Tab');
@@ -118,7 +134,7 @@ for (const path of ['/', '/labs/', '/posts/', '/contact/', '/privacy/', '/access
 test.describe('display settings', () => {
   test('open from the header, apply at once, are remembered, and close with Esc returning focus', async ({ page }) => {
     await page.goto('/');
-    const opener = page.locator('[data-display-settings-open]:visible');
+    const opener = page.locator('header [data-display-settings-open]');
     const dialog = page.locator('#display-settings');
     await opener.focus();
     await page.keyboard.press('Enter');
@@ -146,7 +162,7 @@ test.describe('display settings', () => {
   test('reset goes back to the device settings and clears what was saved', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('a11y-prefs', JSON.stringify({ text: '150', theme: 'dark', motion: 'reduce' })));
     await page.goto('/');
-    await page.locator('[data-display-settings-open]:visible').click();
+    await page.locator('header [data-display-settings-open]').click();
     await page.getByRole('button', { name: 'Reset to my device settings' }).click();
     const root = page.locator('html');
     await expect(root).not.toHaveAttribute('data-text', /.*/);
@@ -286,4 +302,20 @@ test('pages make no requests to other origins', async ({ page, baseURL }) => {
     await page.goto(path);
   }
   expect(foreign).toEqual([]);
+});
+
+test('the home page welcomes visitors and points to the ways to adjust the site', async ({ page }) => {
+  await page.goto('/');
+  const welcome = page.getByRole('region', { name: 'Made for everyone' });
+  await expect(welcome).toBeVisible();
+  await expect(welcome.getByRole('link', { name: 'Easy Read version' })).toHaveAttribute('href', '/about/easy-read/');
+  await expect(welcome.getByRole('link', { name: 'Accessibility statement' })).toHaveAttribute('href', '/accessibility/');
+  await welcome.getByRole('button', { name: 'Display settings' }).click();
+  await expect(page.locator('#display-settings')).toBeVisible();
+});
+
+test('on wide screens the header names the display settings button in words', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('header [data-display-settings-open]')).toContainText('Display settings');
 });
