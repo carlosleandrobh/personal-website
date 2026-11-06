@@ -6,6 +6,8 @@ import type { Profile } from '../lib/types';
 interface Props { profile: Profile }
 const { profile } = Astro.props;
 const initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('');
+// A greeting that starts in te reo Māori is marked as such, so screen readers pronounce it correctly.
+const greeting = profile.greeting.match(/^(Kia ora)(.*)$/i);
 ---
 <section class="container-site grid items-center gap-12 pb-20 pt-10 md:pt-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:pb-28">
   <div class="max-w-[38rem]">
@@ -15,7 +17,7 @@ const initials = profile.full_name.split(/\s+/).filter(Boolean).slice(0, 2).map(
         {profile.availability_text} · {profile.location.split(',')[0]}, NZ
       </p>
     )}
-    <p class="mb-3 font-display text-xl font-semibold text-muted">{profile.greeting}</p>
+    <p class="mb-3 font-display text-xl font-semibold text-muted">{greeting ? <><span lang="mi">{greeting[1]}</span>{greeting[2]}</> : profile.greeting}</p>
     <h1 class="text-display-m font-extrabold sm:text-display">{profile.headline}</h1>
     <p class="mt-6 max-w-[34rem] text-lg leading-8 text-muted">{profile.subheadline}</p>
     <div class="mt-9 flex flex-wrap gap-3">

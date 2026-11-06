@@ -17,7 +17,7 @@
   --surface-2: #f3f6f9;
   --fg: #0f172a;
   --muted: #475569;
-  --subtle: #64748b;
+  --subtle: #5f6f86;
   --brand: #1e3a8a;
   --accent: #0f766e;
   --accent-tint: #e6f4f1;
@@ -25,7 +25,8 @@
   --on-cta: #0f172a;
   --line: rgb(15 23 42 / 0.08);
   --line-strong: rgb(15 23 42 / 0.16);
-  --input-line: #cbd5e1;
+  --input-line: #7a8aa0;
+  --error: #b91c1c;
   --shadow-1: 0 4px 20px -2px rgb(15 23 42 / 0.04);
   --shadow-2: 0 12px 32px -4px rgb(15 23 42 / 0.09);
   --glass: rgb(250 250 247 / 0.85);
@@ -47,12 +48,47 @@
   --on-cta: #0f172a;
   --line: rgb(148 163 184 / 0.14);
   --line-strong: rgb(148 163 184 / 0.28);
-  --input-line: #334155;
+  --input-line: #5f6f87;
+  --error: #f87171;
   --shadow-1: 0 4px 20px -2px rgb(0 0 0 / 0.3);
   --shadow-2: 0 12px 32px -4px rgb(0 0 0 / 0.45);
   --glass: rgb(17 26 46 / 0.85);
   --code-bg: #0a1020;
   color-scheme: dark;
+}
+
+/* People who ask their device for more contrast get full-strength secondary text and borders. */
+@media (prefers-contrast: more) {
+  :root, [data-theme='dark'] {
+    --muted: var(--fg);
+    --subtle: var(--fg);
+    --input-line: var(--fg);
+    --line-strong: var(--fg);
+    --line: var(--fg);
+  }
+}
+
+/* High contrast: the dark theme (data-theme="dark") with every colour pushed to its extreme. */
+[data-contrast='high'] {
+  --bg: #000000;
+  --surface: #000000;
+  --surface-2: #000000;
+  --fg: #ffffff;
+  --muted: #ffffff;
+  --subtle: #ffffff;
+  --brand: #ffffff;
+  --accent: #ffff00;
+  --accent-tint: #000000;
+  --cta: #ffff00;
+  --on-cta: #000000;
+  --line: #ffffff;
+  --line-strong: #ffffff;
+  --input-line: #ffffff;
+  --error: #ff9999;
+  --shadow-1: none;
+  --shadow-2: none;
+  --glass: #000000;
+  --code-bg: #000000;
 }
 
 @theme inline {
@@ -70,6 +106,7 @@
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
   --color-input-line: var(--input-line);
+  --color-error: var(--error);
   --shadow-card: var(--shadow-1);
   --shadow-lift: var(--shadow-2);
 }
@@ -111,7 +148,7 @@
     scroll-padding-top: 6rem;
   }
   @media (prefers-reduced-motion: no-preference) {
-    html { scroll-behavior: smooth; }
+    html:not([data-motion='reduce']) { scroll-behavior: smooth; }
   }
   body {
     background: var(--bg);
@@ -126,6 +163,8 @@
     font-family: var(--font-display);
     color: var(--brand);
     text-wrap: balance;
+    /* With large text a single long word can be wider than a small screen; break it rather than scroll sideways. */
+    overflow-wrap: anywhere;
   }
   p { text-wrap: pretty; }
   ::selection { background: var(--accent-tint); color: var(--accent); }
@@ -232,8 +271,9 @@
     font: inherit;
     transition: border-color 150ms, box-shadow 150ms;
   }
-  .field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
-  .field[aria-invalid='true'] { border-color: #b91c1c; }
+  /* The transparent outline keeps a visible focus ring in forced-colours mode, where box-shadow is dropped. */
+  .field:focus { outline: 2px solid transparent; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .field[aria-invalid='true'] { border-color: var(--error); }
 
   /* Native <progress> styled as the Stitch certification bar */
   .meter { appearance: none; width: 100%; height: 6px; border: 0; border-radius: 9999px; background: var(--surface-2); overflow: hidden; }
@@ -287,7 +327,8 @@
   background: var(--code-bg) !important;
   border: 1px solid var(--line);
 }
-.prose-post table { width: 100%; border-collapse: collapse; font-size: 0.95rem; display: block; overflow-x: auto; }
+.prose-post table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.prose-post .table-scroll { overflow-x: auto; }
 .prose-post th, .prose-post td { border-bottom: 1px solid var(--line); padding: 0.6rem 0.75rem; text-align: left; }
 .prose-post th { font-family: var(--font-display); color: var(--brand); }
 .prose-post img { border-radius: 0.875rem; border: 1px solid var(--line); }
@@ -311,12 +352,12 @@
 .bridge-keystone { transform-box: fill-box; transform-origin: center; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .js .bridge-arch-path { stroke-dashoffset: 1300; animation: bridge-draw 1.6s var(--ease-out-soft) 0.25s forwards; }
-  .js .bridge-end { opacity: 0; animation: bridge-fade 0.5s ease-out forwards; }
-  .js .bridge-end--business { animation-delay: 0.15s; }
-  .js .bridge-end--tech { animation-delay: 1.35s; }
-  .js .bridge-keystone { opacity: 0; transform: scale(0.4); animation: keystone-land 0.6s var(--ease-out-soft) 1.05s forwards; }
-  .js .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 2; }
+  .js:not([data-motion='reduce']) .bridge-arch-path { stroke-dashoffset: 1300; animation: bridge-draw 1.6s var(--ease-out-soft) 0.25s forwards; }
+  .js:not([data-motion='reduce']) .bridge-end { opacity: 0; animation: bridge-fade 0.5s ease-out forwards; }
+  .js:not([data-motion='reduce']) .bridge-end--business { animation-delay: 0.15s; }
+  .js:not([data-motion='reduce']) .bridge-end--tech { animation-delay: 1.35s; }
+  .js:not([data-motion='reduce']) .bridge-keystone { opacity: 0; transform: scale(0.4); animation: keystone-land 0.6s var(--ease-out-soft) 1.05s forwards; }
+  .js:not([data-motion='reduce']) .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 2; }
 }
 @keyframes bridge-draw { to { stroke-dashoffset: 0; } }
 @keyframes bridge-fade { to { opacity: 1; } }
@@ -331,7 +372,7 @@
 .status-dot { position: relative; display: inline-flex; width: 0.5rem; height: 0.5rem; }
 .status-dot::before, .status-dot::after { content: ''; position: absolute; inset: 0; border-radius: 9999px; background: #10b981; }
 @media (prefers-reduced-motion: no-preference) {
-  .status-dot::before { animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite; opacity: 0.6; }
+  html:not([data-motion='reduce']) .status-dot::before { animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) 2; opacity: 0.6; }
 }
 @keyframes ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
 
@@ -339,6 +380,46 @@
 .spectrum-stop { transition: transform 200ms var(--ease-out-soft), background-color 200ms, box-shadow 200ms; }
 .spectrum-card:hover .spectrum-index,
 .spectrum-card:focus-within .spectrum-index { background: var(--cta); color: var(--on-cta); }
+
+/* ---------------------------------------------------------------------------
+   Display settings (src/scripts/prefs.ts). They only change CSS, through data-* attributes on <html>.
+   --------------------------------------------------------------------------- */
+html[data-text='125'] { font-size: 125%; }
+html[data-text='150'] { font-size: 150%; }
+html[data-text='175'] { font-size: 175%; }
+html[data-text='200'] { font-size: 200%; }
+
+html[data-spacing='wide'] body { letter-spacing: 0.12em; word-spacing: 0.16em; }
+html[data-spacing='wide'] :is(p, li, dd, td, th, blockquote, figcaption) { line-height: 1.8; }
+html[data-spacing='wide'] :is(.prose-post, .prose-about) > * + * { margin-top: 2em; }
+
+html[data-measure='narrow'] :is(.prose-post, .prose-about) { max-width: 55ch; }
+
+/* "Reduce motion" in the panel behaves like the device setting. */
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] ::before,
+html[data-motion='reduce'] ::after {
+  transition: none !important;
+  animation: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* Reduced motion: no transitions anywhere, so hover and focus changes are instant. */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+    animation: none !important;
+  }
+}
+
+/* Forced colours (Windows contrast themes) replace our colours with system colours. Anything that
+   relies on a fill or a coloured border alone needs a system-colour fallback. */
+@media (forced-colors: active) {
+  .btn { border: 1px solid ButtonText; }
+  button[aria-pressed='true'] { background: Highlight; color: HighlightText; border-color: Highlight; }
+  .pill, .chip { border: 1px solid CanvasText; }
+}
 
 @media print {
   header, footer, .no-print { display: none !important; }

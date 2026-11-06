@@ -62,7 +62,7 @@ const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, '
       )}
       {lab.repo_url && (
         <a href={lab.repo_url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-muted hover:text-fg">
-          <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code
+          <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code<span class="sr-only"> (opens in a new tab)</span>
         </a>
       )}
     </div>

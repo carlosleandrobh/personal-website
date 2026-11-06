@@ -1,7 +1,7 @@
 /**
  * Markdown -> safe HTML for post bodies (build time only).
- * Pipeline: parse (GFM) -> HAST -> SANITISE -> slug ids -> collect TOC
- *           -> external links hardening -> syntax highlight -> HTML string.
+ * Pipeline: parse (GFM) -> HAST -> SANITISE -> demote h1 -> slug ids -> collect TOC
+ *           -> external links hardening -> scrollable tables -> syntax highlight -> HTML string.
  * Sanitising before highlighting means no raw HTML from the database can
  * reach the page, even if a post body were tampered with.
  */
@@ -60,8 +60,39 @@ function hardenLinks() {
       const href = String(n.properties?.href ?? '');
       if (isExternalLink(href)) {
         n.properties = { ...n.properties, target: '_blank', rel: ['noopener', 'noreferrer'] };
+        // Tell screen reader users the link leaves this tab (WCAG 3.2.5 advisory technique G201).
+        n.children = [
+          ...(n.children ?? []),
+          { type: 'element', tagName: 'span', properties: { className: ['sr-only'] }, children: [{ type: 'text', value: ' (opens in a new tab)' }] },
+        ];
       }
     });
+  };
+}
+
+/** The post title is the page's only h1, so an h1 in the body becomes an h2 (WCAG 1.3.1, 2.4.6). */
+function demoteH1() {
+  return (tree: Node) => {
+    walk(tree, (n) => {
+      if (n.type === 'element' && n.tagName === 'h1') n.tagName = 'h2';
+    });
+  };
+}
+
+/** Wide tables scroll inside their own container. Keeping <table> as a real table preserves its semantics;
+ *  src/scripts/ui.ts makes the container keyboard-focusable only while it actually overflows. */
+function wrapTables() {
+  return (tree: Node) => {
+    const visit = (parent: Node) => {
+      parent.children = (parent.children ?? []).map((child) => {
+        visit(child);
+        if (child.type === 'element' && child.tagName === 'table') {
+          return { type: 'element', tagName: 'div', properties: { className: ['table-scroll'] }, children: [child] };
+        }
+        return child;
+      });
+    };
+    visit(tree);
   };
 }
 
@@ -79,9 +110,11 @@ export async function renderMarkdown(markdown: string): Promise<RenderedMarkdown
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize, schema)
+    .use(demoteH1)
     .use(rehypeSlug)
     .use(collectHeadings(headings))
     .use(hardenLinks)
+    .use(wrapTables)
     .use(rehypeShiki, { theme: 'github-dark-default' })
     .use(rehypeStringify)
     .process(markdown ?? '');

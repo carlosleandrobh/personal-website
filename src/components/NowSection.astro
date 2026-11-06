@@ -51,7 +51,7 @@ const gridClass =
               <li>
                 <div class="flex items-baseline justify-between gap-3">
                   {c.credential_url
-                    ? <a href={c.credential_url} target="_blank" rel="noopener noreferrer" class="font-display text-[0.9375rem] font-semibold text-fg underline-offset-4 hover:underline">{c.name}</a>
+                    ? <a href={c.credential_url} target="_blank" rel="noopener noreferrer" class="font-display text-[0.9375rem] font-semibold text-fg underline-offset-4 hover:underline">{c.name}<span class="sr-only"> (opens in a new tab)</span></a>
                     : <span class="font-display text-[0.9375rem] font-semibold text-fg">{c.name}</span>}
                   <span class:list={['shrink-0 font-mono text-xs', c.status === 'achieved' ? 'text-accent' : 'text-subtle']}>
                     {c.progress !== null ? `${c.progress}%` : certLabel[c.status]}

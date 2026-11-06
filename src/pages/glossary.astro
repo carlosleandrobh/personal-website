@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { GLOSSARY } from '../lib/glossary';
+
+const terms = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, 'en-NZ'));
+---
+<BaseLayout title="Glossary" description="Plain-language meanings for the technical and business terms used on carlos.nz.">
+  <section class="container-site pb-24 pt-12 md:pt-16">
+    <SectionHeading
+      level="h1"
+      icon="material-symbols:menu-book-outline"
+      kicker="Glossary"
+      title="Words used on this site"
+      intro="Short, plain meanings for the abbreviations and technical terms in my posts and labs."
+    />
+
+    <dl class="mt-10 grid max-w-3xl gap-4">
+      {terms.map((item) => (
+        <div class="card p-5">
+          <dt class="font-display text-lg font-bold text-brand">
+            {item.term}{item.expansion && <span class="font-sans text-base font-normal text-muted"> — {item.expansion}</span>}
+          </dt>
+          <dd class="mt-1 text-muted">{item.meaning}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+</BaseLayout>

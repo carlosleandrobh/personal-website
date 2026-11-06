@@ -18,7 +18,7 @@ const topics = [
 ];
 ---
 <BaseLayout title="Contact" description="Get in touch with Carlos about a project, a role or a problem worth solving." activeNav="Contact">
-  <section class="container-site grid gap-12 pb-24 pt-12 md:pt-16 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+  <section class="container-site grid grid-cols-[minmax(0,1fr)] gap-12 pb-24 pt-12 md:pt-16 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
     <div>
       <SectionHeading
         level="h1"
@@ -39,7 +39,7 @@ const topics = [
         {profile.linkedin_url && (
           <li class="flex gap-3">
             <Icon name="simple-icons:linkedin" class="mt-0.5 size-5 shrink-0 text-accent" aria-hidden="true" />
-            <span><strong class="font-display text-fg">Prefer LinkedIn?</strong><br /><a class="text-muted underline underline-offset-4 hover:text-fg" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">Message me there</a></span>
+            <span><strong class="font-display text-fg">Prefer LinkedIn?</strong><br /><a class="text-muted underline underline-offset-4 hover:text-fg" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">Message me there<span class="sr-only"> (opens in a new tab)</span></a></span>
           </li>
         )}
       </ul>
@@ -48,7 +48,7 @@ const topics = [
     <div class="card p-6 md:p-8">
       {!configured && (
         <p class="mb-6 rounded-lg border border-cta/40 bg-cta/10 p-4 text-sm text-fg" role="note">
-          The contact form is being set up.{profile.linkedin_url && <> In the meantime, <a class="font-semibold underline underline-offset-4" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">message me on LinkedIn</a>.</>}
+          The contact form is being set up.{profile.linkedin_url && <> In the meantime, <a class="font-semibold underline underline-offset-4" href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me">message me on LinkedIn<span class="sr-only"> (opens in a new tab)</span></a>.</>}
         </p>
       )}
       <form
@@ -59,36 +59,59 @@ const topics = [
         data-sitekey={PUBLIC_TURNSTILE_SITE_KEY ?? ''}
         data-privacy-version={SITE.privacyVersion}
       >
-        <div class="grid gap-5 sm:grid-cols-2">
-          <label class="block">
-            <span class="mb-1.5 block font-display text-sm font-semibold text-fg">Your name</span>
-            <input class="field" name="name" autocomplete="name" required maxlength="120" />
-          </label>
-          <label class="block">
-            <span class="mb-1.5 block font-display text-sm font-semibold text-fg">Email</span>
-            <input class="field" name="email" type="email" autocomplete="email" required maxlength="254" />
-          </label>
+        <div
+          class="hidden rounded-lg border-2 border-error p-4"
+          tabindex="-1"
+          role="group"
+          aria-labelledby="contact-error-summary-title"
+          data-error-summary
+        >
+          <h2 id="contact-error-summary-title" class="font-display text-base font-bold text-fg">There is a problem</h2>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-fg [&_a]:font-semibold [&_a]:underline [&_a]:underline-offset-4"></ul>
         </div>
-        <label class="block">
-          <span class="mb-1.5 block font-display text-sm font-semibold text-fg">What's it about?</span>
-          <select class="field" name="topic" required data-topic>
+
+        <p class="text-sm text-muted">All fields are required.</p>
+
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="contact-name" class="mb-1.5 block font-display text-sm font-semibold text-fg">Your name</label>
+            <input id="contact-name" class="field" name="name" autocomplete="name" required maxlength="120" aria-describedby="contact-name-error" />
+            <p id="contact-name-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="name"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+          </div>
+          <div>
+            <label for="contact-email" class="mb-1.5 block font-display text-sm font-semibold text-fg">Email</label>
+            <input id="contact-email" class="field" name="email" type="email" autocomplete="email" spellcheck="false" required maxlength="254" aria-describedby="contact-email-error" />
+            <p id="contact-email-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="email"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+          </div>
+        </div>
+        <div>
+          <label for="contact-topic" class="mb-1.5 block font-display text-sm font-semibold text-fg">What's it about?</label>
+          <select id="contact-topic" class="field" name="topic" required data-topic aria-describedby="contact-topic-error">
             {topics.map((t) => <option value={t.value}>{t.label}</option>)}
           </select>
-        </label>
-        <label class="block">
-          <span class="mb-1.5 flex justify-between font-display text-sm font-semibold text-fg">Message <span class="font-sans text-xs font-normal text-subtle" data-counter>0 / 5000</span></span>
-          <textarea class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?"></textarea>
-        </label>
+          <p id="contact-topic-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="topic"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+        </div>
+        <div>
+          <div class="mb-1.5 flex justify-between">
+            <label for="contact-message" class="font-display text-sm font-semibold text-fg">Message</label>
+            <span class="font-sans text-xs text-subtle" data-counter>0 / 5000</span>
+          </div>
+          <textarea id="contact-message" class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?" aria-describedby="contact-message-error"></textarea>
+          <p id="contact-message-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="message"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+        </div>
 
         <!-- Honeypot: invisible to people, tempting to bots. -->
         <div class="absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
           <label>Leave this empty <input name="company_website" tabindex="-1" autocomplete="off" /></label>
         </div>
 
-        <label class="flex gap-3 text-sm text-muted">
-          <input type="checkbox" name="consent" required class="mt-0.5 size-4 shrink-0 accent-[var(--accent)]" />
-          <span>I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</span>
-        </label>
+        <div>
+          <div class="flex gap-3 text-sm text-muted">
+            <input id="contact-consent" type="checkbox" name="consent" required class="mt-0.5 size-5 shrink-0 accent-[var(--accent)]" aria-describedby="contact-consent-error" />
+            <label for="contact-consent">I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</label>
+          </div>
+          <p id="contact-consent-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="consent"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+        </div>
 
         <div data-turnstile class="min-h-[65px]"></div>
 
