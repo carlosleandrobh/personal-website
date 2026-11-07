@@ -5,7 +5,7 @@ import { SITE } from '../lib/site';
 interface Props { active?: string | undefined }
 const { active } = Astro.props;
 ---
-<header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-[var(--glass)] backdrop-blur-md">
+<header data-site-header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-[var(--glass)] backdrop-blur-md">
   <div class="container-site flex h-[80px] items-center justify-between gap-[16px]">
     <a href="/" class="group flex items-center gap-[8px] font-display text-[22px] font-bold tracking-tight text-fg" aria-label="carlos.nz home">
       <span>carlos.nz</span>

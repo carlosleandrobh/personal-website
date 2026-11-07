@@ -198,6 +198,13 @@
     box-shadow: var(--shadow-2);
     border-color: color-mix(in srgb, var(--accent) 35%, transparent);
   }
+  /* A card that is one big link (a post, a repository): the link is stretched over the whole card, so a ring around the
+     title alone would hide how much is clickable. Ring the whole card while its link has keyboard focus. A browser
+     without :has() skips this block and keeps the link's own ring. Never remove a link's outline without a ring like this. */
+  @supports selector(:has(*)) {
+    [data-card-link]:focus-visible { outline: none; }
+    .card:has([data-card-link]:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+  }
 
   .btn {
     display: inline-flex;
@@ -212,6 +219,12 @@
     transition: transform 160ms var(--ease-out-soft), box-shadow 160ms, background-color 160ms, color 160ms;
     white-space: nowrap;
   }
+  /* A full-width button sits in a narrow column (a card in a sidebar, a phone). There a long label has to wrap: with wide
+     text spacing or a large text size it would otherwise run past the screen and force a sideways scroll. Buttons that
+     size themselves to their text stay on one line, or a flex row would squeeze them into two. */
+  .btn.w-full { white-space: normal; text-align: center; padding-inline: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  /* An icon keeps its size when the button is squeezed; without this a squeezed button lost its icon first. */
+  .btn > svg { flex-shrink: 0; }
   .btn-primary { background: var(--cta); color: var(--on-cta); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px -6px rgb(245 158 11 / 0.55); }
   .btn-primary:active { transform: translateY(0); }
@@ -435,6 +448,14 @@ html[data-motion='reduce'] ::after {
   .btn { border: 1px solid ButtonText; }
   button[aria-pressed='true'] { background: Highlight; color: HighlightText; border-color: Highlight; }
   .pill, .chip { border: 1px solid CanvasText; }
+}
+
+/* Short screens: a laptop at 400% zoom shows about 320 x 200 CSS px and a phone on its side about 375 px tall. A fixed
+   header would cover up to 40% of that, so it scrolls away with the page instead (and an open menu can be scrolled
+   to the end). The page keeps its top padding for the header, and anchor jumps stop keeping a gap for it. */
+@media (max-height: 31.25rem) {
+  [data-site-header] { position: absolute; }
+  html { scroll-padding-top: 0.5rem; }
 }
 
 @media print {

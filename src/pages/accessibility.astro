@@ -35,7 +35,7 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Use the whole site with a keyboard. The first three Tab stops are "Skip to content", "Display settings" and this statement.</li>
         <li>Answer a short welcome window the first time you visit. It asks what would make the site easier for you (reading aloud, larger text and stronger contrast, simpler words, less movement, bigger buttons and links), shows each choice straight away, and saves nothing until you press "Use my choices". "Continue without changes" or Esc leaves the site as it was. It asks; it does not try to work out who you are.</li>
         <li>Open <strong>Display settings</strong> from the header at any time to choose a light, dark or high-contrast theme, larger text, wider text spacing, a narrower line length, reduced motion, bigger buttons and links, or a Listen button on every page. They are saved only in your browser and never sent to me. The site also follows your device's own contrast and reduced motion settings.</li>
-        <li>Zoom the page to 400% without losing content or scrolling sideways.</li>
+        <li>Zoom the page to 400% without losing content or scrolling sideways. On a short screen, such as a laptop at 400% zoom or a phone on its side, the header scrolls away with the page instead of covering it.</li>
         <li>Read a simpler version of my About section in <a href="/about/easy-read/">Easy Read</a>, and look up an abbreviation in the <a href="/glossary/">glossary</a>.</li>
         <li>Have any page or post read aloud with the Listen button, which uses your browser's own voices. You can pause, resume, stop and change the speed, and the part being read is outlined. It starts only when you press a button, and the site never turns the microphone on.</li>
         <li>See where you are in a post from the breadcrumb at the top, and which page you are on in the main menu.</li>
@@ -53,6 +53,7 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Automated checks of the Display settings: they open and close with the keyboard, are remembered, and the pages still pass axe and reflow at 200% text size with wide spacing.</li>
         <li>Automated checks of the welcome window: it opens once, names itself, takes focus, can be used with the keyboard alone, previews and then keeps or undoes each choice, passes axe in light, dark and high-contrast themes, and fits a 320 pixel screen at 200% text.</li>
         <li>Automated checks that reading aloud starts only on a button press and can be paused, resumed and stopped, and that "Bigger buttons and links" gives controls a target of at least 48 pixels.</li>
+        <li>Automated checks that every Tab stop on the home page, Labs, Posts and Contact shows where the keyboard focus is, that post pages and every other page still fit a 320 pixel screen with 200% text, wide spacing and the standard text spacing overrides, that the header does not cover a short screen, and that on a post the text comes before the sidebar in the page and on screen.</li>
       </ul>
       <p>
         Automated tools find only part of the barriers that exist. I have <strong>not yet</strong> tested with
