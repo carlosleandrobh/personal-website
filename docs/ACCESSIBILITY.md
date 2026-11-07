@@ -53,7 +53,8 @@ Automated checks find only part of the barriers. For a change to layout or a com
    Tab stop shows where the keyboard focus is" (`e2e/a11y.spec.ts`) fails if any stop on the key pages has no indicator.
 5. **Motion respects the device.** Animations and transitions are off under `prefers-reduced-motion: reduce`
    (a global rule in `global.css`). The hero arch is the one orchestrated moment and only plays when motion is allowed.
-   Anything that loops stops after a few seconds.
+   Nothing moves on its own for more than five seconds in total, counting the delay and every repeat (WCAG 2.2.2);
+   a test measures this.
 6. **New-tab links say so.** Every `target="_blank"` link has `<span class="sr-only"> (opens in a new tab)</span>`.
    Post links get it automatically from `src/lib/markdown.ts`.
 7. **Forms:** every field has a `label`, an error line linked with `aria-describedby`, and the error summary takes
@@ -81,7 +82,8 @@ Automated checks find only part of the barriers. For a change to layout or a com
     never decides for the visitor, and its options are named by what they do ("Larger text and stronger contrast"),
     never by a condition ("I am blind").
 13. **The first Tab stops are fixed:** "Skip to content", "Display settings", "Accessibility statement" (in `BaseLayout.astro`).
-    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`).
+    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`). A fourth stop, "Go to reading
+    controls", exists only while the read-aloud player shows (rule 15); when the player is hidden it is not in the page.
 14. **The welcome window** (`WelcomeDialog.astro`, `src/scripts/welcome.ts`) is a native modal `<dialog>` that opens
     once, on a visitor's first visit. It is the only window that opens by itself, so keep it small and keep these rules:
     - Focus starts on its title, so a screen reader reads the title and then the choices in order. Its ids are unique
@@ -100,11 +102,19 @@ Automated checks find only part of the barriers. For a change to layout or a com
     a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
     or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
     a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
-    and resumes from its start, because the browser's own pause is unreliable.
-16. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
+    and resumes from its start, because the browser's own pause is unreliable. The player is at the end of the page, so
+    keyboard focus is taken to Pause when a reading starts from the welcome window, and the fourth Tab stop ("Go to
+    reading controls") jumps to it at any time.
+16. **Size by default.** No text is smaller than 14 px (`text-sm`, 0.875rem): do not use `text-xs`, and `.chip` and
+    `.pill` are 14 px too. Every control that stands on its own is at least 44 px tall and wide (WCAG asks for 24):
+    `.btn` and `.btn-sm`, filter chips, form fields, header icons, and links in lists, cards, the header and the footer
+    take `min-h-11` (and `min-w-11` when the word is short). A link inside a sentence is exempt. A card that is one big
+    link counts as the card. The "Bigger buttons and links" setting goes further, to 48 px. Two tests in
+    `e2e/a11y.spec.ts` check this on every page.
+17. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
     `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
     Do not add other fixed or sticky bars that take real height without the same rule.
-17. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
+18. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
     must follow what is on screen. On a post the text comes first and the sidebar (share, listen, contents) after it:
     below the text on a phone, beside it on the right on a wide screen. Do not use CSS `order` to put something first on
     screen that comes later in the HTML. `e2e/a11y.spec.ts` checks this on a phone and a desktop.
@@ -123,7 +133,12 @@ Automated checks find only part of the barriers. For a change to layout or a com
   `example.com`) and no real hostnames, ports or versions of exposed services, in the image and in its description.
 - **Plain language:** open key pages and long posts with a sentence or two of summary (a post's `excerpt` is shown as
   its summary), and spell out an abbreviation the first time it appears ("Proxmox VE, a virtualisation platform").
-- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two.
+- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two,
+  without jargon that is not itself in the list. Each page ends with "Words on this page" (`WordsOnPage.astro`,
+  `src/scripts/words.ts`): it lists the glossary terms that page uses, so a term you add appears wherever it is used,
+  with nothing to hover and no extra Tab stop. It is built by a script, so without JavaScript only the glossary page
+  remains. `e2e/words.spec.ts` fails when an abbreviation on the main pages is not in the glossary: add it, or, if it is
+  a name or a place, add it to `NOT_JARGON` in that test. The list is off on the glossary page (`words={false}`).
 - **Easy Read:** `src/pages/about/easy-read.astro` restates the About section in short sentences. Re-read it whenever
   the profile changes, so the two never disagree.
 - **Te reo Māori** in a `.astro` file is wrapped in `lang="mi"`, with macrons. The hero marks a greeting that starts

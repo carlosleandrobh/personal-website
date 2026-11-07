@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import DisplaySettings from '../components/DisplaySettings.astro';
 import WelcomeDialog from '../components/WelcomeDialog.astro';
 import ListenPlayer from '../components/ListenPlayer.astro';
+import WordsOnPage from '../components/WordsOnPage.astro';
 import { SITE } from '../lib/site';
 import { getProfile } from '../lib/content';
 
@@ -18,9 +19,11 @@ interface Props {
   activeNav?: string;
   /** Open the first-visit welcome window here. Off for pages that are themselves about accessibility. */
   welcome?: boolean;
+  /** List the abbreviations the page uses, with their meanings, at the end of it. Off on the glossary page itself. */
+  words?: boolean;
 }
 
-const { title, description, ogImage = '/og/default.png', type = 'website', publishedTime, noindex = false, activeNav, welcome = true } = Astro.props;
+const { title, description, ogImage = '/og/default.png', type = 'website', publishedTime, noindex = false, activeNav, welcome = true, words = true } = Astro.props;
 const profile = await getProfile();
 const canonical = new URL(Astro.url.pathname, SITE.url).toString();
 const ogUrl = new URL(ogImage, SITE.url).toString();
@@ -118,9 +121,13 @@ const personLd = {
       class="hidden"
     >Display settings</button>
     <a href="/accessibility/" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Accessibility statement</a>
+    <!-- A fourth stop that exists only while the read-aloud player shows. The player sits at the end of the page, and
+         without this a keyboard user would have to tab through the whole page to reach Pause or Stop. -->
+    <button type="button" data-listen-skip hidden class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Go to reading controls</button>
     <Header active={activeNav} />
     <main id="main" tabindex="-1" class="flex-1 overflow-x-clip pt-[80px] focus:outline-none">
       <slot />
+      {words && <WordsOnPage />}
     </main>
     <Footer profile={profile} />
     <DisplaySettings />
@@ -131,6 +138,7 @@ const personLd = {
       import '../scripts/display-settings';
       import '../scripts/listen';
       import '../scripts/welcome';
+      import '../scripts/words';
     </script>
   </body>
 </html>

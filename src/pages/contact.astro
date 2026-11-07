@@ -94,7 +94,7 @@ const topics = [
         <div>
           <div class="mb-1.5 flex justify-between">
             <label for="contact-message" class="font-display text-sm font-semibold text-fg">Message</label>
-            <span class="font-sans text-xs text-subtle" data-counter>0 / 5000</span>
+            <span class="font-sans text-sm text-subtle" data-counter>0 / 5000</span>
           </div>
           <textarea id="contact-message" class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?" aria-describedby="contact-message-error"></textarea>
           <p id="contact-message-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="message"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
@@ -107,8 +107,8 @@ const topics = [
 
         <div>
           <div class="flex gap-3 text-sm text-muted">
-            <input id="contact-consent" type="checkbox" name="consent" required class="mt-0.5 size-5 shrink-0 accent-[var(--accent)]" aria-describedby="contact-consent-error" />
-            <label for="contact-consent">I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</label>
+            <input id="contact-consent" type="checkbox" name="consent" required class="size-6 shrink-0 accent-[var(--accent)]" aria-describedby="contact-consent-error" />
+            <label for="contact-consent" class="min-h-11">I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</label>
           </div>
           <p id="contact-consent-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="consent"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
         </div>
@@ -119,7 +119,7 @@ const topics = [
           <button type="submit" class="btn btn-primary justify-center" data-submit disabled={!configured}>
             <Icon name="material-symbols:send-outline" class="size-5" aria-hidden="true" /><span data-submit-label>Send message</span>
           </button>
-          <p class="text-xs text-subtle">Spam protection by Cloudflare Turnstile loads when you start typing.</p>
+          <p class="text-sm text-subtle">Spam protection by Cloudflare Turnstile loads when you start typing.</p>
         </div>
         <p class="hidden rounded-lg p-4 text-sm" role="status" aria-live="polite" data-status></p>
       </form>

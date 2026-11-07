@@ -32,11 +32,12 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
     <div class="prose-post mt-12">
       <h2 id="what-works">What you can do on this site</h2>
       <ul>
-        <li>Use the whole site with a keyboard. The first three Tab stops are "Skip to content", "Display settings" and this statement.</li>
+        <li>Use the whole site with a keyboard. The first three Tab stops are "Skip to content", "Display settings" and this statement. While the Listen player is showing, a fourth stop, "Go to reading controls", takes you to it.</li>
         <li>Answer a short welcome window the first time you visit. It asks what would make the site easier for you (reading aloud, larger text and stronger contrast, simpler words, less movement, bigger buttons and links), shows each choice straight away, and saves nothing until you press "Use my choices". "Continue without changes" or Esc leaves the site as it was. It asks; it does not try to work out who you are.</li>
         <li>Open <strong>Display settings</strong> from the header at any time to choose a light, dark or high-contrast theme, larger text, wider text spacing, a narrower line length, reduced motion, bigger buttons and links, or a Listen button on every page. They are saved only in your browser and never sent to me. The site also follows your device's own contrast and reduced motion settings.</li>
+        <li>Read text that is never smaller than 14 pixels, and use buttons, menu items and links that are at least 44 pixels tall. "Bigger buttons and links" in Display settings makes them 48 pixels and larger.</li>
         <li>Zoom the page to 400% without losing content or scrolling sideways. On a short screen, such as a laptop at 400% zoom or a phone on its side, the header scrolls away with the page instead of covering it.</li>
-        <li>Read a simpler version of my About section in <a href="/about/easy-read/">Easy Read</a>, and look up an abbreviation in the <a href="/glossary/">glossary</a>.</li>
+        <li>Read a simpler version of my About section in <a href="/about/easy-read/">Easy Read</a>, and look up an abbreviation in the <a href="/glossary/">glossary</a>. Each page also ends with "Words on this page", a plain list of the abbreviations and technical terms it uses, with their meanings.</li>
         <li>Have any page or post read aloud with the Listen button, which uses your browser's own voices. You can pause, resume, stop and change the speed, and the part being read is outlined. It starts only when you press a button, and the site never turns the microphone on.</li>
         <li>See where you are in a post from the breadcrumb at the top, and which page you are on in the main menu.</li>
         <li>Read post images through their text descriptions. Alt text is checked before a post is published.</li>
@@ -53,6 +54,8 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Automated checks of the Display settings: they open and close with the keyboard, are remembered, and the pages still pass axe and reflow at 200% text size with wide spacing.</li>
         <li>Automated checks of the welcome window: it opens once, names itself, takes focus, can be used with the keyboard alone, previews and then keeps or undoes each choice, passes axe in light, dark and high-contrast themes, and fits a 320 pixel screen at 200% text.</li>
         <li>Automated checks that reading aloud starts only on a button press and can be paused, resumed and stopped, and that "Bigger buttons and links" gives controls a target of at least 48 pixels.</li>
+        <li>Automated checks that "Words on this page" lists only words that really appear on the page, is plain text with one link, is read aloud with the page, and that every abbreviation on the main pages is in the glossary.</li>
+        <li>Automated checks that no visible text is smaller than 14 pixels, that every control standing on its own is at least 44 pixels tall and wide, and that nothing moves on its own for more than five seconds.</li>
         <li>Automated checks that every Tab stop on the home page, Labs, Posts and Contact shows where the keyboard focus is, that post pages and every other page still fit a 320 pixel screen with 200% text, wide spacing and the standard text spacing overrides, that the header does not cover a short screen, and that on a post the text comes before the sidebar in the page and on screen.</li>
       </ul>
       <p>
@@ -66,6 +69,7 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Posts published before {reviewed} may have images without good descriptions. Tell me which one and I will fix it.</li>
         <li>The Easy Read page has not been checked by people who use Easy Read. Tell me if it is unclear.</li>
         <li>Reading aloud depends on the voices your device has, so the quality varies. It always starts at the top of the page, code examples are skipped, and the outline follows a paragraph at a time, not a word at a time. A browser with no text-to-speech does not show the option at all.</li>
+        <li>"Words on this page" is built by a script, so without JavaScript it is missing. The <a href="/glossary/">glossary</a> page works without it. A term shows only if it is in the glossary, and the list is matched by spelling, so a word used in an unusual form may be missed.</li>
         <li>Choosing "Simpler words" opens the Easy Read version of my About section. The rest of the site is not rewritten in Easy Read.</li>
         <li>"Stronger contrast" uses the dark high-contrast theme. There is no light high-contrast theme yet.</li>
         <li>The welcome window has not been tested with screen readers or with disabled users, only with automated checks and the keyboard.</li>

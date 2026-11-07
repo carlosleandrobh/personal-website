@@ -38,7 +38,7 @@ const gridClass =
           <p class="mt-2 flex-1 text-[0.9375rem] leading-6 text-muted">{first.description}</p>
           <p class="mt-5 flex items-center justify-between gap-2 text-sm">
             {first.status_text && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">{first.status_text}</span>}
-            {first.meta_text && <span class="font-mono text-xs text-subtle">{first.meta_text}</span>}
+            {first.meta_text && <span class="font-mono text-sm text-subtle">{first.meta_text}</span>}
           </p>
         </article>
       )}
@@ -51,13 +51,13 @@ const gridClass =
               <li>
                 <div class="flex items-baseline justify-between gap-3">
                   {c.credential_url
-                    ? <a href={c.credential_url} target="_blank" rel="noopener noreferrer" class="font-display text-[0.9375rem] font-semibold text-fg underline-offset-4 hover:underline">{c.name}<span class="sr-only"> (opens in a new tab)</span></a>
+                    ? <a href={c.credential_url} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center font-display text-[0.9375rem] font-semibold text-fg underline-offset-4 hover:underline">{c.name}<span class="sr-only"> (opens in a new tab)</span></a>
                     : <span class="font-display text-[0.9375rem] font-semibold text-fg">{c.name}</span>}
-                  <span class:list={['shrink-0 font-mono text-xs', c.status === 'achieved' ? 'text-accent' : 'text-subtle']}>
+                  <span class:list={['shrink-0 font-mono text-sm', c.status === 'achieved' ? 'text-accent' : 'text-subtle']}>
                     {c.progress !== null ? `${c.progress}%` : certLabel[c.status]}
                   </span>
                 </div>
-                {c.issuer && <p class="text-xs text-subtle">{c.issuer}{c.target_label ? ` · ${c.target_label}` : ''}</p>}
+                {c.issuer && <p class="text-sm text-subtle">{c.issuer}{c.target_label ? ` · ${c.target_label}` : ''}</p>}
                 {c.progress !== null && (
                   <progress class="meter mt-2" max="100" value={c.progress} aria-label={`${c.name} progress`}>{c.progress}%</progress>
                 )}
@@ -74,7 +74,7 @@ const gridClass =
           <p class="mt-2 flex-1 text-[0.9375rem] leading-6 text-muted">{item.description}</p>
           <p class="mt-5 flex items-center justify-between gap-2 text-sm">
             {item.status_text && <span class="pill bg-accent-tint text-accent">{item.status_text}</span>}
-            {item.meta_text && <span class="font-mono text-xs text-subtle">{item.meta_text}</span>}
+            {item.meta_text && <span class="font-mono text-sm text-subtle">{item.meta_text}</span>}
           </p>
         </article>
       ))}

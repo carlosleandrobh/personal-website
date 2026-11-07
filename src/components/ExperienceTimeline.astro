@@ -39,7 +39,7 @@ const { profile, experiences, education } = Astro.props;
                 <h3 class="text-h3 font-bold md:text-[1.375rem]">{job.role}</h3>
                 <p class="mt-1 font-display text-[0.9375rem] font-semibold text-accent">
                   {job.company_url
-                    ? <a href={job.company_url} target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">{job.company}<span class="sr-only"> (opens in a new tab)</span></a>
+                    ? <a href={job.company_url} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center underline-offset-4 hover:underline">{job.company}<span class="sr-only"> (opens in a new tab)</span></a>
                     : job.company}{job.context && <span class="font-normal text-muted"> — {job.context}</span>}
                 </p>
               </div>
@@ -47,7 +47,7 @@ const { profile, experiences, education } = Astro.props;
                 <span class:list={['pill font-mono font-medium', current ? 'bg-cta/15 text-[#92400e] dark:text-cta' : 'bg-surface-2 text-muted']}>
                   {dateRange(job.start_date, job.end_date)}
                 </span>
-                <span class="text-xs text-subtle">{duration(job.start_date, job.end_date)}{job.location && ` · ${job.location}`}</span>
+                <span class="text-sm text-subtle">{duration(job.start_date, job.end_date)}{job.location && ` · ${job.location}`}</span>
               </p>
             </header>
             <p class="mt-4 text-muted">{job.summary}</p>
@@ -84,7 +84,7 @@ const { profile, experiences, education } = Astro.props;
               <li>
                 <p class="font-display font-semibold text-fg">{e.degree}{e.in_progress && <span class="pill ml-2 bg-cta/15 align-middle text-[#92400e] dark:text-cta">In progress</span>}</p>
                 <p class="text-sm text-muted">{e.institution}{e.location && ` · ${e.location}`}</p>
-                <p class="mt-1 font-mono text-xs text-subtle">{monthYear(e.start_date)} – {e.in_progress ? 'Present' : monthYear(e.end_date)}</p>
+                <p class="mt-1 font-mono text-sm text-subtle">{monthYear(e.start_date)} – {e.in_progress ? 'Present' : monthYear(e.end_date)}</p>
               </li>
             ))}
           </ul>

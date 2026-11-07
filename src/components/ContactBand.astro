@@ -23,7 +23,7 @@ const { profile } = Astro.props;
           Get in touch <Icon name="material-symbols:send-outline" class="size-5" aria-hidden="true" />
         </a>
         {profile.linkedin_url && (
-          <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me" class="inline-flex items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
+          <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer me" class="inline-flex min-h-11 items-center gap-2 font-display text-sm font-semibold text-muted hover:text-fg">
             <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />Or connect on LinkedIn<span class="sr-only"> (opens in a new tab)</span>
           </a>
         )}

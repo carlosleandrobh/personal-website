@@ -282,6 +282,41 @@ test.describe('reading aloud', () => {
     await expect(page.getByRole('region', { name: 'Read aloud' })).toBeHidden(); // hidden again: it was not asked for
   });
 
+  test('after "Use my choices" with reading ticked, keyboard focus is on Pause, so it can be paused at once', async ({ page }) => {
+    await fakeSpeech(page);
+    await page.goto('/');
+    const dialog = welcomeWindow(page);
+    await dialog.getByRole('checkbox', { name: 'Read the pages aloud to me' }).check();
+    await dialog.getByRole('button', { name: 'Use my choices' }).click();
+    const player = page.getByRole('region', { name: 'Read aloud' });
+    await expect(player.getByRole('button', { name: 'Pause' })).toBeFocused();
+    await page.keyboard.press('Space');
+    await expect(player.getByRole('button', { name: 'Resume' })).toBeVisible();
+  });
+
+  test('while the player shows, the fourth Tab stop jumps to its controls; otherwise there is no such stop', async ({ page }) => {
+    await fakeSpeech(page);
+    await page.addInitScript(() => {
+      localStorage.setItem('a11y-welcomed', '1');
+      if (!localStorage.getItem('a11y-prefs')) localStorage.setItem('a11y-prefs', JSON.stringify({ aloud: 'on' }));
+    });
+    await page.goto('/');
+    const focused = () => page.evaluate(() => (document.activeElement as HTMLElement).textContent?.trim());
+    for (let i = 0; i < 3; i++) await page.keyboard.press('Tab');
+    expect(await focused()).toBe('Accessibility statement');
+    await page.keyboard.press('Tab');
+    expect(await focused()).toBe('Go to reading controls');
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('region', { name: 'Read aloud' }).getByRole('button', { name: 'Listen to this page' })).toBeFocused();
+
+    // Switched off: the stop is gone, so the first Tab stops are the same three as always.
+    await page.evaluate(() => localStorage.setItem('a11y-prefs', JSON.stringify({ aloud: 'off' })));
+    await page.reload();
+    for (let i = 0; i < 4; i++) await page.keyboard.press('Tab');
+    expect(await focused()).not.toBe('Go to reading controls');
+    await expect(page.getByRole('button', { name: 'Go to reading controls' })).toHaveCount(0);
+  });
+
   test('the player is hidden until the visitor asks for it', async ({ page }) => {
     await fakeSpeech(page);
     await page.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
