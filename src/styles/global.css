@@ -395,6 +395,22 @@ html[data-spacing='wide'] :is(.prose-post, .prose-about) > * + * { margin-top: 2
 
 html[data-measure='narrow'] :is(.prose-post, .prose-about) { max-width: 55ch; }
 
+/* "Bigger buttons and links": every control gets a target of at least 48 px (the guideline minimum is 24 px).
+   Links inside a paragraph keep their line spacing; only the area that reacts to a tap or click grows. */
+html[data-targets='large'] :is(.btn, button, select, summary, input:not([type='checkbox'], [type='radio']), textarea) { min-height: 48px; }
+html[data-targets='large'] .btn { padding-inline: 1.5rem; }
+html[data-targets='large'] :is(header, footer, nav, aside) a { display: inline-flex; align-items: center; min-height: 48px; padding-inline: 0.25rem; }
+html[data-targets='large'] :is(main, .prose-post, .prose-about) :is(p, li, dd) a:not(.btn) { padding-block: 0.6em; }
+html[data-targets='large'] input:is([type='checkbox'], [type='radio']) { width: 1.75rem; height: 1.75rem; }
+html[data-targets='large'] label:has(> input:is([type='checkbox'], [type='radio'])) { min-height: 48px; }
+
+/* The part of the page being read aloud. A teal ring (3:1 against both themes) and not a fill, so the text keeps its
+   own contrast; in Windows contrast themes the ring takes the system highlight colour. */
+[data-listen-current] { outline: 3px solid var(--accent); outline-offset: 6px; border-radius: 4px; }
+@media (forced-colors: active) { [data-listen-current] { outline-color: Highlight; } }
+/* Room at the bottom so the player never covers the last lines of the page. */
+body.has-listen-player { padding-bottom: 7rem; }
+
 /* "Reduce motion" in the panel behaves like the device setting. */
 html[data-motion='reduce'] *,
 html[data-motion='reduce'] ::before,

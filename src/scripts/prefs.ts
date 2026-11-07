@@ -1,5 +1,5 @@
-// Display settings: the choices a visitor makes in the "Display settings" panel and with the theme button.
-// They live only in this browser's localStorage (key `a11y-prefs`) and are never sent, logged or measured.
+// Display settings: the choices a visitor makes in the welcome window, the "Display settings" panel and with the
+// theme button. They live only in this browser's localStorage (key `a11y-prefs`) and are never sent, logged or measured.
 // The inline script in BaseLayout.astro applies the same logic before first paint; keep the two in step.
 
 export const OPTIONS = {
@@ -8,6 +8,9 @@ export const OPTIONS = {
   spacing: ['normal', 'wide'],
   measure: ['standard', 'narrow'],
   motion: ['system', 'reduce'],
+  targets: ['normal', 'large'], // bigger buttons and links
+  aloud: ['off', 'on'], // show the "Listen to this page" player on every page (it never starts by itself)
+  rate: ['1', '0.75', '1.25', '1.5'], // speaking speed; not a CSS setting
 } as const;
 
 export type PrefKey = keyof typeof OPTIONS;
@@ -15,6 +18,7 @@ export type Prefs = Partial<Record<PrefKey, string>>;
 
 const KEY = 'a11y-prefs';
 const LEGACY_THEME_KEY = 'theme'; // the old light/dark toggle stored its choice here
+const WELCOMED_KEY = 'a11y-welcomed'; // "1" once the visitor has answered the welcome window; it is not a setting
 
 export function isPrefKey(name: string): name is PrefKey {
   return name in OPTIONS;
@@ -61,7 +65,7 @@ function apply(prefs: Prefs) {
   if (prefs.theme === 'high-contrast') root.dataset.contrast = 'high';
   else delete root.dataset.contrast;
   // The first option of each group is the default, which is "no attribute".
-  for (const key of ['text', 'spacing', 'measure', 'motion'] as const) {
+  for (const key of ['text', 'spacing', 'measure', 'motion', 'targets', 'aloud'] as const) {
     const value = prefs[key];
     if (value && value !== OPTIONS[key][0]) root.dataset[key] = value;
     else delete root.dataset[key];
@@ -95,9 +99,47 @@ export function setPref(key: PrefKey, value: string) {
   update(prefs);
 }
 
+/** Drops anything that is not on the allow-list, whatever the caller passed in. */
+function clean(prefs: Prefs): Prefs {
+  const result: Prefs = {};
+  for (const key of Object.keys(OPTIONS) as PrefKey[]) {
+    const value = prefs[key];
+    if (isAllowed(key, value)) result[key] = value;
+  }
+  return result;
+}
+
+/** Shows `prefs` on the page without saving them (the welcome window uses this while the visitor is still choosing). */
+export function previewPrefs(prefs: Prefs) {
+  update(clean(prefs));
+}
+
+/** Replaces every saved setting with `prefs`. */
+export function replacePrefs(prefs: Prefs) {
+  const next = clean(prefs);
+  save(next);
+  update(next);
+}
+
 export function resetPrefs() {
   save({});
   update({});
+}
+
+/**
+ * Whether the visitor has already answered the welcome window. If the browser blocks storage we cannot remember an
+ * answer, so we say "yes": asking again on every page would be worse than not asking.
+ */
+export function hasWelcomed(): boolean {
+  try {
+    return localStorage.getItem(WELCOMED_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
+
+export function markWelcomed() {
+  try { localStorage.setItem(WELCOMED_KEY, '1'); } catch { /* storage blocked: nothing to remember */ }
 }
 
 // "Match my device" follows the device live.

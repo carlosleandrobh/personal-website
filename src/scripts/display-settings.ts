@@ -7,6 +7,9 @@ const openers = document.querySelectorAll<HTMLButtonElement>('[data-display-sett
 if (dialog && typeof dialog.showModal === 'function' && openers.length) {
   let lastOpener: HTMLButtonElement | undefined;
 
+  // A browser without text-to-speech cannot read aloud, so that setting is not offered.
+  if (!('speechSynthesis' in window)) dialog.querySelector('[data-group="aloud"]')?.remove();
+
   const sync = () => {
     const prefs = getPrefs();
     for (const key of Object.keys(OPTIONS) as PrefKey[]) {

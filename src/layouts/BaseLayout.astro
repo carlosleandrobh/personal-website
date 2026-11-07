@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DisplaySettings from '../components/DisplaySettings.astro';
+import WelcomeDialog from '../components/WelcomeDialog.astro';
+import ListenPlayer from '../components/ListenPlayer.astro';
 import { SITE } from '../lib/site';
 import { getProfile } from '../lib/content';
 
@@ -14,9 +16,11 @@ interface Props {
   publishedTime?: string | null;
   noindex?: boolean;
   activeNav?: string;
+  /** Open the first-visit welcome window here. Off for pages that are themselves about accessibility. */
+  welcome?: boolean;
 }
 
-const { title, description, ogImage = '/og/default.png', type = 'website', publishedTime, noindex = false, activeNav } = Astro.props;
+const { title, description, ogImage = '/og/default.png', type = 'website', publishedTime, noindex = false, activeNav, welcome = true } = Astro.props;
 const profile = await getProfile();
 const canonical = new URL(Astro.url.pathname, SITE.url).toString();
 const ogUrl = new URL(ogImage, SITE.url).toString();
@@ -75,7 +79,9 @@ const personLd = {
           text: ['100', '125', '150', '175', '200'],
           spacing: ['normal', 'wide'],
           measure: ['standard', 'narrow'],
-          motion: ['system', 'reduce']
+          motion: ['system', 'reduce'],
+          targets: ['normal', 'large'],
+          aloud: ['off', 'on']
         };
         var p = {};
         try { p = JSON.parse(localStorage.getItem('a11y-prefs') || '{}') || {}; } catch (e) {}
@@ -91,7 +97,7 @@ const personLd = {
           ((!theme || theme === 'system') && matchMedia('(prefers-color-scheme: dark)').matches);
         d.dataset.theme = dark ? 'dark' : 'light';
         if (theme === 'high-contrast') d.dataset.contrast = 'high';
-        ['text', 'spacing', 'measure', 'motion'].forEach(function (k) {
+        ['text', 'spacing', 'measure', 'motion', 'targets', 'aloud'].forEach(function (k) {
           if (A[k].indexOf(p[k]) > 0) d.dataset[k] = p[k];
         });
       })();
@@ -118,9 +124,13 @@ const personLd = {
     </main>
     <Footer profile={profile} />
     <DisplaySettings />
+    {welcome && <WelcomeDialog />}
+    <ListenPlayer />
     <script>
       import '../scripts/ui';
       import '../scripts/display-settings';
+      import '../scripts/listen';
+      import '../scripts/welcome';
     </script>
   </body>
 </html>

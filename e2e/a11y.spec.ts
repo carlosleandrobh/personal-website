@@ -34,8 +34,13 @@ async function prepare(page: Page, mode: Mode) {
   if (mode.prefs) await page.addInitScript((value) => localStorage.setItem('a11y-prefs', value), JSON.stringify(mode.prefs));
 }
 
-/** The Turnstile script must never load in tests: no network, no third-party code. */
+/**
+ * The Turnstile script must never load in tests: no network, no third-party code.
+ * Every test here starts as a visitor who has already answered the welcome window, so it does not cover the page
+ * (e2e/welcome.spec.ts tests the window itself).
+ */
 test.beforeEach(async ({ page, baseURL }) => {
+  await page.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
   await page.route('**/*', (route) => {
     const origin = new URL(route.request().url()).origin;
     return origin === baseURL ? route.continue() : route.abort();
