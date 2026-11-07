@@ -231,7 +231,8 @@
   .btn-secondary { border: 1.5px solid var(--brand); color: var(--brand); }
   [data-theme='dark'] .btn-secondary { border-color: var(--accent); color: var(--accent); }
   .btn-secondary:hover { background: color-mix(in srgb, var(--brand) 6%, transparent); }
-  .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.875rem; }
+  /* 44 px is the size that suits a tremor or a thumb (WCAG asks for 24). The "Bigger buttons and links" setting goes to 48. */
+  .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.875rem; min-height: 2.75rem; }
 
   .chip {
     display: inline-flex;
@@ -239,8 +240,8 @@
     border-radius: 9999px;
     padding: 0.2rem 0.65rem;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    line-height: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
     font-weight: 500;
     background: var(--accent-tint);
     color: var(--accent);
@@ -252,10 +253,12 @@
     border-radius: 9999px;
     padding: 0.25rem 0.75rem;
     font-family: var(--font-display);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    line-height: 1rem;
+    line-height: 1.25rem;
   }
+  /* A pill that is a button (the Labs filters) is a tap target, so it gets the same 44 px as other buttons. */
+  button.pill { min-height: 2.75rem; padding-inline: 1rem; }
   .kicker {
     display: inline-flex;
     align-items: center;
@@ -280,6 +283,7 @@
     border: 1px solid var(--input-line);
     border-radius: var(--radius-control);
     padding: 0.75rem 0.9rem;
+    min-height: 2.75rem;
     color: var(--fg);
     font: inherit;
     transition: border-color 150ms, box-shadow 150ms;
@@ -370,7 +374,7 @@
   .js:not([data-motion='reduce']) .bridge-end--business { animation-delay: 0.15s; }
   .js:not([data-motion='reduce']) .bridge-end--tech { animation-delay: 1.35s; }
   .js:not([data-motion='reduce']) .bridge-keystone { opacity: 0; transform: scale(0.4); animation: keystone-land 0.6s var(--ease-out-soft) 1.05s forwards; }
-  .js:not([data-motion='reduce']) .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 2; }
+  .js:not([data-motion='reduce']) .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 1; }
 }
 @keyframes bridge-draw { to { stroke-dashoffset: 0; } }
 @keyframes bridge-fade { to { opacity: 1; } }

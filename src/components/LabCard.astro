@@ -27,7 +27,7 @@ const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, '
     </span>
     <div class="flex flex-col items-end gap-1">
       <span class:list={['pill', status.cls]}><span class:list={['size-1.5 rounded-full', status.dot]} aria-hidden="true"></span>{status.label}</span>
-      <span class="text-xs text-subtle">{lab.category}{lab.started_on && ` · since ${monthYear(lab.started_on)}`}</span>
+      <span class="text-sm text-subtle">{lab.category}{lab.started_on && ` · since ${monthYear(lab.started_on)}`}</span>
     </div>
   </header>
 
@@ -50,18 +50,18 @@ const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, '
       </ul>
     )}
     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-line pt-4 font-display text-sm font-semibold">
-      <a href={lab.url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-brand hover:underline dark:text-accent">
+      <a href={lab.url} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-1.5 text-brand hover:underline dark:text-accent">
         Open {host}
         <Icon name="material-symbols:open-in-new" class="size-4" aria-hidden="true" />
         <span class="sr-only">(opens in a new tab)</span>
       </a>
       {lab.notes_post_slug && (
-        <a href={`/posts/${lab.notes_post_slug}/`} class="inline-flex items-center gap-1.5 text-muted hover:text-fg">
+        <a href={`/posts/${lab.notes_post_slug}/`} class="inline-flex min-h-11 items-center gap-1.5 text-muted hover:text-fg">
           <Icon name="material-symbols:notes" class="size-4" aria-hidden="true" />Read notes
         </a>
       )}
       {lab.repo_url && (
-        <a href={lab.repo_url} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-muted hover:text-fg">
+        <a href={lab.repo_url} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-1.5 text-muted hover:text-fg">
           <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code<span class="sr-only"> (opens in a new tab)</span>
         </a>
       )}

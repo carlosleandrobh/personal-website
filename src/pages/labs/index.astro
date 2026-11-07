@@ -50,7 +50,7 @@ const counts = {
         <span class="mx-2 hidden h-5 w-px bg-line sm:inline-block" aria-hidden="true"></span>
         <label class="flex items-center gap-2 text-sm text-muted">
           Status
-          <select class="field w-auto py-1.5 text-sm" data-lab-status>
+          <select class="field min-h-11 w-auto py-1.5 text-sm" data-lab-status>
             <option value="">All</option>
             <option value="live">Live</option>
             <option value="testing">Testing</option>
@@ -65,7 +65,7 @@ const counts = {
       {labs.map((lab) => <li data-lab-item><LabCard lab={lab} headingLevel="h2" /></li>)}
     </ul>
     <p class="card mt-4 hidden p-8 text-center text-muted" data-lab-empty>
-      No experiment matches those filters. <button type="button" class="font-semibold text-brand underline dark:text-accent" data-lab-reset>Clear filters</button>
+      No experiment matches those filters. <button type="button" class="inline-flex min-h-11 items-center font-semibold text-brand underline dark:text-accent" data-lab-reset>Clear filters</button>
     </p>
   </section>
 
@@ -80,7 +80,7 @@ const counts = {
               <p class="flex items-center gap-2 font-display font-semibold text-fg">
                 <Icon name={safeIcon(item.icon, 'material-symbols:dns-outline')} class="size-5 text-accent" aria-hidden="true" />{item.title}
               </p>
-              <ul class="mt-2 space-y-1 font-mono text-xs leading-5 text-muted">
+              <ul class="mt-2 space-y-1 font-mono text-sm leading-5 text-muted">
                 {item.lines.map((line) => <li>{line}</li>)}
               </ul>
             </li>

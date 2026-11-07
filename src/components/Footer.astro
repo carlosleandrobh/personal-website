@@ -15,14 +15,14 @@ const links = [
 <footer class="border-t border-line">
   <div class="container-site flex flex-col gap-4 py-10 text-sm text-muted md:flex-row md:items-center md:justify-between">
     <p class="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <a href="/" class="font-display text-base font-bold text-fg">carlos.nz</a>
+      <a href="/" class="inline-flex min-h-11 items-center font-display text-base font-bold text-fg">carlos.nz</a>
       <span>© {year} {profile.display_name}. Made in Auckland, Aotearoa New Zealand.</span>
     </p>
     <nav aria-label="Footer">
-      <ul class="flex flex-wrap gap-x-6 gap-y-2">
+      <ul class="flex flex-wrap gap-x-2">
         {links.map((l) => (
           <li>
-            <a class="link-quiet" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer me' } : {})}>{l.label}{l.external && <span class="sr-only"> (opens in a new tab)</span>}</a>
+            <a class="link-quiet inline-flex min-h-11 min-w-11 items-center justify-center px-2" href={l.href} {...(l.external ? { target: '_blank', rel: 'noopener noreferrer me' } : {})}>{l.label}{l.external && <span class="sr-only"> (opens in a new tab)</span>}</a>
           </li>
         ))}
       </ul>

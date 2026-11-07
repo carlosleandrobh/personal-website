@@ -479,3 +479,68 @@ for (const [name, viewport] of [['phone', { width: 390, height: 800 }], ['deskto
     expect(order.sidebarAfterOnScreen).toBe(true);
   });
 }
+
+// ---------------------------------------------------------------------------
+// Easier by default: text size, tap targets and how long things move (review items 5, 6 and 8).
+// ---------------------------------------------------------------------------
+
+test('nothing moves on its own for more than five seconds (WCAG 2.2.2)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const long = await page.evaluate(() => document.getAnimations()
+    .map((a) => ({ name: (a as CSSAnimation).animationName ?? '', end: a.effect?.getComputedTiming().endTime as number }))
+    .filter((a) => a.end === Infinity || a.end > 5000));
+  expect(long).toEqual([]);
+});
+
+async function pagesAndPosts(page: Page): Promise<string[]> {
+  return [...STATIC_PAGES, ...(await postPaths(page))];
+}
+
+test('no visible text is smaller than 14 px', async ({ page }) => {
+  const small: string[] = [];
+  for (const path of await pagesAndPosts(page)) {
+    await page.goto(path);
+    const found = await page.evaluate(() => {
+      const list: string[] = [];
+      document.querySelectorAll('body *').forEach((el) => {
+        if (el.closest('svg, script, style, dialog:not([open]), [hidden]')) return;
+        const own = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim().length > 0);
+        const box = el.getBoundingClientRect();
+        if (!own || box.width <= 1 || box.height <= 1) return; // text that is only for screen readers is 1 px wide
+        const size = parseFloat(getComputedStyle(el).fontSize);
+        if (size < 14) list.push(`${size}px "${(el.textContent ?? '').trim().slice(0, 30)}"`);
+      });
+      return list;
+    });
+    small.push(...found.slice(0, 4).map((line) => `${path} ${line}`));
+  }
+  expect(small).toEqual([]);
+});
+
+// WCAG asks for 24 px; 44 px is the size that suits a tremor or a thumb. The "Bigger buttons and links" setting goes to 48 px.
+test('every control that stands on its own is at least 44 px tall and wide', async ({ page }) => {
+  const small: string[] = [];
+  for (const path of await pagesAndPosts(page)) {
+    await page.goto(path);
+    const found = await page.evaluate(() => {
+      const list: string[] = [];
+      document.querySelectorAll<HTMLElement>('a[href], button, select, textarea, summary, input:not([type=hidden])').forEach((el) => {
+        if (el.closest('[aria-hidden="true"], [hidden], dialog:not([open])')) return;
+        if (el.matches('[data-card-link]')) return; // stretched over the whole card, so the card is the target
+        let box = el.getBoundingClientRect();
+        if (box.width <= 1 || box.height <= 1) return; // revealed only on focus, or for screen readers
+        const label = (el as HTMLInputElement).labels?.[0];
+        if (label && el.matches('input[type=checkbox], input[type=radio]')) box = label.getBoundingClientRect(); // the label is the target too
+        // A link inside a sentence is exempt: its height is set by the line, and the line is the context.
+        const block = el.closest('p, li, dd, dt, td, label');
+        const inSentence = el.matches('a') && getComputedStyle(el).display === 'inline' && block && (block.textContent ?? '').replace(el.textContent ?? '', '').trim().length > 3;
+        if (inSentence) return;
+        if (box.width < 44 || box.height < 44) list.push(`${Math.round(box.width)}x${Math.round(box.height)} ${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
+      });
+      return [...new Set(list)];
+    });
+    small.push(...found.map((line) => `${path} ${line}`));
+  }
+  expect(small).toEqual([]);
+});
