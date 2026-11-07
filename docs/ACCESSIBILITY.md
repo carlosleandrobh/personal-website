@@ -47,7 +47,10 @@ Automated checks find only part of the barriers. For a change to layout or a com
 3. **Never colour alone.** An error also gets text and an icon; a selected filter is also `aria-pressed`, and has a
    system-colour style in `@media (forced-colors: active)`.
 4. **Focus must be visible.** Do not write `outline: none` without a replacement. Use a transparent outline when the
-   ring is drawn with `box-shadow`, so it survives forced colours.
+   ring is drawn with `box-shadow`, so it survives forced colours. A card that is one big link (a stretched `::after`
+   link, as in `PostCard` and `RepoCard`) takes `data-card-link` on the link: `global.css` then rings the whole card.
+   Never put `focus-visible:outline-none` on such a link; that left post cards with no visible focus. The test "every
+   Tab stop shows where the keyboard focus is" (`e2e/a11y.spec.ts`) fails if any stop on the key pages has no indicator.
 5. **Motion respects the device.** Animations and transitions are off under `prefers-reduced-motion: reduce`
    (a global rule in `global.css`). The hero arch is the one orchestrated moment and only plays when motion is allowed.
    Anything that loops stops after a few seconds.
@@ -68,7 +71,11 @@ Automated checks find only part of the barriers. For a change to layout or a com
     fully without the panel (its button stays hidden until the script runs).
 11. **Use `rem` for text and spacing so the text size setting works,** but keep the header's top bar in px
     (`Header.astro`), so it still fits a 320 px screen at 200% text. Headings may break a long word
-    (`overflow-wrap: anywhere`), and grid columns that hold form fields use `minmax(0, 1fr)`.
+    (`overflow-wrap: anywhere`), and every grid column that holds form fields or long content (a code block, a table)
+    uses `minmax(0, 1fr)`, on a phone too: an `auto` column grows to the longest line of code and the whole post then
+    scrolls sideways. A full-width button (`.btn.w-full`) may wrap its label; other buttons stay on one line.
+    `e2e/a11y.spec.ts` checks every page, post pages included, at 320 px with 200% text and wide spacing, and with the
+    WCAG 1.4.12 text spacing overrides.
 12. **Never detect or infer assistive technology or disability.** Do not read `prefers-*` or `forced-colors` into
     logs, analytics or the database. The welcome window (rule 14) is how the site finds out what helps: it asks. It
     never decides for the visitor, and its options are named by what they do ("Larger text and stronger contrast"),
@@ -94,6 +101,13 @@ Automated checks find only part of the barriers. For a change to layout or a com
     or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
     a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
     and resumes from its start, because the browser's own pause is unreliable.
+16. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
+    `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
+    Do not add other fixed or sticky bars that take real height without the same rule.
+17. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
+    must follow what is on screen. On a post the text comes first and the sidebar (share, listen, contents) after it:
+    below the text on a phone, beside it on the right on a wide screen. Do not use CSS `order` to put something first on
+    screen that comes later in the HTML. `e2e/a11y.spec.ts` checks this on a phone and a desktop.
 
 ## Rules for content
 

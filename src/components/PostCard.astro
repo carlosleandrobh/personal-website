@@ -16,7 +16,7 @@ const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeUR
     <span class="font-mono text-subtle">{fullDate(post.published_at)} · {readingMinutes(post.body_md)} min read</span>
   </p>
   <H class="mt-4 text-h3 font-bold leading-snug">
-    <a href={postUrl(post.slug)} class="after:absolute after:inset-0 after:rounded-[var(--radius-card)] focus-visible:outline-none">
+    <a href={postUrl(post.slug)} data-card-link class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
       {post.title}
     </a>
   </H>

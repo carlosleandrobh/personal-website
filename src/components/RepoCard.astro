@@ -14,7 +14,7 @@ const { repo } = Astro.props;
     {repo.featured && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Featured</span>}
   </header>
   <h3 class="mt-4 font-display text-lg font-bold">
-    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="after:absolute after:inset-0 after:rounded-[var(--radius-card)] focus-visible:outline-none">
+    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" data-card-link class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
       {repo.name}<span class="sr-only"> on GitHub (opens in a new tab)</span>
     </a>
   </h3>
