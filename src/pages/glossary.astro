@@ -5,7 +5,7 @@ import { GLOSSARY } from '../lib/glossary';
 
 const terms = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, 'en-NZ'));
 ---
-<BaseLayout title="Glossary" description="Plain-language meanings for the technical and business terms used on carlos.nz.">
+<BaseLayout title="Glossary" description="Plain-language meanings for the technical and business terms used on carlos.nz." words={false}>
   <section class="container-site pb-24 pt-12 md:pt-16">
     <SectionHeading
       level="h1"

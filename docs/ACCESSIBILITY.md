@@ -133,7 +133,12 @@ Automated checks find only part of the barriers. For a change to layout or a com
   `example.com`) and no real hostnames, ports or versions of exposed services, in the image and in its description.
 - **Plain language:** open key pages and long posts with a sentence or two of summary (a post's `excerpt` is shown as
   its summary), and spell out an abbreviation the first time it appears ("Proxmox VE, a virtualisation platform").
-- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two.
+- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two,
+  without jargon that is not itself in the list. Each page ends with "Words on this page" (`WordsOnPage.astro`,
+  `src/scripts/words.ts`): it lists the glossary terms that page uses, so a term you add appears wherever it is used,
+  with nothing to hover and no extra Tab stop. It is built by a script, so without JavaScript only the glossary page
+  remains. `e2e/words.spec.ts` fails when an abbreviation on the main pages is not in the glossary: add it, or, if it is
+  a name or a place, add it to `NOT_JARGON` in that test. The list is off on the glossary page (`words={false}`).
 - **Easy Read:** `src/pages/about/easy-read.astro` restates the About section in short sentences. Re-read it whenever
   the profile changes, so the two never disagree.
 - **Te reo Māori** in a `.astro` file is wrapped in `lang="mi"`, with macrons. The hero marks a greeting that starts

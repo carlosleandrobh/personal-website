@@ -1,0 +1,19 @@
+---
+// "Words on this page": the abbreviations and technical terms this page uses, with plain meanings from the glossary
+// (src/lib/glossary.ts). It stays hidden until src/scripts/words.ts finds at least one term, so a page with none shows
+// nothing. It is plain text on the page: no tooltip to hover, no extra Tab stop, and it is read aloud with the page.
+---
+<section data-words hidden aria-labelledby="words-title" class="container-site pb-16">
+  <div class="card p-6 md:p-8">
+    <h2 id="words-title" class="text-h3 font-bold">Words on this page</h2>
+    <p class="mt-2 text-sm text-muted">Short meanings for the abbreviations and technical terms used above.</p>
+    <dl class="mt-5 grid gap-x-10 gap-y-4 sm:grid-cols-2" data-words-list></dl>
+    <a href="/glossary/" class="mt-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand underline underline-offset-4 hover:text-fg dark:text-accent">See the full glossary</a>
+  </div>
+  <template data-words-item>
+    <div>
+      <dt class="font-display font-semibold text-fg"><span data-word></span><span data-expansion class="font-normal text-muted"></span></dt>
+      <dd class="mt-0.5 text-sm text-muted"></dd>
+    </div>
+  </template>
+</section>
