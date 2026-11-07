@@ -81,7 +81,8 @@ Automated checks find only part of the barriers. For a change to layout or a com
     never decides for the visitor, and its options are named by what they do ("Larger text and stronger contrast"),
     never by a condition ("I am blind").
 13. **The first Tab stops are fixed:** "Skip to content", "Display settings", "Accessibility statement" (in `BaseLayout.astro`).
-    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`).
+    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`). A fourth stop, "Go to reading
+    controls", exists only while the read-aloud player shows (rule 15); when the player is hidden it is not in the page.
 14. **The welcome window** (`WelcomeDialog.astro`, `src/scripts/welcome.ts`) is a native modal `<dialog>` that opens
     once, on a visitor's first visit. It is the only window that opens by itself, so keep it small and keep these rules:
     - Focus starts on its title, so a screen reader reads the title and then the choices in order. Its ids are unique
@@ -100,7 +101,9 @@ Automated checks find only part of the barriers. For a change to layout or a com
     a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
     or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
     a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
-    and resumes from its start, because the browser's own pause is unreliable.
+    and resumes from its start, because the browser's own pause is unreliable. The player is at the end of the page, so
+    keyboard focus is taken to Pause when a reading starts from the welcome window, and the fourth Tab stop ("Go to
+    reading controls") jumps to it at any time.
 16. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
     `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
     Do not add other fixed or sticky bars that take real height without the same rule.

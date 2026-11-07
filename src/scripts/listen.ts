@@ -15,6 +15,7 @@ if (synth && player) {
   const stopButton = player.querySelector<HTMLButtonElement>('[data-listen-stop]')!;
   const rateSelect = player.querySelector<HTMLSelectElement>('[data-listen-rate]')!;
   const status = player.querySelector<HTMLElement>('[data-listen-status]')!;
+  const skipButton = document.querySelector<HTMLButtonElement>('[data-listen-skip]');
 
   type State = 'idle' | 'reading' | 'paused';
   let state: State = 'idle';
@@ -60,6 +61,7 @@ if (synth && player) {
   const show = () => {
     const wanted = state !== 'idle' || document.documentElement.dataset.aloud === 'on';
     player.hidden = !wanted;
+    if (skipButton) skipButton.hidden = !wanted;
     document.body.classList.toggle('has-listen-player', wanted);
     mainButton.textContent = state === 'reading' ? 'Pause' : state === 'paused' ? 'Resume' : 'Listen to this page';
     stopButton.hidden = state === 'idle';
@@ -128,8 +130,16 @@ if (synth && player) {
     if (state === 'reading') speakFrom(index); // carry on at the new speed
   });
 
-  // The welcome window asks for this after the visitor presses "Use my choices".
-  document.addEventListener('listen:start', () => { if (state === 'idle') start(); });
+  // The fourth Tab stop (see BaseLayout.astro): a keyboard visitor jumps straight to the controls.
+  skipButton?.addEventListener('click', () => mainButton.focus());
+
+  // The welcome window asks for this after the visitor presses "Use my choices". Focus goes to Pause, because the
+  // window has just closed and focus would otherwise be left at the top of the page, far from the controls.
+  document.addEventListener('listen:start', () => {
+    if (state !== 'idle') return;
+    start();
+    mainButton.focus();
+  });
 
   onChange(show); // the Display settings panel can show or hide the player
   addEventListener('pagehide', () => synth.cancel());

@@ -118,6 +118,9 @@ const personLd = {
       class="hidden"
     >Display settings</button>
     <a href="/accessibility/" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Accessibility statement</a>
+    <!-- A fourth stop that exists only while the read-aloud player shows. The player sits at the end of the page, and
+         without this a keyboard user would have to tab through the whole page to reach Pause or Stop. -->
+    <button type="button" data-listen-skip hidden class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-primary">Go to reading controls</button>
     <Header active={activeNav} />
     <main id="main" tabindex="-1" class="flex-1 overflow-x-clip pt-[80px] focus:outline-none">
       <slot />
