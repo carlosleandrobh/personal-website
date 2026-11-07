@@ -15,7 +15,8 @@ It follows section 7.3 and 7.4 of the long guide.
 
 ## Tasks (give them one at a time, in the tester's own words)
 
-1. Open carlos.nz. **What do you think this site is for? What do you expect to find?**
+1. Open carlos.nz. **What do you think this site is for? What do you expect to find?** (Do not mention the welcome
+   window. Note what they do when it opens, what they choose and whether the wording makes sense.)
 2. Find out what Carlos does for work.
 3. Make the text easier for you to read. (Do not say where. Note whether they find *Display settings*.)
 4. Find a post about the homelab and read the first few paragraphs.
@@ -31,6 +32,8 @@ It follows section 7.3 and 7.4 of the long guide.
 | Did they feel welcome? What did they say about the first screen? | their own words |
 | Where did they get lost, stuck or give up? | page and step |
 | Did they find *Display settings* and the *Easy Read* page without help? | yes / no / after how long |
+| Welcome window: did it open at a good moment? Did they understand each choice? Did it feel like being asked to label themselves? | their own words |
+| Did *Read the pages aloud* start when they expected, and could they pause or stop it? | what happened |
 | Did anything read out loud (screen reader, *Listen*) sound wrong or confusing? | what it said |
 | Did any control not work with their usual setup? | setup, browser, control |
 | Anything they wished the site did? | their own words |
