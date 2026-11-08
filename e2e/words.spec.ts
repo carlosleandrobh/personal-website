@@ -18,8 +18,20 @@ test('the home page explains the abbreviations it uses, in a list on the page', 
   await page.goto('/');
   const list = wordsList(page);
   await expect(list).toBeVisible();
-  const terms = (await list.locator('dt').allInnerTexts()).join(' | ');
-  for (const term of ['HSQE', 'HRIS', 'BPMN', 'BABOK', 'CBAP', 'SSRS', 'DAX', 'ALM']) expect(terms).toContain(term);
+  // Whatever the content is (fixtures or the live site), every glossary abbreviation the page uses must be in the list.
+  const listed = new Set(
+    (await list.locator('[data-word]').allInnerTexts()).flatMap((term) => term.split('/').map((part) => part.trim())),
+  );
+  const used = await page.evaluate(() => {
+    const walker = document.createTreeWalker(document.querySelector('main')!, NodeFilter.SHOW_TEXT);
+    const parts: string[] = [];
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (!node.parentElement?.closest('[data-words], pre, script, style, .sr-only, [aria-hidden="true"]')) parts.push(node.textContent ?? '');
+    }
+    return parts.join(' ').match(/\b(?:[A-Z]-)?[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*\b/g) ?? [];
+  });
+  const missing = [...new Set(used)].filter((token) => KNOWN.has(token) && !listed.has(token));
+  expect(missing).toEqual([]);
   for (const meaning of await list.locator('dd').allInnerTexts()) expect(meaning.trim().length).toBeGreaterThan(10);
 });
 
