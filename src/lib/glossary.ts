@@ -46,6 +46,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   { term: 'T-SQL', expansion: 'Transact-SQL', meaning: 'Microsoft\'s version of SQL, used with SQL Server.' },
   { term: 'Traefik', meaning: 'A reverse proxy that sends web traffic to the right service in a homelab.' },
   { term: 'Turnstile', meaning: 'Cloudflare\'s spam check on the contact form. It decides whether a visitor is a person without asking them to solve a puzzle.' },
+  { term: 'UX', expansion: 'user experience', meaning: 'How easy, clear and pleasant something is to use, from the first click to getting the job done.' },
   { term: 'VM', expansion: 'virtual machine', meaning: 'A computer that exists only as software, running inside a real computer.' },
   { term: 'WCAG', expansion: 'Web Content Accessibility Guidelines', meaning: 'The international rules for making websites usable by people with disabilities. This site aims for version 2.2, level AA.' },
 ];
