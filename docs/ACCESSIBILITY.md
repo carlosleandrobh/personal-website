@@ -18,7 +18,8 @@ has the research and the wider rationale, but parts of it assume a different sta
 ```bash
 npm run build                 # the checks below test the built site in dist/
 npm run test:contrast         # colour tokens in src/styles/global.css (text 4.5:1, borders and focus rings 3:1)
-npm run test:a11y             # Playwright + axe-core, keyboard, reflow at 320 px, reduced motion, forced colours
+npm run test:a11y             # Playwright + axe-core, keyboard, reflow at 320 px, reduced motion, forced colours,
+                              # the welcome window, reading aloud and bigger targets (e2e/welcome.spec.ts)
 uv run pytest                 # includes the alt text rules for `cms post push`
 ```
 
@@ -46,10 +47,14 @@ Automated checks find only part of the barriers. For a change to layout or a com
 3. **Never colour alone.** An error also gets text and an icon; a selected filter is also `aria-pressed`, and has a
    system-colour style in `@media (forced-colors: active)`.
 4. **Focus must be visible.** Do not write `outline: none` without a replacement. Use a transparent outline when the
-   ring is drawn with `box-shadow`, so it survives forced colours.
+   ring is drawn with `box-shadow`, so it survives forced colours. A card that is one big link (a stretched `::after`
+   link, as in `PostCard` and `RepoCard`) takes `data-card-link` on the link: `global.css` then rings the whole card.
+   Never put `focus-visible:outline-none` on such a link; that left post cards with no visible focus. The test "every
+   Tab stop shows where the keyboard focus is" (`e2e/a11y.spec.ts`) fails if any stop on the key pages has no indicator.
 5. **Motion respects the device.** Animations and transitions are off under `prefers-reduced-motion: reduce`
    (a global rule in `global.css`). The hero arch is the one orchestrated moment and only plays when motion is allowed.
-   Anything that loops stops after a few seconds.
+   Nothing moves on its own for more than five seconds in total, counting the delay and every repeat (WCAG 2.2.2);
+   a test measures this.
 6. **New-tab links say so.** Every `target="_blank"` link has `<span class="sr-only"> (opens in a new tab)</span>`.
    Post links get it automatically from `src/lib/markdown.ts`.
 7. **Forms:** every field has a `label`, an error line linked with `aria-describedby`, and the error summary takes
@@ -59,21 +64,60 @@ Automated checks find only part of the barriers. For a change to layout or a com
 9. **No overlays, no CAPTCHAs that need a puzzle, no accessibility widgets from third parties.** Anything new from a
    third party needs the CSP in `astro.config.mjs` and the privacy notice updated first (see `CLAUDE.md`).
 10. **Display settings only change CSS.** `src/scripts/prefs.ts` sets `data-*` attributes on `<html>` (`data-theme`,
-    `data-contrast`, `data-text`, `data-spacing`, `data-measure`, `data-motion`) and saves them under the single
-    `localStorage` key `a11y-prefs`, from an allow-list of values. They never change ARIA, content or the DOM order, and
-    are never sent, logged or measured. High contrast is the dark theme plus `data-contrast="high"`. The inline script
+    `data-contrast`, `data-text`, `data-spacing`, `data-measure`, `data-motion`, `data-targets`, `data-aloud`) and saves
+    them under the `localStorage` key `a11y-prefs`, from an allow-list of values (the speaking speed, `rate`, is saved
+    there too but is not a CSS setting). A second key, `a11y-welcomed`, only records that the welcome window has been
+    answered. They never change ARIA, content or the DOM order, and are never sent, logged or measured. High contrast is the dark theme plus `data-contrast="high"`. The inline script
     in `BaseLayout.astro` applies the same logic before first paint, so keep the two in step. The site must work
     fully without the panel (its button stays hidden until the script runs).
 11. **Use `rem` for text and spacing so the text size setting works,** but keep the header's top bar in px
     (`Header.astro`), so it still fits a 320 px screen at 200% text. Headings may break a long word
-    (`overflow-wrap: anywhere`), and grid columns that hold form fields use `minmax(0, 1fr)`.
+    (`overflow-wrap: anywhere`), and every grid column that holds form fields or long content (a code block, a table)
+    uses `minmax(0, 1fr)`, on a phone too: an `auto` column grows to the longest line of code and the whole post then
+    scrolls sideways. A full-width button (`.btn.w-full`) may wrap its label; other buttons stay on one line.
+    `e2e/a11y.spec.ts` checks every page, post pages included, at 320 px with 200% text and wide spacing, and with the
+    WCAG 1.4.12 text spacing overrides.
 12. **Never detect or infer assistive technology or disability.** Do not read `prefers-*` or `forced-colors` into
-    logs, analytics or the database.
+    logs, analytics or the database. The welcome window (rule 14) is how the site finds out what helps: it asks. It
+    never decides for the visitor, and its options are named by what they do ("Larger text and stronger contrast"),
+    never by a condition ("I am blind").
 13. **The first Tab stops are fixed:** "Skip to content", "Display settings", "Accessibility statement" (in `BaseLayout.astro`).
-    The home page also shows a welcome note (`Hero.astro`) that points to the display settings, Easy Read and the
-    statement. It is always visible, never a pop-up, and stores nothing. Do not add audio that plays by itself.
-14. **Speech is opt-in.** "Listen to this post" (`src/scripts/listen.ts`) uses the browser's speech synthesis, only when
-    the visitor presses the button. It never uses the microphone.
+    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`). A fourth stop, "Go to reading
+    controls", exists only while the read-aloud player shows (rule 15); when the player is hidden it is not in the page.
+14. **The welcome window** (`WelcomeDialog.astro`, `src/scripts/welcome.ts`) is a native modal `<dialog>` that opens
+    once, on a visitor's first visit. It is the only window that opens by itself, so keep it small and keep these rules:
+    - Focus starts on its title, so a screen reader reads the title and then the choices in order. Its ids are unique
+      (`welcome-window-*`): the home page already has a `welcome-title`, and a repeated id gave the dialog the wrong name.
+    - Each tick previews its effect (`previewPrefs`); "Use my choices" saves it (`replacePrefs`); "Continue without
+      changes", Esc and any other way of closing it put the page back as it was. Every route marks it answered.
+    - It does not open on the accessibility statement, the Easy Read page or the LinkedIn callback page
+      (`welcome={false}` on `BaseLayout`), and not at all when the browser blocks storage (it could not remember the
+      answer, so it would open on every page).
+    - An option that cannot work is not offered: with no `speechSynthesis`, "Read the pages aloud" is removed.
+    - Do not add audio that plays by itself. Reading starts only from a button press (rule 15).
+    - Every end-to-end test except `e2e/welcome.spec.ts` starts with `a11y-welcomed` already set, or the window would
+      cover every page.
+15. **Speech is opt-in.** `src/scripts/listen.ts` and `ListenPlayer.astro` read the page aloud with the browser's own
+    voices, only when the visitor presses a button ("Use my choices" with reading ticked, the player's Listen button, or
+    a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
+    or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
+    a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
+    and resumes from its start, because the browser's own pause is unreliable. The player is at the end of the page, so
+    keyboard focus is taken to Pause when a reading starts from the welcome window, and the fourth Tab stop ("Go to
+    reading controls") jumps to it at any time.
+16. **Size by default.** No text is smaller than 14 px (`text-sm`, 0.875rem): do not use `text-xs`, and `.chip` and
+    `.pill` are 14 px too. Every control that stands on its own is at least 44 px tall and wide (WCAG asks for 24):
+    `.btn` and `.btn-sm`, filter chips, form fields, header icons, and links in lists, cards, the header and the footer
+    take `min-h-11` (and `min-w-11` when the word is short). A link inside a sentence is exempt. A card that is one big
+    link counts as the card. The "Bigger buttons and links" setting goes further, to 48 px. Two tests in
+    `e2e/a11y.spec.ts` check this on every page.
+17. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
+    `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
+    Do not add other fixed or sticky bars that take real height without the same rule.
+18. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
+    must follow what is on screen. On a post the text comes first and the sidebar (share, listen, contents) after it:
+    below the text on a phone, beside it on the right on a wide screen. Do not use CSS `order` to put something first on
+    screen that comes later in the HTML. `e2e/a11y.spec.ts` checks this on a phone and a desktop.
 
 ## Rules for content
 
@@ -89,7 +133,12 @@ Automated checks find only part of the barriers. For a change to layout or a com
   `example.com`) and no real hostnames, ports or versions of exposed services, in the image and in its description.
 - **Plain language:** open key pages and long posts with a sentence or two of summary (a post's `excerpt` is shown as
   its summary), and spell out an abbreviation the first time it appears ("Proxmox VE, a virtualisation platform").
-- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two.
+- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two,
+  without jargon that is not itself in the list. Each page ends with "Words on this page" (`WordsOnPage.astro`,
+  `src/scripts/words.ts`): it lists the glossary terms that page uses, so a term you add appears wherever it is used,
+  with nothing to hover and no extra Tab stop. It is built by a script, so without JavaScript only the glossary page
+  remains. `e2e/words.spec.ts` fails when an abbreviation on the main pages is not in the glossary: add it, or, if it is
+  a name or a place, add it to `NOT_JARGON` in that test. The list is off on the glossary page (`words={false}`).
 - **Easy Read:** `src/pages/about/easy-read.astro` restates the About section in short sentences. Re-read it whenever
   the profile changes, so the two never disagree.
 - **Te reo Māori** in a `.astro` file is wrapped in `lang="mi"`, with macrons. The hero marks a greeting that starts

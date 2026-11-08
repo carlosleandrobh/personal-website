@@ -5,20 +5,20 @@ import { SITE } from '../lib/site';
 interface Props { active?: string | undefined }
 const { active } = Astro.props;
 ---
-<header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-[var(--glass)] backdrop-blur-md">
+<header data-site-header class="fixed inset-x-0 top-0 z-50 border-b border-line bg-[var(--glass)] backdrop-blur-md">
   <div class="container-site flex h-[80px] items-center justify-between gap-[16px]">
-    <a href="/" class="group flex items-center gap-[8px] font-display text-[22px] font-bold tracking-tight text-fg" aria-label="carlos.nz home">
+    <a href="/" class="group flex min-h-[44px] items-center gap-[8px] font-display text-[22px] font-bold tracking-tight text-fg" aria-label="carlos.nz home">
       <span>carlos.nz</span>
       <span class="inline-block size-[8px] rounded-full bg-cta transition-transform duration-300 group-hover:scale-125" aria-hidden="true"></span>
     </a>
 
     <nav aria-label="Main" class="hidden md:block">
-      <ul class="flex items-center gap-7 font-display text-sm font-semibold">
+      <ul class="flex items-center gap-3 font-display text-sm font-semibold">
         {SITE.nav.map((item) => (
           <li>
             <a
               href={item.href}
-              class:list={['transition-colors hover:text-fg', active === item.label ? 'text-brand underline decoration-2 underline-offset-8' : 'text-muted']}
+              class:list={['inline-flex min-h-[44px] min-w-[44px] items-center justify-center px-2 transition-colors hover:text-fg', active === item.label ? 'text-brand underline decoration-2 underline-offset-8' : 'text-muted']}
               aria-current={active === item.label ? 'page' : undefined}
             >{item.label}</a>
           </li>
@@ -27,11 +27,11 @@ const { active } = Astro.props;
     </nav>
 
     <div class="flex items-center gap-[8px]">
-      <button type="button" data-theme-toggle class="grid size-[40px] place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-label="Switch to dark theme">
+      <button type="button" data-theme-toggle class="grid size-[44px] place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-label="Switch to dark theme">
         <Icon name="material-symbols:dark-mode-outline" class="size-[20px] dark:hidden" aria-hidden="true" />
         <Icon name="material-symbols:light-mode-outline" class="hidden size-[20px] dark:block" aria-hidden="true" />
       </button>
-      <button type="button" data-display-settings-open data-reveal="flex" class="hidden h-[40px] min-w-[40px] items-center justify-center gap-[6px] rounded-lg px-[10px] text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-haspopup="dialog" aria-controls="display-settings" aria-label="Display settings">
+      <button type="button" data-display-settings-open data-reveal="flex" class="hidden h-[44px] min-w-[44px] items-center justify-center gap-[6px] rounded-lg px-[10px] text-muted transition-colors hover:bg-surface-2 hover:text-fg" aria-haspopup="dialog" aria-controls="display-settings" aria-label="Display settings">
         <Icon name="material-symbols:tune" class="size-[20px]" aria-hidden="true" />
         <span class="hidden font-display text-[14px] font-semibold xl:inline" aria-hidden="true">Display settings</span>
       </button>
@@ -39,7 +39,7 @@ const { active } = Astro.props;
         Let's talk
         <Icon name="material-symbols:arrow-forward" class="size-4" aria-hidden="true" />
       </a>
-      <button type="button" data-menu-toggle class="grid size-[40px] place-items-center rounded-lg text-fg hover:bg-surface-2 md:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+      <button type="button" data-menu-toggle class="grid size-[44px] place-items-center rounded-lg text-fg hover:bg-surface-2 md:hidden" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <Icon name="material-symbols:menu" class="size-[24px]" aria-hidden="true" />
       </button>
     </div>

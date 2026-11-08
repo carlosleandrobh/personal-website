@@ -8,13 +8,13 @@ const { repo } = Astro.props;
 ---
 <article class="card card-interactive group relative flex h-full flex-col p-6">
   <header class="flex items-center justify-between gap-3">
-    <span class="inline-flex items-center gap-2 font-mono text-xs text-subtle">
+    <span class="inline-flex items-center gap-2 font-mono text-sm text-subtle">
       <Icon name="simple-icons:github" class="size-4 text-fg" aria-hidden="true" />{repo.full_name.split('/')[0]}
     </span>
     {repo.featured && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Featured</span>}
   </header>
   <h3 class="mt-4 font-display text-lg font-bold">
-    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" class="after:absolute after:inset-0 after:rounded-[var(--radius-card)] focus-visible:outline-none">
+    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" data-card-link class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
       {repo.name}<span class="sr-only"> on GitHub (opens in a new tab)</span>
     </a>
   </h3>
@@ -24,7 +24,7 @@ const { repo } = Astro.props;
       {repo.topics.slice(0, 4).map((t) => <li class="chip">{t}</li>)}
     </ul>
   )}
-  <p class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-xs text-subtle">
+  <p class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-sm text-subtle">
     {repo.language && <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>{repo.language}</span>}
     <span class="inline-flex items-center gap-1"><Icon name="material-symbols:star-outline" class="size-4" aria-hidden="true" />{repo.stargazers_count}<span class="sr-only"> stars</span></span>
     {repo.pushed_at && <span>Updated {monthYear(repo.pushed_at)}</span>}

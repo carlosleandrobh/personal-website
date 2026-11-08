@@ -34,8 +34,13 @@ async function prepare(page: Page, mode: Mode) {
   if (mode.prefs) await page.addInitScript((value) => localStorage.setItem('a11y-prefs', value), JSON.stringify(mode.prefs));
 }
 
-/** The Turnstile script must never load in tests: no network, no third-party code. */
+/**
+ * The Turnstile script must never load in tests: no network, no third-party code.
+ * Every test here starts as a visitor who has already answered the welcome window, so it does not cover the page
+ * (e2e/welcome.spec.ts tests the window itself).
+ */
 test.beforeEach(async ({ page, baseURL }) => {
+  await page.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
   await page.route('**/*', (route) => {
     const origin = new URL(route.request().url()).origin;
     return origin === baseURL ? route.continue() : route.abort();
@@ -318,4 +323,224 @@ test('on wide screens the header names the display settings button in words', as
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await expect(page.locator('header [data-display-settings-open]')).toContainText('Display settings');
+});
+
+// ---------------------------------------------------------------------------
+// Fixes from the site-wide accessibility review: focus indicators, text spacing, short screens, reading order.
+// ---------------------------------------------------------------------------
+
+/** Tabs through a page and lists every stop that shows no focus indicator, on itself or on the card around it. */
+async function stopsWithoutFocusIndicator(page: Page): Promise<string[]> {
+  const missing: string[] = [];
+  let first: string | undefined;
+  for (let i = 0; i < 120; i++) {
+    await page.keyboard.press('Tab');
+    const stop = await page.evaluate(() => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el || el === document.body) return null;
+      const outline = (node: Element) => {
+        const style = getComputedStyle(node);
+        return style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) >= 2;
+      };
+      // A card has a resting shadow, so only a real outline on it counts. The focused control may use a ring drawn with box-shadow.
+      const card = el.closest('.card');
+      const name = (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+      return {
+        key: `${el.tagName}|${name}|${el.getAttribute('href')}`,
+        label: `${el.tagName.toLowerCase()} "${name}"`,
+        shows: outline(el) || getComputedStyle(el).boxShadow !== 'none' || (card ? outline(card) : false),
+      };
+    });
+    if (!stop || stop.key === first) break;
+    first ??= stop.key;
+    if (!stop.shows) missing.push(stop.label);
+  }
+  return missing;
+}
+
+for (const path of ['/', '/labs/', '/posts/', '/contact/']) {
+  test(`${path}: every Tab stop shows where the keyboard focus is`, async ({ page }) => {
+    await page.goto(path);
+    expect(await stopsWithoutFocusIndicator(page)).toEqual([]);
+  });
+}
+
+test('a post card rings the whole card when its link has keyboard focus', async ({ page }) => {
+  await page.goto('/posts/');
+  const card = page.locator('article[data-post]').first();
+  await expect(card).toBeVisible();
+  for (let i = 0; i < 40; i++) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate(() => !!document.activeElement?.closest('article[data-post] :is(h2, h3)'))) break;
+  }
+  const ring = await card.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+  });
+  expect(ring.style).not.toBe('none');
+  expect(ring.width).toBeGreaterThanOrEqual(2);
+});
+
+test('any card that is one big link (a post, a repository) rings the whole card on keyboard focus', async ({ page }) => {
+  await page.goto('/contact/');
+  await page.evaluate(() => {
+    const card = document.createElement('article');
+    card.className = 'card card-interactive relative';
+    card.innerHTML = '<a href="#x" data-card-link class="after:absolute after:inset-0">A stretched link</a>';
+    document.body.prepend(card);
+  });
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement?.hasAttribute('data-card-link'))).toBe(true);
+  const ring = await page.locator('article.card-interactive').evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { style: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+  });
+  expect(ring.style).not.toBe('none');
+  expect(ring.width).toBeGreaterThanOrEqual(2);
+});
+
+test.describe('text spacing and wide settings on a phone', () => {
+  test('post pages reflow at 320 CSS px, also with 200% text and wide spacing', async ({ page }) => {
+    const paths = await postPaths(page);
+    expect(paths.length).toBeGreaterThan(0);
+    await page.setViewportSize({ width: 320, height: 800 });
+    for (const path of paths) {
+      await page.goto(path);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${path} default`).toBeLessThanOrEqual(320);
+    }
+    await page.addInitScript(() => localStorage.setItem('a11y-prefs', JSON.stringify({ text: '200', spacing: 'wide' })));
+    for (const path of paths) {
+      await page.goto(path);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${path} 200% and wide`).toBeLessThanOrEqual(320);
+    }
+  });
+
+  // WCAG 1.4.12: a reader's own style sheet may set these spacings, and nothing may be cut off or scroll sideways.
+  test('every page copes with the WCAG text spacing overrides at 320 CSS px', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    const paths = [...STATIC_PAGES, ...(await postPaths(page))];
+    const wide: string[] = [];
+    for (const path of paths) {
+      await page.goto(path);
+      // The site's strict content security policy blocks an injected <style>, but not a style sheet built by script.
+      await page.evaluate((css) => {
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(css);
+        document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+      }, '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important } p { margin-bottom: 2em !important }');
+      // Guard: the override really is in force, so this test cannot pass by doing nothing.
+      expect(await page.evaluate(() => getComputedStyle(document.body).letterSpacing), `${path}: spacing applied`).not.toBe('normal');
+      if ((await page.evaluate(() => document.documentElement.scrollWidth)) > 320) wide.push(path);
+    }
+    expect(wide).toEqual([]);
+  });
+});
+
+test.describe('the header on short screens', () => {
+  // At 400% zoom a laptop shows about 320 x 200 CSS px, and a phone on its side about 667 x 375.
+  test('scrolls away with the page when the screen is short, so it never covers the text', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 200 });
+    await page.goto('/');
+    const header = page.locator('body > header');
+    expect(await header.evaluate((el) => getComputedStyle(el).position)).not.toBe('fixed');
+    await page.evaluate(() => window.scrollTo({ top: 600, behavior: 'instant' }));
+    expect(await header.evaluate((el) => el.getBoundingClientRect().bottom)).toBeLessThanOrEqual(0);
+    // Anchor jumps and focus do not keep a gap for a header that is no longer there.
+    expect(await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop))).toBeLessThan(40);
+  });
+
+  test('stays in view on a normal screen', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto('/');
+    const header = page.locator('body > header');
+    expect(await header.evaluate((el) => getComputedStyle(el).position)).toBe('fixed');
+    await page.evaluate(() => window.scrollTo({ top: 600, behavior: 'instant' }));
+    expect(await header.evaluate((el) => el.getBoundingClientRect().top)).toBe(0);
+  });
+});
+
+for (const [name, viewport] of [['phone', { width: 390, height: 800 }], ['desktop', { width: 1280, height: 800 }]] as const) {
+  test(`on a post the text comes before the sidebar, in the page and on screen (${name})`, async ({ page }) => {
+    const [path] = await postPaths(page);
+    expect(path).toBeTruthy();
+    await page.setViewportSize(viewport);
+    await page.goto(path!);
+    const order = await page.evaluate(() => {
+      const text = document.querySelector('[data-listen-source]')!;
+      const sidebar = document.querySelector('aside:has([data-copy])')!; // the share, listen and contents column
+      const t = text.getBoundingClientRect();
+      const s = sidebar.getBoundingClientRect();
+      return {
+        textFirstInPage: Boolean(text.compareDocumentPosition(sidebar) & Node.DOCUMENT_POSITION_FOLLOWING),
+        sidebarAfterOnScreen: s.top >= t.bottom - 1 || s.left >= t.right - 1, // below the text, or beside it on its right
+      };
+    });
+    expect(order.textFirstInPage).toBe(true);
+    expect(order.sidebarAfterOnScreen).toBe(true);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Easier by default: text size, tap targets and how long things move (review items 5, 6 and 8).
+// ---------------------------------------------------------------------------
+
+test('nothing moves on its own for more than five seconds (WCAG 2.2.2)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const long = await page.evaluate(() => document.getAnimations()
+    .map((a) => ({ name: (a as CSSAnimation).animationName ?? '', end: a.effect?.getComputedTiming().endTime as number }))
+    .filter((a) => a.end === Infinity || a.end > 5000));
+  expect(long).toEqual([]);
+});
+
+async function pagesAndPosts(page: Page): Promise<string[]> {
+  return [...STATIC_PAGES, ...(await postPaths(page))];
+}
+
+test('no visible text is smaller than 14 px', async ({ page }) => {
+  const small: string[] = [];
+  for (const path of await pagesAndPosts(page)) {
+    await page.goto(path);
+    const found = await page.evaluate(() => {
+      const list: string[] = [];
+      document.querySelectorAll('body *').forEach((el) => {
+        if (el.closest('svg, script, style, dialog:not([open]), [hidden]')) return;
+        const own = [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim().length > 0);
+        const box = el.getBoundingClientRect();
+        if (!own || box.width <= 1 || box.height <= 1) return; // text that is only for screen readers is 1 px wide
+        const size = parseFloat(getComputedStyle(el).fontSize);
+        if (size < 14) list.push(`${size}px "${(el.textContent ?? '').trim().slice(0, 30)}"`);
+      });
+      return list;
+    });
+    small.push(...found.slice(0, 4).map((line) => `${path} ${line}`));
+  }
+  expect(small).toEqual([]);
+});
+
+// WCAG asks for 24 px; 44 px is the size that suits a tremor or a thumb. The "Bigger buttons and links" setting goes to 48 px.
+test('every control that stands on its own is at least 44 px tall and wide', async ({ page }) => {
+  const small: string[] = [];
+  for (const path of await pagesAndPosts(page)) {
+    await page.goto(path);
+    const found = await page.evaluate(() => {
+      const list: string[] = [];
+      document.querySelectorAll<HTMLElement>('a[href], button, select, textarea, summary, input:not([type=hidden])').forEach((el) => {
+        if (el.closest('[aria-hidden="true"], [hidden], dialog:not([open])')) return;
+        if (el.matches('[data-card-link]')) return; // stretched over the whole card, so the card is the target
+        let box = el.getBoundingClientRect();
+        if (box.width <= 1 || box.height <= 1) return; // revealed only on focus, or for screen readers
+        const label = (el as HTMLInputElement).labels?.[0];
+        if (label && el.matches('input[type=checkbox], input[type=radio]')) box = label.getBoundingClientRect(); // the label is the target too
+        // A link inside a sentence is exempt: its height is set by the line, and the line is the context.
+        const block = el.closest('p, li, dd, dt, td, label');
+        const inSentence = el.matches('a') && getComputedStyle(el).display === 'inline' && block && (block.textContent ?? '').replace(el.textContent ?? '', '').trim().length > 3;
+        if (inSentence) return;
+        if (box.width < 44 || box.height < 44) list.push(`${Math.round(box.width)}x${Math.round(box.height)} ${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
+      });
+      return [...new Set(list)];
+    });
+    small.push(...found.map((line) => `${path} ${line}`));
+  }
+  expect(small).toEqual([]);
 });

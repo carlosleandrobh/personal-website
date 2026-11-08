@@ -1,0 +1,26 @@
+---
+// "Listen to this page": a small player that reads the page aloud with the browser's own voices. It stays hidden until
+// the visitor asks for it (the welcome window or Display settings) or presses a post's "Listen" button, and it never
+// starts by itself. See src/scripts/listen.ts.
+---
+<section
+  data-listen-player
+  aria-label="Read aloud"
+  hidden
+  class="fixed bottom-4 left-4 z-40 max-w-[calc(100%-2rem)] rounded-[1rem] border-2 border-input-line bg-surface p-3 text-fg shadow-lift no-print"
+>
+  <div class="flex flex-wrap items-center gap-2">
+    <button type="button" data-listen-main class="btn btn-primary btn-sm">Listen to this page</button>
+    <button type="button" data-listen-stop class="btn btn-secondary btn-sm" hidden>Stop</button>
+    <label class="flex items-center gap-2 font-display text-sm font-semibold">
+      Speed
+      <select data-listen-rate class="min-h-10 rounded-lg border border-input-line bg-surface px-2 text-sm font-normal text-fg">
+        <option value="0.75">Slower</option>
+        <option value="1" selected>Normal</option>
+        <option value="1.25">Faster</option>
+        <option value="1.5">Fastest</option>
+      </select>
+    </label>
+  </div>
+  <p class="sr-only" role="status" data-listen-status></p>
+</section>

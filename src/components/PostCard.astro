@@ -10,13 +10,13 @@ const H = headingLevel;
 const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(absolute(postUrl(post.slug)))}`;
 ---
 <article class="card card-interactive group relative flex h-full flex-col p-6" data-post data-category={post.category}>
-  <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+  <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
     <span class="pill bg-accent-tint text-accent">{post.category}</span>
     {post.status === 'draft' && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Draft preview</span>}
     <span class="font-mono text-subtle">{fullDate(post.published_at)} · {readingMinutes(post.body_md)} min read</span>
   </p>
   <H class="mt-4 text-h3 font-bold leading-snug">
-    <a href={postUrl(post.slug)} class="after:absolute after:inset-0 after:rounded-[var(--radius-card)] focus-visible:outline-none">
+    <a href={postUrl(post.slug)} data-card-link class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
       {post.title}
     </a>
   </H>
@@ -29,7 +29,7 @@ const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeUR
       href={shareUrl}
       target="_blank"
       rel="noopener noreferrer"
-      class="relative z-10 grid size-9 place-items-center rounded-lg text-muted transition-colors hover:bg-[#0a66c2]/10 hover:text-[#0a66c2]"
+      class="relative z-10 grid size-11 place-items-center rounded-lg text-muted transition-colors hover:bg-[#0a66c2]/10 hover:text-[#0a66c2]"
       aria-label={`Share “${post.title}” on LinkedIn (opens in a new tab)`}
     >
       <Icon name="simple-icons:linkedin" class="size-4" aria-hidden="true" />

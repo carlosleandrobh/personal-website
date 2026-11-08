@@ -198,6 +198,13 @@
     box-shadow: var(--shadow-2);
     border-color: color-mix(in srgb, var(--accent) 35%, transparent);
   }
+  /* A card that is one big link (a post, a repository): the link is stretched over the whole card, so a ring around the
+     title alone would hide how much is clickable. Ring the whole card while its link has keyboard focus. A browser
+     without :has() skips this block and keeps the link's own ring. Never remove a link's outline without a ring like this. */
+  @supports selector(:has(*)) {
+    [data-card-link]:focus-visible { outline: none; }
+    .card:has([data-card-link]:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+  }
 
   .btn {
     display: inline-flex;
@@ -212,13 +219,20 @@
     transition: transform 160ms var(--ease-out-soft), box-shadow 160ms, background-color 160ms, color 160ms;
     white-space: nowrap;
   }
+  /* A full-width button sits in a narrow column (a card in a sidebar, a phone). There a long label has to wrap: with wide
+     text spacing or a large text size it would otherwise run past the screen and force a sideways scroll. Buttons that
+     size themselves to their text stay on one line, or a flex row would squeeze them into two. */
+  .btn.w-full { white-space: normal; text-align: center; padding-inline: 0.5rem; flex-wrap: wrap; justify-content: center; }
+  /* An icon keeps its size when the button is squeezed; without this a squeezed button lost its icon first. */
+  .btn > svg { flex-shrink: 0; }
   .btn-primary { background: var(--cta); color: var(--on-cta); }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px -6px rgb(245 158 11 / 0.55); }
   .btn-primary:active { transform: translateY(0); }
   .btn-secondary { border: 1.5px solid var(--brand); color: var(--brand); }
   [data-theme='dark'] .btn-secondary { border-color: var(--accent); color: var(--accent); }
   .btn-secondary:hover { background: color-mix(in srgb, var(--brand) 6%, transparent); }
-  .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.875rem; }
+  /* 44 px is the size that suits a tremor or a thumb (WCAG asks for 24). The "Bigger buttons and links" setting goes to 48. */
+  .btn-sm { padding: 0.5rem 0.9rem; font-size: 0.875rem; min-height: 2.75rem; }
 
   .chip {
     display: inline-flex;
@@ -226,8 +240,8 @@
     border-radius: 9999px;
     padding: 0.2rem 0.65rem;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    line-height: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
     font-weight: 500;
     background: var(--accent-tint);
     color: var(--accent);
@@ -239,10 +253,12 @@
     border-radius: 9999px;
     padding: 0.25rem 0.75rem;
     font-family: var(--font-display);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    line-height: 1rem;
+    line-height: 1.25rem;
   }
+  /* A pill that is a button (the Labs filters) is a tap target, so it gets the same 44 px as other buttons. */
+  button.pill { min-height: 2.75rem; padding-inline: 1rem; }
   .kicker {
     display: inline-flex;
     align-items: center;
@@ -267,6 +283,7 @@
     border: 1px solid var(--input-line);
     border-radius: var(--radius-control);
     padding: 0.75rem 0.9rem;
+    min-height: 2.75rem;
     color: var(--fg);
     font: inherit;
     transition: border-color 150ms, box-shadow 150ms;
@@ -357,7 +374,7 @@
   .js:not([data-motion='reduce']) .bridge-end--business { animation-delay: 0.15s; }
   .js:not([data-motion='reduce']) .bridge-end--tech { animation-delay: 1.35s; }
   .js:not([data-motion='reduce']) .bridge-keystone { opacity: 0; transform: scale(0.4); animation: keystone-land 0.6s var(--ease-out-soft) 1.05s forwards; }
-  .js:not([data-motion='reduce']) .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 2; }
+  .js:not([data-motion='reduce']) .bridge-keystone-pulse { animation: keystone-pulse 2.4s ease-out 1.8s 1; }
 }
 @keyframes bridge-draw { to { stroke-dashoffset: 0; } }
 @keyframes bridge-fade { to { opacity: 1; } }
@@ -395,6 +412,22 @@ html[data-spacing='wide'] :is(.prose-post, .prose-about) > * + * { margin-top: 2
 
 html[data-measure='narrow'] :is(.prose-post, .prose-about) { max-width: 55ch; }
 
+/* "Bigger buttons and links": every control gets a target of at least 48 px (the guideline minimum is 24 px).
+   Links inside a paragraph keep their line spacing; only the area that reacts to a tap or click grows. */
+html[data-targets='large'] :is(.btn, button, select, summary, input:not([type='checkbox'], [type='radio']), textarea) { min-height: 48px; }
+html[data-targets='large'] .btn { padding-inline: 1.5rem; }
+html[data-targets='large'] :is(header, footer, nav, aside) a { display: inline-flex; align-items: center; min-height: 48px; padding-inline: 0.25rem; }
+html[data-targets='large'] :is(main, .prose-post, .prose-about) :is(p, li, dd) a:not(.btn) { padding-block: 0.6em; }
+html[data-targets='large'] input:is([type='checkbox'], [type='radio']) { width: 1.75rem; height: 1.75rem; }
+html[data-targets='large'] label:has(> input:is([type='checkbox'], [type='radio'])) { min-height: 48px; }
+
+/* The part of the page being read aloud. A teal ring (3:1 against both themes) and not a fill, so the text keeps its
+   own contrast; in Windows contrast themes the ring takes the system highlight colour. */
+[data-listen-current] { outline: 3px solid var(--accent); outline-offset: 6px; border-radius: 4px; }
+@media (forced-colors: active) { [data-listen-current] { outline-color: Highlight; } }
+/* Room at the bottom so the player never covers the last lines of the page. */
+body.has-listen-player { padding-bottom: 7rem; }
+
 /* "Reduce motion" in the panel behaves like the device setting. */
 html[data-motion='reduce'] *,
 html[data-motion='reduce'] ::before,
@@ -419,6 +452,14 @@ html[data-motion='reduce'] ::after {
   .btn { border: 1px solid ButtonText; }
   button[aria-pressed='true'] { background: Highlight; color: HighlightText; border-color: Highlight; }
   .pill, .chip { border: 1px solid CanvasText; }
+}
+
+/* Short screens: a laptop at 400% zoom shows about 320 x 200 CSS px and a phone on its side about 375 px tall. A fixed
+   header would cover up to 40% of that, so it scrolls away with the page instead (and an open menu can be scrolled
+   to the end). The page keeps its top padding for the header, and anchor jumps stop keeping a gap for it. */
+@media (max-height: 31.25rem) {
+  [data-site-header] { position: absolute; }
+  html { scroll-padding-top: 0.5rem; }
 }
 
 @media print {

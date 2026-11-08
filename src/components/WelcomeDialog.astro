@@ -1,0 +1,48 @@
+---
+// The welcome window: a native <dialog> that opens once, on a visitor's first visit, and asks what would make the
+// site easier to use. It asks; it never tries to work out who the visitor is. The choices are named by what they do,
+// not by a condition, so nobody has to say they have a disability. See src/scripts/welcome.ts.
+const choices = [
+  { name: 'aloud', label: 'Read the pages aloud to me' },
+  { name: 'comfort', label: 'Larger text and stronger contrast' },
+  { name: 'easyread', label: 'Simpler words (Easy Read)' },
+  { name: 'calm', label: 'Less movement and animation' },
+  { name: 'targets', label: 'Bigger buttons and links' },
+] as const;
+---
+<dialog
+  id="welcome-window"
+  data-welcome
+  aria-labelledby="welcome-window-title"
+  aria-describedby="welcome-window-intro"
+  class="m-auto max-h-[calc(100dvh-2rem)] w-[min(36rem,calc(100%-2rem))] overflow-y-auto rounded-[1rem] border-2 border-input-line bg-surface p-0 text-fg backdrop:bg-black/60"
+>
+  <form method="dialog" class="p-6 md:p-8">
+    <!-- Focus starts on the title, so a screen reader reads it first and the choices after it, in order. -->
+    <h2 id="welcome-window-title" tabindex="-1" autofocus class="text-h3 font-bold focus:outline-none">Welcome! This site can adapt to you.</h2>
+    <p id="welcome-window-intro" class="mt-2 text-muted">
+      Choose anything that would make it easier for you. You can pick more than one, and change your mind later.
+    </p>
+
+    <fieldset class="mt-5 border-0 p-0">
+      <legend class="sr-only">What would make this site easier for you?</legend>
+      {choices.map((choice) => (
+        <label class="flex min-h-12 cursor-pointer items-center gap-3 py-1 font-display font-semibold" data-choice={choice.name}>
+          <input type="checkbox" name={choice.name} class="size-6 shrink-0 accent-[var(--accent)]" />
+          {choice.label}
+        </label>
+      ))}
+    </fieldset>
+
+    <p class="mt-4 text-sm text-muted">
+      Using a screen reader or only the keyboard? You don't need to change anything. The whole site works that way.
+    </p>
+
+    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <button value="apply" class="btn btn-primary">Use my choices</button>
+      <button value="skip" class="inline-flex min-h-11 items-center font-display text-[0.9375rem] font-semibold text-brand underline underline-offset-4 hover:text-fg dark:text-accent">Continue without changes</button>
+    </div>
+
+    <p class="mt-5 text-sm text-muted">Saved only in this browser. Change it any time from Display settings.</p>
+  </form>
+</dialog>
