@@ -383,3 +383,31 @@ test.describe('bigger buttons and links', () => {
     await expect(page.locator('html')).toHaveAttribute('data-targets', 'large');
   });
 });
+
+test.describe('the "Listen to this page" button in the home page note', () => {
+  test('starts reading on a press, and puts keyboard focus on Pause', async ({ page }) => {
+    await fakeSpeech(page);
+    await page.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
+    await page.goto('/');
+    const note = page.getByRole('region', { name: 'Made for everyone' });
+    expect(await spoken(page)).toEqual([]); // nothing is read until the button is pressed
+    await note.getByRole('button', { name: 'Listen to this page' }).click();
+    await expect.poll(async () => (await spoken(page)).length).toBeGreaterThan(3);
+    const player = page.getByRole('region', { name: 'Read aloud' });
+    await expect(player.getByRole('button', { name: 'Pause' })).toBeFocused();
+    await player.getByRole('button', { name: 'Stop' }).click();
+    await expect(player).toBeHidden();
+    await expect(note.getByRole('button', { name: 'Listen to this page' })).toBeFocused(); // focus is not lost with the player
+  });
+
+  test('is not offered when the browser cannot read aloud', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('a11y-welcomed', '1');
+      delete (window as any).speechSynthesis;
+    });
+    await page.goto('/');
+    const note = page.getByRole('region', { name: 'Made for everyone' });
+    await expect(note.getByRole('button', { name: 'Display settings' })).toBeVisible(); // the scripts have run
+    await expect(note.getByRole('button', { name: 'Listen to this page' })).toHaveCount(0);
+  });
+});

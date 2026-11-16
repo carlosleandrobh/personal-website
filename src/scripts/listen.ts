@@ -75,9 +75,12 @@ if (synth && player) {
     if (covered > 0 && target !== document.body) window.scrollBy({ top: covered + 16, behavior: 'instant' });
   });
 
+  let opener: HTMLElement | undefined;
   const show = () => {
     const wanted = state !== 'idle' || document.documentElement.dataset.aloud === 'on';
+    const hadFocus = player.contains(document.activeElement);
     player.hidden = !wanted;
+    if (!wanted && hadFocus && opener) opener.focus();
     if (skipButton) skipButton.hidden = !wanted;
     document.body.classList.toggle('has-listen-player', wanted);
     mainButton.textContent = state === 'reading' ? 'Pause' : state === 'paused' ? 'Resume' : 'Listen to this page';
@@ -156,6 +159,18 @@ if (synth && player) {
     if (state !== 'idle') return;
     start();
     mainButton.focus();
+  });
+
+  // "Listen to this page" buttons in the page itself (the home page note). A press starts the reading and takes
+  // keyboard focus to Pause; when the player goes away again, focus returns to the button that was pressed.
+  document.querySelectorAll<HTMLButtonElement>('[data-listen-open]').forEach((button) => {
+    button.classList.remove('hidden');
+    button.classList.add('inline-flex');
+    button.addEventListener('click', () => {
+      if (state === 'idle') start();
+      mainButton.focus();
+      opener = button;
+    });
   });
 
   onChange(show); // the Display settings panel can show or hide the player

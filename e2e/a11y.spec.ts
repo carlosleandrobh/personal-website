@@ -716,3 +716,40 @@ test('every control that stands on its own is at least 44 px tall and wide', asy
   }
   expect(small).toEqual([]);
 });
+
+test.describe('signposts: a visitor can tell the site is built for people who cannot see the screen well', () => {
+  test('the home page note names screen readers, the keyboard and zoom, and links to the screen reader guide', async ({ page }) => {
+    await page.goto('/');
+    const note = page.getByRole('region', { name: 'Made for everyone' });
+    await expect(note).toContainText('screen reader');
+    await expect(note).toContainText('keyboard');
+    await expect(note).toContainText('read aloud');
+    await expect(note.getByRole('link', { name: 'How to use it with a screen reader' })).toHaveAttribute('href', '/accessibility/#screen-reader');
+  });
+
+  test('the statement has a screen reader guide and a guide for people who find the screen hard to read, before the long lists', async ({ page }) => {
+    await page.goto('/accessibility/');
+    const headings = await page.locator('main h2').allInnerTexts();
+    const at = (name: string) => headings.indexOf(name);
+    expect(at('Using a screen reader?')).toBeGreaterThan(-1);
+    expect(at('If the screen is hard to read')).toBeGreaterThan(-1);
+    expect(at('Using a screen reader?')).toBeLessThan(at('What you can do on this site'));
+    expect(at('If the screen is hard to read')).toBeLessThan(at('What you can do on this site'));
+
+    // The links from the home page and from the short version land on them.
+    await expect(page.locator('#screen-reader')).toHaveText('Using a screen reader?');
+    await expect(page.locator('#hard-to-read')).toHaveText('If the screen is hard to read');
+    const short = page.locator('main .card').first();
+    await expect(short.getByRole('link', { name: 'Using a screen reader?' })).toHaveAttribute('href', '#screen-reader');
+    await expect(short.getByRole('link', { name: 'If the screen is hard to read' })).toHaveAttribute('href', '#hard-to-read');
+  });
+
+  test('the screen reader guide does not claim testing that has not been done', async ({ page }) => {
+    await page.goto('/accessibility/');
+    const guide = page.locator('section[aria-labelledby="screen-reader"]');
+    await expect(guide).toContainText('not yet tested');
+    // It names the built-in screen readers, for people who do not know their device has one.
+    const hard = page.locator('section[aria-labelledby="hard-to-read"]');
+    for (const name of ['VoiceOver', 'TalkBack', 'Narrator']) await expect(hard).toContainText(name);
+  });
+});

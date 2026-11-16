@@ -89,7 +89,11 @@ Automated checks find only part of the barriers. For a change to layout or a com
     never decides for the visitor, and its options are named by what they do ("Larger text and stronger contrast"),
     never by a condition ("I am blind").
 13. **The first Tab stops are fixed:** "Skip to content", "Display settings", "Accessibility statement" (in `BaseLayout.astro`).
-    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`). A fourth stop, "Go to reading
+    The home page also shows an always-visible "Made for everyone" note (`Hero.astro`). It says in plain words that the
+    site is built for a screen reader, the keyboard and zoom, links to the screen reader guide
+    (`/accessibility/#screen-reader`) and has a "Listen to this page" button. The statement also has
+    `#hard-to-read`, for visitors who do not know these tools exist. Say "built for", never "tested with", until a
+    real test is listed in the statement. A fourth stop, "Go to reading
     controls", exists only while the read-aloud player shows (rule 15); when the player is hidden it is not in the page.
 14. **The welcome window** (`WelcomeDialog.astro`, `src/scripts/welcome.ts`) is a native modal `<dialog>` that opens
     once, on a visitor's first visit. It is the only window that opens by itself, so keep it small and keep these rules:
@@ -105,8 +109,8 @@ Automated checks find only part of the barriers. For a change to layout or a com
     - Every end-to-end test except `e2e/welcome.spec.ts` starts with `a11y-welcomed` already set, or the window would
       cover every page.
 15. **Speech is opt-in.** `src/scripts/listen.ts` and `ListenPlayer.astro` read the page aloud with the browser's own
-    voices, only when the visitor presses a button ("Use my choices" with reading ticked, the player's Listen button, or
-    a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
+    voices, only when the visitor presses a button ("Use my choices" with reading ticked, the player's Listen button, a
+    `data-listen-open` button such as the one in the home page note, or a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
     or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
     a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
     and resumes from its start, because the browser's own pause is unreliable. The player is at the end of the page, so
