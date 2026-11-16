@@ -49,6 +49,7 @@
     "check": "astro check",
     "audit": "npm audit --audit-level=high",
     "test:contrast": "node scripts/check-contrast.mjs",
+    "test:glossary": "node --experimental-strip-types --no-warnings scripts/check-glossary.mjs",
     "test:a11y": "playwright test"
   },
   "overrides": {

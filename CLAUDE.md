@@ -67,6 +67,9 @@ INCLUDE_DRAFTS=true npm run dev            # preview drafts from Supabase
 - **Stage 1 vs stage 2:** without Supabase secrets in GitHub, the deploy builds from `supabase/seed/content.json`
   (edit that file and push). Once Supabase is set up, that file is only used for fixtures/CI and the initial seed.
   Production builds never include drafts.
+- **Keep the glossary in step:** the glossary (`src/lib/glossary.ts`) follows the site's text. Whenever a post or any
+  other site text changes, add the terms it starts using and remove the ones no page uses any more: build with the real
+  content, run `npm run test:glossary`, and follow the `glossary` skill (`.claude/skills/glossary/SKILL.md`).
 - **Read contact messages:** `uv run cms messages` or MCP `select … from contact_messages where status='new'`.
 - **Changing the CLI:** keep business logic in the modules as plain functions that take the client as a parameter
   (testable with the fake in `tests/conftest.py`); `cli.py` only parses arguments and prints. Add or update tests.
@@ -105,7 +108,7 @@ Inter (body), JetBrains Mono (tech tags only). Use semantic utilities (`bg-surfa
 
 ## Before you finish any change
 
-- Site: `npm run check` (0 errors) → `npm run build` → `npm run test:contrast` → `npm run test:a11y`
+- Site: `npm run check` (0 errors) → `npm run build` → `npm run test:contrast` → `npm run test:glossary` → `npm run test:a11y`
   (build first; the accessibility rules are in `docs/ACCESSIBILITY.md`)
 - Python: `uv run ruff check carlos_cms tests` → `uv run ruff format --check carlos_cms tests` → `uv run pytest`
 - Edge Function: `cd supabase/functions && deno fmt --check && deno lint && deno check contact/index.ts`
