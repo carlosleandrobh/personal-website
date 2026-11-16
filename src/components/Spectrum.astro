@@ -17,19 +17,21 @@ const { areas } = Astro.props;
       intro="Most problems don't respect org charts. I work across the whole range, so the requirement, the process and the system end up describing the same thing."
     />
 
-    <div class="relative mt-14">
-      <!-- The rail: business on the left, technology on the right -->
-      <div class="mb-6 hidden items-center justify-between font-display text-sm font-semibold lg:flex" aria-hidden="true">
+    <div class="mt-14">
+      <!-- The rail (wide screens): a scale from business to technology that stands clear of the cards. Each card has a
+           numbered stop on it, joined to the card by a short tick. The stops belong to the cards (below), so they move
+           and change colour with them. -->
+      <div class="mb-2 hidden items-center justify-between font-display text-sm font-semibold lg:flex" aria-hidden="true">
         <span class="text-brand">Business</span>
         <span class="text-accent">Technology</span>
       </div>
-      <div class="relative">
-      <div class="absolute inset-x-[10%] top-0 hidden h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-trust via-teal to-teal dark:from-brand dark:via-accent dark:to-accent lg:block" aria-hidden="true"></div>
+      <div class="relative lg:pt-14">
+      <div class="absolute inset-x-0 top-4 hidden h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-trust to-teal dark:from-brand dark:to-accent lg:block" aria-hidden="true"></div>
 
       <ol class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {areas.map((area, i) => (
-          <li class="spectrum-card card card-interactive relative flex flex-col p-6 lg:pt-12">
-            <span aria-hidden="true" class="spectrum-index spectrum-stop absolute left-6 top-6 grid size-7 place-items-center rounded-full border-2 border-surface bg-brand font-mono text-sm font-semibold text-surface lg:left-1/2 lg:-top-[0.9rem] lg:-translate-x-1/2 dark:bg-accent dark:text-bg">
+          <li class="spectrum-card card card-interactive relative flex flex-col p-6 lg:before:absolute lg:before:bottom-full lg:before:left-1/2 lg:before:h-6 lg:before:w-px lg:before:-translate-x-1/2 lg:before:bg-line-strong">
+            <span aria-hidden="true" class="spectrum-index spectrum-stop absolute left-6 top-6 grid size-7 place-items-center rounded-full border-2 border-surface bg-brand font-mono text-sm font-semibold text-surface lg:left-1/2 lg:-top-14 lg:size-8 lg:-translate-x-1/2 dark:bg-accent dark:text-bg">
               {i + 1}
             </span>
             <div class="ml-10 mb-4 grid size-10 place-items-center rounded-lg bg-accent-tint text-accent lg:ml-0">
