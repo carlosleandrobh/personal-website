@@ -107,7 +107,9 @@ The migration keeps the existing `revoke … from anon, authenticated` pattern, 
 **SR-14 The hero fits a small screen (F14).** The hero grid uses `minmax(0, 1fr)` columns (rule 11), and its two
 buttons may wrap their label onto a second line. The reflow tests also fail when an element is wider than the screen
 but hidden by a clip, not only when the page scrolls sideways. *Done when* at 320 px with 200% text and wide spacing
-no visible element on any page reaches past the right edge of the screen.
+no visible element on any page reaches past the right edge of the screen. *Done 16 Nov 2026 (phase 3b): the fix turned
+out to be site-wide — buttons wrap only when they would not fit, every grid has a shrinkable column by default, long
+words break inside `<main>`, and the privacy table scrolls in its own box.*
 
 **SR-15 Glossary covers the GitHub languages (F15).** Add "PL/SQL" and "T-SQL" (and "TSQL", the spelling GitHub uses
 for the language) to `src/lib/glossary.ts`. *Done when* `e2e/words.spec.ts` passes when built from Supabase as well as

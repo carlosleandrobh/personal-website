@@ -57,7 +57,7 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Automated checks that "Words on this page" lists only words that really appear on the page, is plain text with one link, is read aloud with the page, and that every abbreviation on the main pages is in the glossary.</li>
         <li>Automated checks that no visible text is smaller than 14 pixels, that every control standing on its own is at least 44 pixels tall and wide, and that nothing moves on its own for more than five seconds.</li>
         <li>Automated checks of what a screen reader receives: each card's heading comes before its status and date, no heading repeats "(opens in a new tab)", links make sense on their own, statuses read as sentences, durations are in whole words, the welcome window tells screen reader users first that they need not change anything, "Copy link" and the Labs filter announce their result, and contact form fields announce their limit, and "Error" only when there is one.</li>
-        <li>Automated checks that every Tab stop on the home page, Labs, Posts and Contact shows where the keyboard focus is, that no page scrolls sideways on a 320 pixel screen with 200% text, wide spacing and the standard text spacing overrides (see the known issue about cut-off text), that the header does not cover a short screen, and that on a post the text comes before the sidebar in the page and on screen.</li>
+        <li>Automated checks that every Tab stop on the home page, Labs, Posts and Contact shows where the keyboard focus is, that every page fits a 320 pixel screen, at the normal text size and with 200% text, wide spacing and the standard text spacing overrides, without scrolling sideways or cutting anything off at the edge, that buttons keep their label on one line on a desktop, that the header does not cover a short screen, and that on a post the text comes before the sidebar in the page and on screen.</li>
       </ul>
       <p>
         Automated tools find only part of the barriers that exist. I have <strong>not yet</strong> tested with
@@ -66,7 +66,6 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
 
       <h2 id="known-issues">Known issues</h2>
       <ul>
-        <li>On a small phone (320 pixels wide) with text at 200%, some content is cut off at the right edge instead of wrapping, mostly buttons, cards and the table on the privacy page. At the normal text size only that table is affected. A fix is in progress; meanwhile, a smaller text size or turning the phone sideways shows everything.</li>
         <li>The contact form needs JavaScript and the Cloudflare Turnstile spam check. If you cannot use it, contact me on LinkedIn instead.</li>
         <li>Posts published before {reviewed} may have images without good descriptions. Tell me which one and I will fix it.</li>
         <li>The Easy Read page has not been checked by people who use Easy Read. Tell me if it is unclear.</li>

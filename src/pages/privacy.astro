@@ -40,7 +40,11 @@ const updated = fullDate(`${SITE.privacyVersion}T12:00:00+13:00`);
       </p>
 
       <h2 id="what">What I collect and why</h2>
+      <!-- Scrolls in its own box when it is wider than the screen (rule 8); src/scripts/ui.ts then makes the box a
+           keyboard-focusable region named by the caption. -->
+      <div class="table-scroll">
       <table>
+        <caption class="sr-only">What I collect and why</caption>
         <thead><tr><th>Information</th><th>Why</th><th>Kept for</th></tr></thead>
         <tbody>
           <tr>
@@ -60,6 +64,7 @@ const updated = fullDate(`${SITE.privacyVersion}T12:00:00+13:00`);
           </tr>
         </tbody>
       </table>
+      </div>
       <p>
         Your display settings (colour theme, text size, text spacing, line length, reduced motion, bigger buttons and
         links, the Listen button and its speed) are saved in your own browser's local storage, only if you change them.
