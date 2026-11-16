@@ -115,8 +115,11 @@ Automated checks find only part of the barriers. For a change to layout or a com
       cover every page.
 15. **Speech is opt-in.** `src/scripts/listen.ts` and `ListenPlayer.astro` read the page aloud with the browser's own
     voices, only when the visitor presses a button ("Use my choices" with reading ticked, the player's Listen button, a
-    `data-listen-open` button such as the one in the home page note, or a post's "Listen to this post"). The player stays hidden until it is asked for (welcome window or Display settings)
-    or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
+    `data-listen-open` button, or a post's "Listen to this post"). Every page starts with a `data-listen-open` button,
+    "Listen to this page" (`BaseLayout.astro`, the first thing in `<main>`), so reading aloud is offered in the same
+    place everywhere and not only in the settings; the home page note has a second one. Its row keeps its height
+    whether or not the button shows, so the page does not jump. The player stays hidden until it is asked for (welcome
+    window or Display settings) or a reading starts. It has Pause, Resume, Stop and Speed, outlines the paragraph being read (`data-listen-current`:
     a ring and not a fill, so text contrast is unchanged) and never uses the microphone. Pause remembers the paragraph
     and resumes from its start, because the browser's own pause is unreliable. The player is at the end of the page, so
     keyboard focus is taken to Pause when a reading starts from the welcome window, and the fourth Tab stop ("Go to

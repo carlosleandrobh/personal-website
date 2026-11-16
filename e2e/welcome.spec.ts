@@ -411,3 +411,61 @@ test.describe('the "Listen to this page" button in the home page note', () => {
     await expect(note.getByRole('button', { name: 'Listen to this page' })).toHaveCount(0);
   });
 });
+
+test.describe('the "Listen to this page" button at the top of every page', () => {
+  const PAGES = ['/', '/labs/', '/projects/', '/posts/', '/contact/', '/privacy/', '/accessibility/', '/glossary/', '/about/easy-read/', '/posts/how-this-site-works/'];
+  const topButton = (page: Page) => page.locator('main [data-listen-bar]').getByRole('button', { name: 'Listen to this page' });
+
+  for (const path of PAGES) {
+    test(`is the first thing in the content of ${path}, and reads only after a press`, async ({ page }) => {
+      test.skip(path.startsWith('/posts/how-') && process.env.CONTENT_SOURCE !== 'fixtures', 'the post comes from the fixtures');
+      await fakeSpeech(page);
+      await page.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
+      await page.goto(path);
+      await expect(topButton(page)).toBeVisible();
+      // In the same place on every page: before the main heading, so nobody has to look for it.
+      expect(await page.evaluate(() => {
+        const bar = document.querySelector('main [data-listen-bar]')!;
+        return Boolean(bar.compareDocumentPosition(document.querySelector('main h1')!) & Node.DOCUMENT_POSITION_FOLLOWING);
+      })).toBe(true);
+      expect(await spoken(page)).toEqual([]);
+      await topButton(page).click();
+      await expect.poll(async () => (await spoken(page)).length).toBeGreaterThan(0);
+      expect((await spoken(page))[0]).not.toContain('Listen to this page'); // the reading starts with the page, not the button
+      const player = page.getByRole('region', { name: 'Read aloud' });
+      await expect(player.getByRole('button', { name: 'Pause' })).toBeFocused();
+      await player.getByRole('button', { name: 'Stop' }).click();
+      await expect(topButton(page)).toBeFocused();
+    });
+  }
+
+  test('keeps its room while the page loads, so the page does not jump when it appears', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('a11y-welcomed', '1');
+      delete (window as any).speechSynthesis; // the button never appears here
+    });
+    await page.goto('/labs/');
+    const without = await page.locator('main h1').evaluate((el) => el.getBoundingClientRect().top);
+    await expect(page.locator('main [data-listen-bar]').getByRole('button')).toHaveCount(0);
+
+    const other = await page.context().newPage();
+    await fakeSpeech(other);
+    await other.addInitScript(() => localStorage.setItem('a11y-welcomed', '1'));
+    await other.goto('/labs/');
+    await expect(topButton(other)).toBeVisible();
+    expect(await other.locator('main h1').evaluate((el) => el.getBoundingClientRect().top)).toBe(without);
+  });
+
+  test('is at least 44 px tall and fits a 320 px screen at 200% text', async ({ page }) => {
+    await fakeSpeech(page);
+    await page.addInitScript(() => {
+      localStorage.setItem('a11y-welcomed', '1');
+      localStorage.setItem('a11y-prefs', JSON.stringify({ text: '200' }));
+    });
+    await page.setViewportSize({ width: 320, height: 700 });
+    await page.goto('/labs/');
+    const box = (await topButton(page).boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    expect(box.x + box.width).toBeLessThanOrEqual(320);
+  });
+});
