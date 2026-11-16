@@ -16,14 +16,14 @@ for Drogaria Araujo.
 
 **Acceptance criteria:**
 - [x] The migration only adds columns and keeps grants and RLS unchanged (no access for `anon`/`authenticated`)
-- [ ] pgTAP: both columns exist, accept `pt-BR` and null, reject `portuguese` (written; not run yet: needs Docker)
+- [x] pgTAP: both columns exist, accept `pt-BR` and null, reject `portuguese` (written; the four cases checked on production in a rolled-back block)
 - [x] `Experience` and `Education` in `src/lib/types.ts` have the optional fields
 
 **Verification:** `npx supabase test db` · `npm run check` · `npm run build`
 
 **Dependencies:** none
 
-**Files:** `supabase/migrations/20261116000000_name_language.sql`, `supabase/tests/database/security.test.sql` (or a
+**Files:** `supabase/migrations/20261116040224_name_language.sql`, `supabase/tests/database/security.test.sql` (or a
 new test file), `supabase/seed/content.json`, `src/lib/types.ts`
 
 **Scope:** M
@@ -66,8 +66,11 @@ education and "Studying") in `<span lang={…}>` when the field is set.
 
 ### Checkpoint 1
 - [x] pytest (56), `npm run check`, build, `test:contrast`, `test:a11y` (140) pass
-- [ ] pgTAP passes (`npx supabase test db`, needs Docker)
-- [ ] Carlos approves `npx supabase db push`, then sets the field with `content pull` / `content push`
+- [x] Migration applied to Supabase on 16 Nov 2026 (recorded as version 20261116040224; the file was renamed to match)
+- [x] Database checks without Docker, on production: read-only queries (RLS on every table, no grants to client
+  roles, both columns and constraints present) and the four new pgTAP cases run in a block that rolls back on purpose
+  (all four ok, nothing left behind). The full pgTAP file was **not** run on production: it deletes Vault secrets.
+- [x] `experiences.company_lang = 'pt-BR'` set for Drogaria Araujo; a build from Supabase shows `<span lang="pt-BR">`
 - [ ] PR 1 opened and reviewed
 
 ---

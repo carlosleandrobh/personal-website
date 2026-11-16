@@ -101,7 +101,7 @@ PROFILE_FIELDS = [
 REPO_FIELDS = ['is_visible', 'featured']  # the rest of github_repos comes from GitHub
 
 # The language of a name that is not English, so screen readers pronounce it properly (e.g. pt-BR).
-# Same rule as the check constraints in supabase/migrations/20261116000000_name_language.sql.
+# Same rule as the check constraints in supabase/migrations/20261116040224_name_language.sql.
 LANG_FIELDS = {'experiences': 'company_lang', 'education': 'institution_lang'}
 _LANG_TAG = re.compile(r'[a-z]{2,3}(-[A-Z]{2})?')
 
