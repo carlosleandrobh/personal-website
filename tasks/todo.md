@@ -225,7 +225,12 @@ aloud to me" says it is a separate voice from a screen reader.
 
 **Scope:** S
 
-### T13: The hero fits a 320 px screen at 200% text, and the reflow test catches clipped content (SR-14)
+### T13: The hero fits a 320 px screen at 200% text, and the reflow test catches clipped content (SR-14) — moved to phase 3b
+
+> **Moved to phase 3b on 16 Nov 2026.** The new check found cut-off content on almost every page at 200% text (worst:
+> /privacy/ 388 px, Easy Read 189 px, home 117 px; at the normal size only the privacy table, 34 px). Causes: buttons
+> never wrap, grids with `auto` columns, and a table outside a scrolling box. Carlos chose a separate PR, and approved
+> changing rule 11 so buttons wrap only when they would not fit.
 
 **Description:** Found at checkpoint 2. The hero column grows to the width of the "See my work" button and `<main>`
 clips it, so the heading is cut off. Give the hero grid `minmax(0, 1fr)` columns and let its buttons wrap. Teach the
@@ -259,8 +264,10 @@ reflow tests to look for visible elements past the right edge, not only for a sc
 **Scope:** XS
 
 ### Checkpoint 3
-- [ ] All site checks pass
-- [ ] `/accessibility/`: the automated test list mentions the new checks; review date updated
+- [x] All site checks pass: check (0 errors), contrast (0), test:a11y 159/159 on the seed, pytest 56; words tests
+  also pass on a build from Supabase
+- [x] `/accessibility/`: the automated test list mentions the new checks; review date 16 Nov 2026; the 320 px claim is
+  corrected and the cut-off text is listed as a known issue until phase 3b
 - [ ] PR 3 opened and reviewed
 
 ---
