@@ -79,11 +79,12 @@ education and "Studying") in `<span lang={…}>` when the field is set.
 
 ### T4: Durations in whole words (SR-5)
 
-**Description:** `duration()` returns "8 years 9 months", "1 year", "1 month".
+**Description:** `duration()` returns "8 years 9 months", "1 year", "1 month". It now reads dates in UTC: a build
+west of UTC (Carlos's computer is on Brasília time) used to count one month too many.
 
 **Acceptance criteria:**
-- [ ] Singular and plural are right for years and months, and the minimum is "1 month"
-- [ ] No text on `/` contains the words "mo" or "yrs"
+- [x] Singular and plural are right for years and months, and the minimum is "1 month"
+- [x] No text on `/` contains the words "mo" or "yrs"
 
 **Verification:** new `e2e/format.spec.ts` (imports `src/lib/format.ts`) · `npm run test:a11y`
 
@@ -100,9 +101,9 @@ and owner. The repo card's new-tab hint moves to `aria-describedby`. Lab card li
 lab name in `sr-only` text.
 
 **Acceptance criteria:**
-- [ ] On `/`, `/labs/` and `/projects/`, the element after each card heading in the tree is its status or date
-- [ ] No heading's accessible name contains "(opens in a new tab)"; the repo links still announce it as a description
-- [ ] Lab links read "Code for {name}" and "Read notes on {name}", and the visible word stays at the start of the name
+- [x] On `/`, `/labs/` and `/projects/`, the element after each card heading in the tree is its status or date
+- [x] No heading's accessible name contains "(opens in a new tab)"; the repo links still announce it as a description
+- [x] Lab links read "Code for {name}" and "Read notes on {name}", and the visible word stays at the start of the name
 
 **Verification:** `npm run build` · `npm run test:a11y` (order, reflow at 320 px, targets, focus rings all still pass)
 
@@ -119,8 +120,8 @@ lab name in `sr-only` text.
 stays above the `h1`.
 
 **Acceptance criteria:**
-- [ ] With `is_available` true, the text straight after the `h1` is the availability line
-- [ ] With `is_available` false, nothing is left in its place
+- [x] With `is_available` true, the text straight after the `h1` is the availability line
+- [x] With `is_available` false, nothing is left in its place
 
 **Verification:** `npm run test:a11y`
 
@@ -137,9 +138,9 @@ card footers, the education "In progress" pill and the hero figure ("Business an
 "Where I can help" gets `aria-hidden="true"`.
 
 **Acceptance criteria:**
-- [ ] The tree reads "… Azure Database Administrator. Status: studying" (pattern, not exact text)
-- [ ] Spectrum items no longer expose the bare number
-- [ ] No visual change
+- [x] The tree reads "… Azure Database Administrator. Status: studying" (pattern, not exact text)
+- [x] Spectrum items no longer expose the bare number
+- [x] No visual change
 
 **Verification:** `npm run test:a11y` · visual comparison by hand in light and dark
 
@@ -151,7 +152,9 @@ card footers, the education "In progress" pill and the hero figure ("Business an
 **Scope:** M
 
 ### Checkpoint 2
-- [ ] All site checks pass
+- [x] All site checks pass: check (0 errors), contrast (0), test:a11y 152/152 on the seed. Against real content the only
+  failures are tests that need posts (none published yet) and PL/TSQL from GitHub data missing in the glossary (both
+  were there before this phase)
 - [ ] Carlos looks at the cards and the hero in light and dark themes, on a phone and on a desktop
 - [ ] PR 2 opened and reviewed
 

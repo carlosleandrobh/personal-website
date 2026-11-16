@@ -6,19 +6,21 @@ import type { GithubRepo } from '../lib/types';
 interface Props { repo: GithubRepo }
 const { repo } = Astro.props;
 ---
-<article class="card card-interactive group relative flex h-full flex-col p-6">
-  <header class="flex items-center justify-between gap-3">
-    <span class="inline-flex items-center gap-2 font-mono text-sm text-subtle">
-      <Icon name="simple-icons:github" class="size-4 text-fg" aria-hidden="true" />{repo.full_name.split('/')[0]}
-    </span>
-    {repo.featured && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Featured</span>}
-  </header>
-  <h3 class="mt-4 font-display text-lg font-bold">
-    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" data-card-link class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
-      {repo.name}<span class="sr-only"> on GitHub (opens in a new tab)</span>
+<article class="card card-interactive group relative flex h-full flex-col p-6" data-card>
+  <!-- The name comes first, so a screen reader that jumps to the heading hears the owner right after it. The new-tab hint
+       is the link's description (aria-describedby), not part of its name, so the list of headings stays clean. -->
+  <h3 class="font-display text-lg font-bold">
+    <a href={repo.html_url} target="_blank" rel="noopener noreferrer" data-card-link aria-describedby="github-new-tab-hint" class="after:absolute after:inset-0 after:rounded-[var(--radius-card)]">
+      {repo.name}
     </a>
   </h3>
-  <p class="mt-2 line-clamp-3 flex-1 text-[0.9375rem] leading-6 text-muted">{repo.description ?? 'No description yet.'}</p>
+  <p class="mt-2 flex items-center justify-between gap-3" data-card-meta>
+    <span class="inline-flex items-center gap-2 font-mono text-sm text-subtle">
+      <Icon name="simple-icons:github" class="size-4 text-fg" aria-hidden="true" /><span class="sr-only">GitHub repository by </span>{repo.full_name.split('/')[0]}<span class="sr-only">.</span>
+    </span>
+    {repo.featured && <span class="pill bg-cta/15 text-[#92400e] dark:text-cta">Featured<span class="sr-only">.</span></span>}
+  </p>
+  <p class="mt-3 line-clamp-3 flex-1 text-[0.9375rem] leading-6 text-muted">{repo.description ?? 'No description yet.'}</p>
   {repo.topics.length > 0 && (
     <ul class="mt-4 flex flex-wrap gap-1.5" aria-label="Topics">
       {repo.topics.slice(0, 4).map((t) => <li class="chip">{t}</li>)}
