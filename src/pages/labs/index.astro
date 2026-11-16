@@ -6,6 +6,7 @@ import LabCard from '../../components/LabCard.astro';
 import ContactBand from '../../components/ContactBand.astro';
 import { getHomelab, getLabs, getProfile } from '../../lib/content';
 import { safeIcon } from '../../lib/icons';
+import { count } from '../../lib/format';
 
 const [profile, labs, homelab] = await Promise.all([getProfile(), getLabs(), getHomelab()]);
 const categories = [...new Set(labs.map((l) => l.category))].sort();
@@ -28,11 +29,12 @@ const counts = {
       intro="Where ideas meet real hardware before they meet a client. If something is live, you can open it and try it."
     />
 
-    <dl class="card mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 px-6 py-4 text-sm">
-      <div class="flex items-center gap-2"><dt class="sr-only">Live</dt><span class="size-2 rounded-full bg-accent" aria-hidden="true"></span><dd><strong class="font-display text-fg">{counts.live}</strong> live</dd></div>
-      <div class="flex items-center gap-2"><dt class="sr-only">Testing</dt><span class="size-2 rounded-full bg-cta" aria-hidden="true"></span><dd><strong class="font-display text-fg">{counts.testing}</strong> in testing</dd></div>
-      <div class="flex items-center gap-2"><dt class="sr-only">Total</dt><Icon name="material-symbols:dns-outline" class="size-4 text-muted" aria-hidden="true" /><dd><strong class="font-display text-fg">{labs.length}</strong> experiments in total</dd></div>
-    </dl>
+    <!-- Each number is said once: "3 live, 1 in testing, 4 experiments in total". The dots and icon are decoration. -->
+    <p class="card mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 px-6 py-4 text-sm" data-lab-summary>
+      <span class="flex items-center gap-2"><span class="size-2 rounded-full bg-accent" aria-hidden="true"></span><span><strong class="font-display text-fg">{counts.live}</strong> live<span class="sr-only">, </span></span></span>
+      <span class="flex items-center gap-2"><span class="size-2 rounded-full bg-cta" aria-hidden="true"></span><span><strong class="font-display text-fg">{counts.testing}</strong> in testing<span class="sr-only">, </span></span></span>
+      <span class="flex items-center gap-2"><Icon name="material-symbols:dns-outline" class="size-4 text-muted" aria-hidden="true" /><span><strong class="font-display text-fg">{labs.length}</strong> {labs.length === 1 ? 'experiment' : 'experiments'} in total</span></span>
+    </p>
   </section>
 
   <section class="container-site pb-20" aria-label="Experiments">
@@ -60,7 +62,7 @@ const counts = {
       </div>
     </form>
 
-    <p class="mt-6 text-sm text-muted" aria-live="polite" data-lab-count>Showing {labs.length} experiments</p>
+    <p class="mt-6 text-sm text-muted" aria-live="polite" data-lab-count>Showing {labs.length} of {count(labs.length, 'experiment')}</p>
     <ul class="mt-4 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
       {labs.map((lab) => <li data-lab-item><LabCard lab={lab} headingLevel="h2" /></li>)}
     </ul>

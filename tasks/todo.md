@@ -168,9 +168,9 @@ card footers, the education "In progress" pill and the hero figure ("Business an
 aloud to me" says it is a separate voice from a screen reader.
 
 **Acceptance criteria:**
-- [ ] The dialog's accessible description contains the screen reader sentence
-- [ ] The read-aloud choice explains that it is a separate voice
-- [ ] All existing tests in `e2e/welcome.spec.ts` pass
+- [x] The dialog's accessible description contains the screen reader sentence
+- [x] The read-aloud choice explains that it is a separate voice
+- [x] All existing tests in `e2e/welcome.spec.ts` pass
 
 **Verification:** `npm run test:a11y`
 
@@ -183,8 +183,8 @@ aloud to me" says it is a separate voice from a screen reader.
 ### T9: Labs summary without repetition, count with the right plural (SR-8)
 
 **Acceptance criteria:**
-- [ ] The summary reads "3 live, 1 in testing, 4 experiments in total" with no repeated words
-- [ ] The count says "1 experiment" for one and "experiments" otherwise, before and after filtering
+- [x] The summary reads "3 live, 1 in testing, 4 experiments in total" with no repeated words
+- [x] The count says "1 experiment" for one and "experiments" otherwise, before and after filtering
 
 **Verification:** `npm run test:a11y`
 
@@ -197,8 +197,8 @@ aloud to me" says it is a separate voice from a screen reader.
 ### T10: "Link copied" is announced (SR-10)
 
 **Acceptance criteria:**
-- [ ] Pressing "Copy link" writes "Link copied" (or the failure text) into a `role="status"` region
-- [ ] The region is empty again after the label resets
+- [x] Pressing "Copy link" writes "Link copied" (or the failure text) into a `role="status"` region
+- [x] The region is empty again after the label resets
 
 **Verification:** build with `CONTENT_SOURCE=fixtures INCLUDE_DRAFTS=true`, then `npm run test:a11y`
 
@@ -211,9 +211,11 @@ aloud to me" says it is a separate voice from a screen reader.
 ### T11: The message limit is announced on the contact form (SR-11)
 
 **Acceptance criteria:**
-- [ ] The message field's description includes "Up to 5,000 characters"
-- [ ] The live counter is not announced on every key press
-- [ ] The error line is still part of the description when an error shows
+- [x] The message field's description includes "Up to 5,000 characters"
+- [x] The live counter is not announced on every key press
+- [x] The error line is still part of the description when an error shows
+- [x] Found on the way: the hidden error line always held "Error: ", so every contact field was described as "Error:"
+  before anything went wrong. The prefix is now written only while there is an error (test added)
 
 **Verification:** `npm run test:a11y`
 
@@ -222,6 +224,39 @@ aloud to me" says it is a separate voice from a screen reader.
 **Files:** `src/pages/contact.astro`, `e2e/a11y.spec.ts`
 
 **Scope:** S
+
+### T13: The hero fits a 320 px screen at 200% text, and the reflow test catches clipped content (SR-14)
+
+**Description:** Found at checkpoint 2. The hero column grows to the width of the "See my work" button and `<main>`
+clips it, so the heading is cut off. Give the hero grid `minmax(0, 1fr)` columns and let its buttons wrap. Teach the
+reflow tests to look for visible elements past the right edge, not only for a scrolling page.
+
+**Acceptance criteria:**
+- [ ] At 320 px with 200% text and wide spacing, no visible element on any page reaches past the right edge
+- [ ] The hero buttons stay at least 44 px tall and keep their focus rings
+- [ ] The new check fails on the old hero (proved before the fix)
+
+**Verification:** `npm run test:a11y`; screenshot at 320 px with 200% text
+
+**Dependencies:** none
+
+**Files:** `src/components/Hero.astro`, `src/styles/global.css` (if the wrap rule lives there), `e2e/a11y.spec.ts`
+
+**Scope:** S
+
+### T14: The glossary explains PL/SQL and T-SQL (SR-15)
+
+**Acceptance criteria:**
+- [x] "PL/SQL", "T-SQL" and the GitHub spelling "TSQL" have plain meanings in `src/lib/glossary.ts`
+- [x] `e2e/words.spec.ts` passes when built from Supabase
+
+**Verification:** `npm run build` (from Supabase) then `npx playwright test e2e/words.spec.ts`
+
+**Dependencies:** none
+
+**Files:** `src/lib/glossary.ts`
+
+**Scope:** XS
 
 ### Checkpoint 3
 - [ ] All site checks pass

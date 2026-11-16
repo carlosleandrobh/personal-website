@@ -76,12 +76,12 @@ const topics = [
           <div>
             <label for="contact-name" class="mb-1.5 block font-display text-sm font-semibold text-fg">Your name</label>
             <input id="contact-name" class="field" name="name" autocomplete="name" required maxlength="120" aria-describedby="contact-name-error" />
-            <p id="contact-name-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="name"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+            <p id="contact-name-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="name"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only" data-error-prefix></span><span data-error-text></span></p>
           </div>
           <div>
             <label for="contact-email" class="mb-1.5 block font-display text-sm font-semibold text-fg">Email</label>
             <input id="contact-email" class="field" name="email" type="email" autocomplete="email" spellcheck="false" required maxlength="254" aria-describedby="contact-email-error" />
-            <p id="contact-email-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="email"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+            <p id="contact-email-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="email"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only" data-error-prefix></span><span data-error-text></span></p>
           </div>
         </div>
         <div>
@@ -89,15 +89,17 @@ const topics = [
           <select id="contact-topic" class="field" name="topic" required data-topic aria-describedby="contact-topic-error">
             {topics.map((t) => <option value={t.value}>{t.label}</option>)}
           </select>
-          <p id="contact-topic-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="topic"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+          <p id="contact-topic-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="topic"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only" data-error-prefix></span><span data-error-text></span></p>
         </div>
         <div>
           <div class="mb-1.5 flex justify-between">
             <label for="contact-message" class="font-display text-sm font-semibold text-fg">Message</label>
-            <span class="font-sans text-sm text-subtle" data-counter>0 / 5000</span>
+            <!-- The counter changes on every key press, so screen readers get the limit once, as the field's description. -->
+            <span class="font-sans text-sm text-subtle" data-counter aria-hidden="true">0 / 5000</span>
           </div>
-          <textarea id="contact-message" class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?" aria-describedby="contact-message-error"></textarea>
-          <p id="contact-message-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="message"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+          <span id="contact-message-limit" class="sr-only">Up to 5,000 characters.</span>
+          <textarea id="contact-message" class="field min-h-40" name="message" required minlength="10" maxlength="5000" rows="7" placeholder="What's going on, and what would a good outcome look like?" aria-describedby="contact-message-limit contact-message-error"></textarea>
+          <p id="contact-message-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="message"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only" data-error-prefix></span><span data-error-text></span></p>
         </div>
 
         <!-- Honeypot: invisible to people, tempting to bots. -->
@@ -110,7 +112,7 @@ const topics = [
             <input id="contact-consent" type="checkbox" name="consent" required class="size-6 shrink-0 accent-[var(--accent)]" aria-describedby="contact-consent-error" />
             <label for="contact-consent" class="min-h-11">I agree that Carlos may use these details to reply to my message, as described in the <a href="/privacy/" class="font-semibold text-fg underline underline-offset-4">privacy notice</a>.</label>
           </div>
-          <p id="contact-consent-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="consent"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only">Error: </span><span data-error-text></span></p>
+          <p id="contact-consent-error" class="mt-1.5 hidden text-sm font-semibold text-error" data-error-for="consent"><Icon name="material-symbols:error-outline" class="mr-1 inline size-4 align-text-bottom" aria-hidden="true" /><span class="sr-only" data-error-prefix></span><span data-error-text></span></p>
         </div>
 
         <div data-turnstile class="min-h-[65px]"></div>

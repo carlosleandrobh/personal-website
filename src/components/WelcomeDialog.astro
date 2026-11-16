@@ -2,19 +2,19 @@
 // The welcome window: a native <dialog> that opens once, on a visitor's first visit, and asks what would make the
 // site easier to use. It asks; it never tries to work out who the visitor is. The choices are named by what they do,
 // not by a condition, so nobody has to say they have a disability. See src/scripts/welcome.ts.
-const choices = [
-  { name: 'aloud', label: 'Read the pages aloud to me' },
+const choices: readonly { name: string; label: string; hint?: string }[] = [
+  { name: 'aloud', label: 'Read the pages aloud to me', hint: "A separate voice from this site. If you use a screen reader, you won't need it." },
   { name: 'comfort', label: 'Larger text and stronger contrast' },
   { name: 'easyread', label: 'Simpler words (Easy Read)' },
   { name: 'calm', label: 'Less movement and animation' },
   { name: 'targets', label: 'Bigger buttons and links' },
-] as const;
+];
 ---
 <dialog
   id="welcome-window"
   data-welcome
   aria-labelledby="welcome-window-title"
-  aria-describedby="welcome-window-intro"
+  aria-describedby="welcome-window-intro welcome-window-screen-reader"
   class="m-auto max-h-[calc(100dvh-2rem)] w-[min(36rem,calc(100%-2rem))] overflow-y-auto rounded-[1rem] border-2 border-input-line bg-surface p-0 text-fg backdrop:bg-black/60"
 >
   <form method="dialog" class="p-6 md:p-8">
@@ -23,20 +23,23 @@ const choices = [
     <p id="welcome-window-intro" class="mt-2 text-muted">
       Choose anything that would make it easier for you. You can pick more than one, and change your mind later.
     </p>
+    <!-- Before the choices and in the window's description, so a screen reader user hears it with the title. -->
+    <p id="welcome-window-screen-reader" class="mt-2 text-muted">
+      Using a screen reader or only the keyboard? You don't need to change anything. The whole site works that way.
+    </p>
 
     <fieldset class="mt-5 border-0 p-0">
       <legend class="sr-only">What would make this site easier for you?</legend>
       {choices.map((choice) => (
-        <label class="flex min-h-12 cursor-pointer items-center gap-3 py-1 font-display font-semibold" data-choice={choice.name}>
-          <input type="checkbox" name={choice.name} class="size-6 shrink-0 accent-[var(--accent)]" />
-          {choice.label}
-        </label>
+        <div data-choice={choice.name}>
+          <label class="flex min-h-12 cursor-pointer items-center gap-3 py-1 font-display font-semibold">
+            <input type="checkbox" name={choice.name} class="size-6 shrink-0 accent-[var(--accent)]" aria-describedby={choice.hint ? `welcome-window-hint-${choice.name}` : undefined} />
+            {choice.label}
+          </label>
+          {choice.hint && <p id={`welcome-window-hint-${choice.name}`} class="mb-1 ml-9 text-sm text-muted">{choice.hint}</p>}
+        </div>
       ))}
     </fieldset>
-
-    <p class="mt-4 text-sm text-muted">
-      Using a screen reader or only the keyboard? You don't need to change anything. The whole site works that way.
-    </p>
 
     <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
       <button value="apply" class="btn btn-primary">Use my choices</button>

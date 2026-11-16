@@ -132,6 +132,8 @@
     }
   ],
   "github_repos": [
-    { "id": 1, "name": "personal-website", "full_name": "carlosleandrobh/personal-website", "description": "A personal website showcasing professional experience and projects, as well as some experiments carried out in a home laboratory and using self-hosted applications.", "html_url": "https://github.com/carlosleandrobh/personal-website", "homepage": "https://carlos.nz", "language": "TypeScript", "topics": [], "stargazers_count": 0, "forks_count": 0, "pushed_at": "2026-11-15T00:00:00Z", "featured": false }
+    { "id": 1, "name": "personal-website", "full_name": "carlosleandrobh/personal-website", "description": "A personal website showcasing professional experience and projects, as well as some experiments carried out in a home laboratory and using self-hosted applications.", "html_url": "https://github.com/carlosleandrobh/personal-website", "homepage": "https://carlos.nz", "language": "TypeScript", "topics": [], "stargazers_count": 0, "forks_count": 0, "pushed_at": "2026-11-15T00:00:00Z", "featured": false },
+    { "id": 2, "name": "sethos-sql-server", "full_name": "carlosleandrobh/sethos-sql-server", "description": "These T-SQL queries were developed for SETHOS Information Technology's clients.", "html_url": "https://github.com/carlosleandrobh/sethos-sql-server", "homepage": null, "language": "TSQL", "topics": [], "stargazers_count": 0, "forks_count": 0, "pushed_at": "2026-11-01T00:00:00Z", "featured": false },
+    { "id": 3, "name": "sethos-oracle-plsql", "full_name": "carlosleandrobh/sethos-oracle-plsql", "description": "These PL/SQL queries were developed for SETHOS Information Technology's clients.", "html_url": "https://github.com/carlosleandrobh/sethos-oracle-plsql", "homepage": null, "language": null, "topics": [], "stargazers_count": 0, "forks_count": 0, "pushed_at": "2026-11-01T00:00:00Z", "featured": false }
   ]
 }

@@ -33,17 +33,26 @@ if (menuButton && menu) {
   });
 }
 
-// "Copy link" buttons
+// "Copy link" buttons. The result shows on the button and is also written to a status message, which screen readers
+// announce (they do not announce a change to the text of the button that has focus).
 document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+  const label = button.querySelector('[data-copy-label]');
+  const status = button.parentElement?.querySelector('[data-copy-status]');
+  const say = (text: string) => {
+    if (label) label.textContent = text;
+    if (status) status.textContent = text;
+  };
   button.addEventListener('click', async () => {
-    const label = button.querySelector('[data-copy-label]');
     try {
       await navigator.clipboard.writeText(button.dataset.copy ?? location.href);
-      if (label) label.textContent = 'Link copied';
+      say('Link copied');
     } catch {
-      if (label) label.textContent = 'Copy failed — use the address bar';
+      say('Copy failed — use the address bar');
     }
-    setTimeout(() => { if (label) label.textContent = 'Copy link'; }, 2500);
+    setTimeout(() => {
+      if (label) label.textContent = 'Copy link';
+      if (status) status.textContent = '';
+    }, 2500);
   });
 });
 

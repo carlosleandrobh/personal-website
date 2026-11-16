@@ -58,10 +58,12 @@ SR-1 manual test ── needs everything above merged and deployed
 - [ ] All checks pass; Carlos looks at the cards and the hero in light, dark and on a phone
 
 ### Phase 3: interactions (SR-2, 8, 10, 11), PR 3
-- [ ] T8: Welcome window speaks to screen reader users first
-- [ ] T9: Labs summary without repetition, count with the right plural
-- [ ] T10: "Link copied" is announced
-- [ ] T11: The message limit is announced on the contact form
+- [x] T8: Welcome window speaks to screen reader users first
+- [x] T9: Labs summary without repetition, count with the right plural
+- [x] T10: "Link copied" is announced
+- [x] T11: The message limit is announced on the contact form
+- [ ] T13: The hero fits a 320 px screen at 200% text, and the reflow test catches clipped content (SR-14)
+- [x] T14: The glossary explains PL/SQL and T-SQL (SR-15)
 
 ### Checkpoint 3
 - [ ] All checks pass; `/accessibility/` lists the new automated checks and a new review date

@@ -83,6 +83,19 @@ function summarise(violations: Awaited<ReturnType<AxeBuilder['analyze']>>['viola
   return violations.map((v) => `${v.id} (${v.impact ?? 'n/a'}): ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);
 }
 
+test('the Labs summary says each number once, and the result count uses the right plural', async ({ page }) => {
+  await page.goto('/labs/');
+  const summary = (await page.locator('[data-lab-summary]').textContent())!.replace(/\s+/g, ' ').trim();
+  expect(summary).toMatch(/^\d+ live, \d+ in testing, \d+ experiments? in total$/);
+  const counter = page.locator('[data-lab-count]');
+  await expect(counter).not.toContainText(/1 experiments/);
+  await page.getByRole('searchbox', { name: 'Search experiments' }).fill('zzzz-no-match');
+  await expect(counter).toHaveText(/^Showing 0 of \d+ experiments?$/);
+  await page.getByRole('searchbox', { name: 'Search experiments' }).fill('');
+  const total = await page.locator('[data-lab-item]').count();
+  await expect(counter).toHaveText(total === 1 ? 'Showing 1 of 1 experiment' : `Showing ${total} of ${total} experiments`);
+});
+
 test('Labs filter shows which category is selected in forced-colours mode', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto('/labs/');
@@ -214,6 +227,20 @@ test('post pages have a breadcrumb, a summary and a "Listen" button', async ({ p
   await expect(crumbs.locator('[aria-current="page"]')).toBeVisible();
   await expect(page.locator('[data-listen]')).toBeVisible();
   await expect(page.locator('[data-listen]')).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('"Copy link" says what happened in a status message, so a screen reader announces it', async ({ page, context }) => {
+  // A screen reader does not announce a change to the text of a button that already has focus.
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  const [path] = await postPaths(page);
+  expect(path).toBeTruthy();
+  await page.goto(path!);
+  const status = page.locator('[data-copy-status]');
+  await expect(status).toHaveAttribute('role', 'status');
+  await expect(status).toHaveText('');
+  await page.getByRole('button', { name: 'Copy link' }).click();
+  await expect(status).toHaveText('Link copied');
+  await expect(status).toHaveText('', { timeout: 5000 }); // cleared with the button label
 });
 
 test('the main menu marks the current page', async ({ page }) => {
@@ -391,7 +418,7 @@ test.describe('contact form errors', () => {
     for (const field of ['name', 'email', 'message', 'consent']) {
       const input = page.locator(`[name="${field}"]`);
       await expect(input).toHaveAttribute('aria-invalid', 'true');
-      await expect(input).toHaveAttribute('aria-describedby', `contact-${field}-error`);
+      await expect(input).toHaveAttribute('aria-describedby', new RegExp(`(^| )contact-${field}-error( |$)`));
       await expect(page.locator(`#contact-${field}-error`)).toBeVisible();
     }
     // The error state itself must also pass axe (contrast of the error colour, names, descriptions).
@@ -406,6 +433,23 @@ test.describe('contact form errors', () => {
     await page.keyboard.type('Ada');
     await expect(page.locator('[name="name"]')).not.toHaveAttribute('aria-invalid', 'true');
     await expect(page.locator('#contact-name-error')).toBeHidden();
+  });
+
+  test('before anything goes wrong, no field announces "Error"', async ({ page }) => {
+    // The hidden error line used to hold a fixed "Error: " prefix, so every field was described as "Error:" from the start.
+    for (const field of ['name', 'email', 'topic', 'message', 'consent']) {
+      await expect(page.locator(`[name="${field}"]`)).not.toHaveAccessibleDescription(/Error/);
+    }
+  });
+
+  test('the message field announces its limit, and still its error when there is one', async ({ page }) => {
+    const message = page.getByRole('textbox', { name: 'Message' });
+    await expect(message).toHaveAccessibleDescription('Up to 5,000 characters.');
+    // The visible counter changes on every key press, so it is not a live region and is not read out as "0 / 5000".
+    await expect(page.locator('[data-counter]')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('[data-counter]')).not.toHaveAttribute('aria-live', /.*/);
+    await page.getByRole('button', { name: 'Send message' }).click();
+    await expect(message).toHaveAccessibleDescription(/^Up to 5,000 characters\. Error: Enter your message\.$/);
   });
 
   test('an invalid email address gets its own message', async ({ page }) => {

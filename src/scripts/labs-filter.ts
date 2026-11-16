@@ -1,3 +1,5 @@
+import { count } from '../lib/format';
+
 // Client-side filtering for /labs/. Works on data-* attributes rendered at build time.
 const form = document.querySelector<HTMLFormElement>('[data-lab-filters]');
 const search = document.querySelector<HTMLInputElement>('[data-lab-search]');
@@ -23,7 +25,7 @@ function apply() {
     item.hidden = !ok;
     if (ok) visible++;
   }
-  if (counter) counter.textContent = `Showing ${visible} of ${items.length} experiments`;
+  if (counter) counter.textContent = `Showing ${visible} of ${count(items.length, 'experiment')}`;
   empty?.classList.toggle('hidden', visible > 0);
 }
 

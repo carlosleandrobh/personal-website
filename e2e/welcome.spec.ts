@@ -51,6 +51,23 @@ test.describe('welcome window', () => {
     await expect(dialog).toContainText('Using a screen reader or only the keyboard?');
   });
 
+  test('tells screen reader users first that they need not change anything', async ({ page }) => {
+    // The sentence used to come after the five choices. Now it is part of the window's description, read with the title.
+    await page.goto('/');
+    const dialog = welcomeWindow(page);
+    await expect(dialog).toHaveAccessibleDescription(/Using a screen reader or only the keyboard\? You don't need to change anything/);
+    const before = await dialog.evaluate((d) => {
+      const note = [...d.querySelectorAll('p')].find((p) => p.textContent!.includes('Using a screen reader'))!;
+      return Boolean(note.compareDocumentPosition(d.querySelector('fieldset')!) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+    expect(before).toBe(true);
+  });
+
+  test('the reading choice says it is a separate voice from a screen reader', async ({ page }) => {
+    await page.goto('/');
+    await expect(welcomeWindow(page).getByRole('checkbox', { name: 'Read the pages aloud to me' })).toHaveAccessibleDescription(/separate voice/i);
+  });
+
   test('is reachable in a sensible order with the keyboard alone', async ({ page }) => {
     await page.goto('/');
     await expect(welcomeWindow(page)).toBeVisible();
