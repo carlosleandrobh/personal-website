@@ -70,10 +70,10 @@ SR-1 manual test ── needs everything above merged and deployed
 - [ ] All checks pass; `/accessibility/` lists the new automated checks and a new review date
 
 ### Phase 3b: nothing is cut off on a small screen with large text (SR-14), PR 4
-- [ ] T13a: The reflow tests catch content cut off at the right edge (all pages, 200% text and wide spacing)
-- [ ] T13b: Buttons wrap their label only when it would not fit (rule 11 changed, approved 16 Nov 2026)
-- [ ] T13c: Grids and tables fit: minmax(0, 1fr) columns on the hero and About; the privacy table scrolls in its own box
-- [ ] T13d: Fix whatever else T13a finds, page by page, then remove the known issue from /accessibility/
+- [x] T13a: The reflow tests catch content cut off at the right edge (all pages, 200% text and wide spacing)
+- [x] T13b: Buttons wrap their label only when it would not fit (rule 11 changed, approved 16 Nov 2026)
+- [x] T13c: Grids and tables fit: minmax(0, 1fr) columns on the hero and About; the privacy table scrolls in its own box
+- [x] T13d: Fix whatever else T13a finds, page by page, then remove the known issue from /accessibility/
 
 ### Checkpoint 3b
 - [ ] All checks pass; screenshots at 320 px with 200% text reviewed by Carlos

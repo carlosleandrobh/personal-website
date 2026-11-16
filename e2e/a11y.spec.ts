@@ -132,12 +132,43 @@ test('skip link is the first focus stop and moves focus to main', async ({ page 
   expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
 });
 
-for (const path of ['/', '/labs/', '/posts/', '/contact/', '/privacy/', '/accessibility/', '/glossary/', '/about/easy-read/']) {
+/**
+ * Visible elements that reach past the right edge of the screen. `<main>` clips sideways overflow (overflow-x: clip),
+ * so content that is too wide does not make the page scroll: it is cut off instead, and a scrollWidth check misses it.
+ * An element inside a box that clips or scrolls and itself fits on the screen (a decorative arch in a card, a wide
+ * table in its scrolling box) is not counted.
+ */
+async function cutOffAtTheRight(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const edge = document.documentElement.clientWidth + 1;
+    const fitsInClip = (el: Element) => {
+      for (let a = el.parentElement; a && a.tagName !== 'MAIN' && a !== document.body; a = a.parentElement) {
+        const ox = getComputedStyle(a).overflowX;
+        // A box that clips or scrolls (a wide table or code block, rule 8) and itself fits on the screen is fine.
+        if (['hidden', 'clip', 'auto', 'scroll'].includes(ox) && a.getBoundingClientRect().right <= edge) return true;
+      }
+      return false;
+    };
+    return [...document.querySelectorAll('main *')]
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0 || r.right <= edge) return false;
+        if (el.closest('.sr-only, [hidden], template')) return false;
+        if (!el.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return false;
+        return !fitsInClip(el);
+      })
+      .filter((el, _, all) => !all.some((other) => other !== el && el.contains(other))) // the innermost ones say most
+      .map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 40)}" ends at ${Math.round(el.getBoundingClientRect().right)} px`);
+  });
+}
+
+for (const path of ['/', '/labs/', '/projects/', '/posts/', '/contact/', '/privacy/', '/accessibility/', '/glossary/', '/about/easy-read/']) {
   test(`${path} reflows at 320 CSS px without horizontal scrolling`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto(path);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(width).toBeLessThanOrEqual(320);
+    expect(await cutOffAtTheRight(page), 'nothing may be cut off at the right edge').toEqual([]);
   });
 
   test(`${path} still reflows at 320 CSS px with 200% text and wide spacing`, async ({ page }) => {
@@ -146,8 +177,24 @@ for (const path of ['/', '/labs/', '/posts/', '/contact/', '/privacy/', '/access
     await page.goto(path);
     const width = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(width).toBeLessThanOrEqual(320);
+    expect(await cutOffAtTheRight(page), 'nothing may be cut off at the right edge').toEqual([]);
   });
 }
+
+test('at the normal text size on a desktop, every button label stays on one line', async ({ page }) => {
+  // Buttons may wrap when they would not fit (200% text on a phone), but never just to make room for the text beside
+  // them: "Send message" once wrapped next to the Turnstile note.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const tall: string[] = [];
+  for (const path of ['/', '/labs/', '/projects/', '/posts/', '/contact/', '/about/easy-read/']) {
+    await page.goto(path);
+    for (const button of await page.locator('main .btn:visible').all()) {
+      const box = await button.boundingBox();
+      if (box && box.height > 50) tall.push(`${path}: "${(await button.innerText()).trim()}" is ${Math.round(box.height)} px tall`);
+    }
+  }
+  expect(tall).toEqual([]);
+});
 
 test.describe('display settings', () => {
   test('open from the header, apply at once, are remembered, and close with Esc returning focus', async ({ page }) => {
@@ -574,11 +621,13 @@ test.describe('text spacing and wide settings on a phone', () => {
     for (const path of paths) {
       await page.goto(path);
       expect(await page.evaluate(() => document.documentElement.scrollWidth), `${path} default`).toBeLessThanOrEqual(320);
+      expect(await cutOffAtTheRight(page), `${path} default: nothing cut off`).toEqual([]);
     }
     await page.addInitScript(() => localStorage.setItem('a11y-prefs', JSON.stringify({ text: '200', spacing: 'wide' })));
     for (const path of paths) {
       await page.goto(path);
       expect(await page.evaluate(() => document.documentElement.scrollWidth), `${path} 200% and wide`).toBeLessThanOrEqual(320);
+      expect(await cutOffAtTheRight(page), `${path} 200% and wide: nothing cut off`).toEqual([]);
     }
   });
 
@@ -598,6 +647,7 @@ test.describe('text spacing and wide settings on a phone', () => {
       // Guard: the override really is in force, so this test cannot pass by doing nothing.
       expect(await page.evaluate(() => getComputedStyle(document.body).letterSpacing), `${path}: spacing applied`).not.toBe('normal');
       if ((await page.evaluate(() => document.documentElement.scrollWidth)) > 320) wide.push(path);
+      for (const cut of await cutOffAtTheRight(page)) wide.push(`${path}: ${cut}`);
     }
     expect(wide).toEqual([]);
   });

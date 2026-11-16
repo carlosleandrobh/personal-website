@@ -167,6 +167,13 @@
     overflow-wrap: anywhere;
   }
   p { text-wrap: pretty; }
+  /* Large text on a small screen (200% at 320 px fits about nine letters to a line). A grid with no columns of its own
+     gets one column that may shrink to the screen (rule 11), and a word too long for its box breaks instead of pushing
+     the box past the edge, where <main> would cut it off. Tables and code keep their words whole: they scroll in their
+     own box (rule 8). Nothing changes while the content fits. */
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  main { overflow-wrap: anywhere; }
+  main :is(table, pre, code) { overflow-wrap: normal; }
   ::selection { background: var(--accent-tint); color: var(--accent); }
   :focus-visible {
     outline: 2px solid var(--accent);
@@ -217,7 +224,12 @@
     line-height: 1.25rem;
     padding: 0.75rem 1.25rem;
     transition: transform 160ms var(--ease-out-soft), box-shadow 160ms, background-color 160ms, color 160ms;
-    white-space: nowrap;
+    /* One line whenever it fits. The label wraps only when the button would be wider than its box, for example at 200%
+       text on a phone; a button that never wrapped pushed its section past the edge of the screen (rule 11).
+       flex-shrink: 0 keeps it from giving way to the text beside it in a row ("Send message" wrapped on a desktop). */
+    max-width: 100%;
+    flex-shrink: 0;
+    text-wrap: balance;
   }
   /* A full-width button sits in a narrow column (a card in a sidebar, a phone). There a long label has to wrap: with wide
      text spacing or a large text size it would otherwise run past the screen and force a sideways scroll. Buttons that
@@ -279,6 +291,7 @@
 
   .field {
     width: 100%;
+    max-width: 100%;
     background: var(--surface);
     border: 1px solid var(--input-line);
     border-radius: var(--radius-control);
@@ -345,7 +358,8 @@
   border: 1px solid var(--line);
 }
 .prose-post table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-.prose-post .table-scroll { overflow-x: auto; }
+/* relative: a screen-reader-only caption stays inside the box instead of widening the page. */
+.prose-post .table-scroll { overflow-x: auto; position: relative; }
 .prose-post th, .prose-post td { border-bottom: 1px solid var(--line); padding: 0.6rem 0.75rem; text-align: left; }
 .prose-post th { font-family: var(--font-display); color: var(--brand); }
 .prose-post img { border-radius: 0.875rem; border: 1px solid var(--line); }

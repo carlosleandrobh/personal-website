@@ -74,7 +74,13 @@ Automated checks find only part of the barriers. For a change to layout or a com
     (`Header.astro`), so it still fits a 320 px screen at 200% text. Headings may break a long word
     (`overflow-wrap: anywhere`), and every grid column that holds form fields or long content (a code block, a table)
     uses `minmax(0, 1fr)`, on a phone too: an `auto` column grows to the longest line of code and the whole post then
-    scrolls sideways. A full-width button (`.btn.w-full`) may wrap its label; other buttons stay on one line.
+    scrolls sideways. `global.css` gives every `.grid` one `minmax(0, 1fr)` column by default, so a phone layout only
+    needs `md:grid-cols-…` for wider screens. A button keeps its label on one line whenever it fits and wraps only when
+    it would be wider than its box (`max-width: 100%`); it never shrinks to make room for the text beside it
+    (`flex-shrink: 0`). Inside `<main>` a word too long for its box breaks (`overflow-wrap: anywhere`), except in
+    tables and code, which scroll in their own box (rule 8). `<main>` clips sideways overflow, so content that is too
+    wide is cut off rather than scrolled: the reflow tests in `e2e/a11y.spec.ts` look for visible elements past the
+    right edge on every page at 320 px, at the normal size and with 200% text and wide spacing.
     `e2e/a11y.spec.ts` checks every page, post pages included, at 320 px with 200% text and wide spacing, and with the
     WCAG 1.4.12 text spacing overrides.
 12. **Never detect or infer assistive technology or disability.** Do not read `prefers-*` or `forced-colors` into
