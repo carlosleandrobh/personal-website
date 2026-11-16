@@ -2,7 +2,7 @@
 -- Guards the core security property: client roles can't read or write anything.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(14);
+select plan(18);
 
 -- No GitHub secrets in this transaction, so request_rebuild must say so instead of failing silently.
 delete from vault.secrets where name in ('github_repository', 'github_dispatch_token');
@@ -28,6 +28,13 @@ select is((select count(*)::int from public.rebuild_result(-1)), 0, 'rebuild_res
 select lives_ok($$insert into public.labs (name, url) values ('Tāmaki Makaurau Lab', 'https://example.com')$$, 'the secret key can add a lab with just name + url');
 select is((select slug from public.labs where name = 'Tāmaki Makaurau Lab'), 'tamaki-makaurau-lab', 'lab slug is generated automatically (macrons removed)');
 select throws_ok($$insert into public.labs (name, url) values ('Insecure', 'http://example.com')$$, '23514', null, 'lab links must use https');
+-- Names in another language (company, institution) carry a language tag so screen readers pronounce them properly.
+select lives_ok($$insert into public.experiences (role, company, company_lang, start_date, summary)
+                  values ('Analyst', 'Drogaria Araujo', 'pt-BR', '2008-09-01', 'x')$$, 'an experience accepts a language tag such as pt-BR');
+select throws_ok($$insert into public.experiences (role, company, company_lang, start_date, summary)
+                   values ('Analyst', 'Somewhere', 'portuguese', '2008-09-01', 'x')$$, '23514', null, 'an experience rejects a malformed language tag');
+select lives_ok($$insert into public.education (degree, institution, institution_lang) values ('Degree', 'Universidade', 'pt')$$, 'education accepts a language tag such as pt');
+select throws_ok($$insert into public.education (degree, institution, institution_lang) values ('Degree', 'Somewhere', 'pt_br')$$, '23514', null, 'education rejects a malformed language tag');
 reset role;
 
 select * from finish();

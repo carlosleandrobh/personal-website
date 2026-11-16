@@ -37,6 +37,7 @@
     {
       "role": "Business Analyst — HSQE & Reporting",
       "company": "Redvespa Consultants",
+      "company_lang": null,
       "company_url": null,
       "context": "Placed at Northpower Limited",
       "location": "Auckland, NZ",
@@ -52,6 +53,7 @@
     {
       "role": "Founder & Senior Business Analyst",
       "company": "SETHOS Information Technology",
+      "company_lang": null,
       "company_url": null,
       "context": "Boutique ERP & HRIS consultancy",
       "location": "Brazil (remote)",
@@ -69,6 +71,7 @@
     {
       "role": "Senior Business Analyst",
       "company": "Drogaria Araujo",
+      "company_lang": "pt-BR",
       "company_url": null,
       "context": "Pharmacy chain · 11,000+ employees, 340+ stores",
       "location": "Brazil",
@@ -86,8 +89,8 @@
     }
   ],
   "education": [
-    { "degree": "Master of Business Analytics", "institution": "Yoobee Colleges", "location": "Auckland, NZ", "start_date": "2026-04-01", "end_date": null, "in_progress": true },
-    { "degree": "Bachelor of Business", "institution": "Pontifical Catholic University of Minas Gerais (PUC Minas)", "location": "Brazil", "start_date": "2011-02-01", "end_date": "2014-07-31", "in_progress": false }
+    { "degree": "Master of Business Analytics", "institution": "Yoobee Colleges", "institution_lang": null, "location": "Auckland, NZ", "start_date": "2026-04-01", "end_date": null, "in_progress": true },
+    { "degree": "Bachelor of Business", "institution": "Pontifical Catholic University of Minas Gerais (PUC Minas)", "institution_lang": null, "location": "Brazil", "start_date": "2011-02-01", "end_date": "2014-07-31", "in_progress": false }
   ],
   "labs": [
     { "slug": "bentopdf", "name": "BentoPDF", "url": "https://pdf.carlos.nz", "summary": "Self-hosted, privacy-first PDF toolkit: merge, split, compress and convert files without uploading them to a third-party service.", "status": "live", "category": "Self-hosted", "tags": ["Docker", "Self-hosted", "PDF"], "icon": "material-symbols:picture-as-pdf-outline", "featured": true, "position": 1 },
