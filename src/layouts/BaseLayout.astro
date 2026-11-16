@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { Icon } from 'astro-icon/components';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DisplaySettings from '../components/DisplaySettings.astro';
@@ -128,6 +129,14 @@ const personLd = {
     <span id="github-new-tab-hint" hidden>Opens on GitHub in a new tab</span>
     <Header active={activeNav} />
     <main id="main" tabindex="-1" class="flex-1 overflow-x-clip pt-[80px] focus:outline-none">
+      <!-- "Listen to this page", in the same place on every page: the first thing in the content, before the heading.
+           src/scripts/listen.ts shows the button, and only when the browser can read aloud. The row keeps its height
+           either way, so the page does not jump when the button appears. -->
+      <div data-listen-bar class="container-site flex min-h-11 justify-end no-print">
+        <button type="button" data-listen-open class="hidden min-h-11 items-center gap-1.5 font-display text-sm font-semibold text-brand underline underline-offset-4 hover:text-fg dark:text-accent">
+          <Icon name="material-symbols:volume-up-outline" class="size-4 shrink-0" aria-hidden="true" />Listen to this page
+        </button>
+      </div>
       <slot />
       {words && <WordsOnPage />}
     </main>
