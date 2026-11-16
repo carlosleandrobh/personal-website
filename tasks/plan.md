@@ -78,6 +78,15 @@ SR-1 manual test ── needs everything above merged and deployed
 ### Checkpoint 3b
 - [ ] All checks pass; screenshots at 320 px with 200% text reviewed by Carlos
 
+### Phase 3c: phones (found 16 Nov 2026), PR 5
+- [x] The phone menu scrolls within itself when taller than the screen (agent 1)
+- [x] Phone emulation tests: `e2e/mobile.spec.ts` (iPhone SE, Pixel 7; normal and 200% text) (agent 1)
+- [x] The post card share button keeps 44 px on a small phone (found by the new tests)
+- [x] Phone-only review (agent 2), each finding with a failing test first: the read-aloud player covered the focused
+  element and most of a landscape screen; Display settings lost the chosen option from view; the page behind a window
+  scrolled; 14 px fields made iPhone Safari zoom in; the jump offset doubled at 200% text
+- [x] `docs/USER-TESTING.md`: TalkBack in the self-test and a phone checklist
+
 ### Phase 4: real screen reader test (SR-1), Carlos
 - [ ] T12: Test with NVDA + Firefox and VoiceOver + Safari (iPhone); record results in `/accessibility/`
 

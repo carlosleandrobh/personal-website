@@ -117,13 +117,20 @@ Automated checks find only part of the barriers. For a change to layout or a com
     `.btn` and `.btn-sm`, filter chips, form fields, header icons, and links in lists, cards, the header and the footer
     take `min-h-11` (and `min-w-11` when the word is short). A link inside a sentence is exempt. A card that is one big
     link counts as the card. The "Bigger buttons and links" setting goes further, to 48 px. Two tests in
-    `e2e/a11y.spec.ts` check this on every page.
+    `e2e/a11y.spec.ts` check this on every page, and `e2e/mobile.spec.ts` on two phones. A small control in a row
+    takes `shrink-0`, or the text beside it squeezes it below 44 px on a phone. Text in a form field (input, select,
+    textarea) is at least 16 px (`text-base`): iPhone Safari zooms in on any smaller field when it gets focus.
 17. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
     `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
     Do not add other fixed or sticky bars that take real height without the same rule.
     The phone menu lives inside the fixed header, so when it is taller than the screen below the 80 px bar (a small
     phone with 200% text) it scrolls within itself (`max-h-[calc(100dvh-81px)] overflow-y-auto`) and every link stays
     reachable by touch and keyboard. `e2e/mobile.spec.ts` checks this.
+    The read-aloud player is the other fixed bar. On a short screen it sits at the end of the page instead. Elsewhere
+    `listen.ts` puts its height in `--listen-player-space`: the page keeps that much room at the bottom
+    (`scroll-padding-bottom`), and an element that gets focus behind the player is scrolled out from under it
+    (WCAG 2.4.11). `scroll-padding-top` is `80px + 1rem`, in step with the header's px height, not a `rem` value that
+    doubles at 200% text. While a window (`<dialog>`) is open, the page behind it does not scroll.
 18. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
     must follow what is on screen. On a post the text comes first and the sidebar (share, listen, contents) after it:
     below the text on a phone, beside it on the right on a wide screen. Do not use CSS `order` to put something first on
