@@ -27,9 +27,61 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Automated checks run on every change. Screen reader testing is <strong class="text-fg">not done yet</strong>, so treat the site as a work in progress.</li>
         <li>If something does not work for you, tell me. I will fix it or give you the information another way.</li>
       </ul>
+      <p class="mt-4 flex flex-wrap gap-x-5 gap-y-1 font-display text-sm font-semibold">
+        <a href="#screen-reader" class="inline-flex min-h-11 items-center text-brand underline underline-offset-4 hover:text-fg dark:text-accent">Using a screen reader?</a>
+        <a href="#hard-to-read" class="inline-flex min-h-11 items-center text-brand underline underline-offset-4 hover:text-fg dark:text-accent">If the screen is hard to read</a>
+      </p>
     </div>
 
-    <div class="prose-post mt-12">
+    <!-- For someone who already uses a screen reader: what to expect, in the order they will meet it. -->
+    <section class="prose-post mt-12" aria-labelledby="screen-reader">
+      <h2 id="screen-reader">Using a screen reader?</h2>
+      <p>
+        You do not need to change anything. The site is built for screen readers and checked automatically on every
+        change, but I have <strong>not yet tested</strong> it with a screen reader myself. If something
+        reads badly, <a href="#feedback">tell me</a>.
+      </p>
+      <ul>
+        <li><strong>The first visit.</strong> A welcome window opens once and takes focus on its title. It offers a few ways to adjust the site. Press Esc, or "Continue without changes", to leave the site as it is. It does not open again.</li>
+        <li><strong>The first Tab stops</strong> on every page are "Skip to content", "Display settings" and "Accessibility statement".</li>
+        <li><strong>Landmarks.</strong> Every page has a banner with the "Main" navigation (on a small screen it is behind the "Open menu" button and is called "Mobile"), one main region, and a footer with the "Footer" navigation.</li>
+        <li><strong>Headings.</strong> Every page has one level 1 heading. Each section starts with a level 2 heading, and each card (a lab, a post, a repository) with a level 3 heading. Moving by headings gives you an outline of the page.</li>
+        <li><strong>Cards</strong> start with their name. The status and the date come after it, as a sentence.</li>
+        <li><strong>Links</strong> say where they go, and a link that opens a new tab says so.</li>
+        <li><strong>Changes are announced:</strong> how many labs a filter shows, a copied link, and each problem in the contact form, next to its field and in a summary at the top.</li>
+        <li><strong>Other languages.</strong> Words in te reo Māori and names in Portuguese are marked, so a screen reader with those voices pronounces them correctly.</li>
+        <li><strong>"Listen to this page" is a separate voice</strong> that belongs to the site. It is there for people without a screen reader, and it never starts by itself. You will not need it.</li>
+        <li><strong>Images</strong> have text descriptions, and decorative ones are hidden.</li>
+      </ul>
+    </section>
+
+    <!-- For someone who does not know these tools exist: what the site offers, then what their own device offers. -->
+    <section class="prose-post" aria-labelledby="hard-to-read">
+      <h2 id="hard-to-read">If the screen is hard to read</h2>
+      <p>You do not have to struggle with small or pale text. On this site you can:</p>
+      <ul>
+        <li><strong>Have a page read aloud.</strong> Press "Listen to this page" on the home page, or "Listen to this post" on a post. To have the button on every page, open Display settings and choose "Show a Listen button on every page".</li>
+        <li><strong>Make the text bigger and the colours stronger.</strong> Open Display settings, the button with the sliders icon at the top of every page, and choose a text size up to 200% and the "High contrast" theme.</li>
+        <li><strong>Zoom the whole page.</strong> On a computer, hold Ctrl (Command on a Mac) and press the plus key. On a phone, spread two fingers on the screen. Nothing is cut off, up to 400%.</li>
+        <li><strong>Read a shorter, simpler version</strong> of my story on the <a href="/about/easy-read/">Easy Read</a> page.</li>
+      </ul>
+      <p>
+        Your phone or computer can also help on every site, not only this one. It already
+        has a <strong>screen reader</strong>: a tool that reads aloud what is on the screen and lets you use the device
+        without seeing it. It is free and already installed. Look for "Accessibility" in the device's settings.
+      </p>
+      <ul>
+        <li><strong>iPhone, iPad and Mac:</strong> VoiceOver, and Zoom to magnify the screen.</li>
+        <li><strong>Android:</strong> TalkBack, and Magnification.</li>
+        <li><strong>Windows:</strong> Narrator, and Magnifier. <a href="https://www.nvaccess.org/">NVDA</a> is another free screen reader for Windows.</li>
+      </ul>
+      <p>
+        In New Zealand, <a href="https://blindlowvision.org.nz/">Blind Low Vision NZ</a> helps people who are blind or
+        losing their sight to learn these tools.
+      </p>
+    </section>
+
+    <div class="prose-post">
       <h2 id="what-works">What you can do on this site</h2>
       <ul>
         <li>Use the whole site with a keyboard. The first three Tab stops are "Skip to content", "Display settings" and this statement. While the Listen player is showing, a fourth stop, "Go to reading controls", takes you to it.</li>
@@ -58,6 +110,7 @@ const reviewed = fullDate(`${REVIEWED}T12:00:00+13:00`);
         <li>Automated checks that no visible text is smaller than 14 pixels, that every control standing on its own is at least 44 pixels tall and wide, and that nothing moves on its own for more than five seconds.</li>
         <li>Automated checks on two phone screens (iPhone SE and Pixel 7, with touch, at the normal text size and at 200%): the menu opens, says whether it is open and every link can be reached; nothing is cut off or too small to tap; the read-aloud player never covers the focused element and scrolls with the page on a phone turned sideways; form fields are large enough that iPhone Safari does not zoom in; the page behind an open window stays still.</li>
         <li>Automated checks of what a screen reader receives: each card's heading comes before its status and date, no heading repeats "(opens in a new tab)", links make sense on their own, statuses read as sentences, durations are in whole words, the welcome window tells screen reader users first that they need not change anything, "Copy link" and the Labs filter announce their result, and contact form fields announce their limit, and "Error" only when there is one.</li>
+        <li>Automated checks that the home page says the site is built for screen readers, the keyboard and zoom, that its "Listen to this page" button reads only after a press and is not shown when the browser cannot read aloud, and that this statement has its screen reader guide and its guide for people who find the screen hard to read.</li>
         <li>Automated checks that every Tab stop on the home page, Labs, Posts and Contact shows where the keyboard focus is, that every page fits a 320 pixel screen, at the normal text size and with 200% text, wide spacing and the standard text spacing overrides, without scrolling sideways or cutting anything off at the edge, that buttons keep their label on one line on a desktop, that the header does not cover a short screen, and that on a post the text comes before the sidebar in the page and on screen.</li>
       </ul>
       <p>
