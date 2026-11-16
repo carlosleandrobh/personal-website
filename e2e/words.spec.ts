@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { GLOSSARY } from '../src/lib/glossary';
+import { FIXTURE_ONLY, NOT_JARGON, knownWords } from '../src/lib/glossary';
 
 // "Words on this page": each page lists the abbreviations and technical terms it uses, with plain meanings, taken from
 // the glossary (src/lib/glossary.ts). A visitor never has to leave the page or hover for a tooltip to find out what HSQE is.
@@ -83,11 +83,10 @@ test('the list is read aloud with the rest of the page', async ({ page }) => {
 });
 
 // Every abbreviation on the main pages must be in the glossary, or be a name, a place or a word everyone knows. When this
-// fails after a content change, add the new term to src/lib/glossary.ts (or to NOT_JARGON below if it is a name).
-const NOT_JARGON = new Set([
-  'IBM', 'NZ', 'CV', 'PDF', 'IT', 'HR', 'IP', 'TOTVS', 'SETHOS', 'PUC', 'RM', 'VE', 'UTC', 'OK',
-]);
-const KNOWN = new Set(GLOSSARY.flatMap((g) => g.term.split('/').map((part) => part.trim())));
+// fails after a content change, add the new term to GLOSSARY in src/lib/glossary.ts (or to NOT_JARGON there if it is a
+// name). `npm run test:glossary` checks the same thing on every built page, and also finds terms no page uses.
+const NOT_JARGON_WORDS = new Set([...NOT_JARGON, ...(process.env.CONTENT_SOURCE === 'fixtures' ? FIXTURE_ONLY : [])]);
+const KNOWN = knownWords();
 
 test('every abbreviation on the main pages is in the glossary', async ({ page }) => {
   await page.goto('/posts/');
@@ -104,7 +103,7 @@ test('every abbreviation on the main pages is in the glossary', async ({ page })
       }
       return parts.join(' ').match(/\b(?:[A-Z]-)?[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*\b/g) ?? [];
     });
-    for (const token of tokens) if (!KNOWN.has(token) && !NOT_JARGON.has(token)) unknown.add(`${token} (${path})`);
+    for (const token of tokens) if (!KNOWN.has(token) && !NOT_JARGON_WORDS.has(token)) unknown.add(`${token} (${path})`);
   }
   expect([...unknown].sort()).toEqual([]);
 });

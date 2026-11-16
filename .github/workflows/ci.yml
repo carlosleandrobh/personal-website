@@ -35,6 +35,8 @@ jobs:
         run: npm run check
       - name: Build
         run: npm run build
+      - name: Glossary covers every abbreviation on the pages
+        run: npm run test:glossary
       - name: No secrets or personal data in the output
         env:
           # Regex of private data that must never be published (phone, personal email, suburb…).

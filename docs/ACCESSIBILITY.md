@@ -18,6 +18,8 @@ has the research and the wider rationale, but parts of it assume a different sta
 ```bash
 npm run build                 # the checks below test the built site in dist/
 npm run test:contrast         # colour tokens in src/styles/global.css (text 4.5:1, borders and focus rings 3:1)
+npm run test:glossary         # the glossary against the built pages: no abbreviation without an entry, and
+                              # (with the real content) no entry that no page uses
 npm run test:a11y             # Playwright + axe-core, keyboard, reflow at 320 px, reduced motion, forced colours,
                               # the welcome window, reading aloud and bigger targets (e2e/welcome.spec.ts)
                               # and phones (e2e/mobile.spec.ts: iPhone SE and Pixel 7, touch, normal and 200% text)
@@ -157,12 +159,19 @@ Automated checks find only part of the barriers. For a change to layout or a com
   `example.com`) and no real hostnames, ports or versions of exposed services, in the image and in its description.
 - **Plain language:** open key pages and long posts with a sentence or two of summary (a post's `excerpt` is shown as
   its summary), and spell out an abbreviation the first time it appears ("Proxmox VE, a virtualisation platform").
-- **Glossary:** add a new abbreviation or technical term to `src/lib/glossary.ts`. Keep each meaning to a sentence or two,
-  without jargon that is not itself in the list. Each page ends with "Words on this page" (`WordsOnPage.astro`,
-  `src/scripts/words.ts`): it lists the glossary terms that page uses, so a term you add appears wherever it is used,
-  with nothing to hover and no extra Tab stop. It is built by a script, so without JavaScript only the glossary page
-  remains. `e2e/words.spec.ts` fails when an abbreviation on the main pages is not in the glossary: add it, or, if it is
-  a name or a place, add it to `NOT_JARGON` in that test. The list is off on the glossary page (`words={false}`).
+- **Glossary:** the glossary follows the site's text, in both directions. Add an abbreviation or technical term to
+  `GLOSSARY` in `src/lib/glossary.ts` when a page starts using it, and remove it when no page uses it any more. Keep
+  each meaning to a sentence or two, without jargon that is not itself in the list. The real site (the content in
+  Supabase) is the judge, not the test content. After any change to the site's text, build and run
+  `npm run test:glossary`: it reports abbreviations that have no entry and entries that no page uses. A name or a place
+  goes in `NOT_JARGON`, and an abbreviation that only the fixtures use goes in `FIXTURE_ONLY`, both in the same file.
+  The check finds abbreviations only, so read new text yourself for other technical terms. The steps are in the
+  `glossary` skill (`.claude/skills/glossary/SKILL.md`). CI fails on a missing abbreviation, and the deploy reports
+  both directions as warnings without holding a post back.
+  Each page ends with "Words on this page" (`WordsOnPage.astro`, `src/scripts/words.ts`): it lists the glossary terms
+  that page uses, so a term you add appears wherever it is used, with nothing to hover and no extra Tab stop. It is
+  built by a script, so without JavaScript only the glossary page remains. The list is off on the glossary page
+  (`words={false}`).
 - **Easy Read:** `src/pages/about/easy-read.astro` restates the About section in short sentences. Re-read it whenever
   the profile changes, so the two never disagree.
 - **Te reo Māori** in a `.astro` file is wrapped in `lang="mi"`, with macrons. The hero marks a greeting that starts
