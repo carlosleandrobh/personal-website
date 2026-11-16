@@ -50,8 +50,22 @@ It follows section 7.3 and 7.4 of the long guide.
 | Zoom to 200% or 400%, or a screen magnifier | any |
 | High contrast theme or *Display settings* high contrast | any |
 
-If you cannot recruit testers yet, do the same tasks yourself with NVDA and Firefox, then with VoiceOver on a phone,
-and write down what you notice. That is a start, not a replacement for other people.
+If you cannot recruit testers yet, do the same tasks yourself with NVDA and Firefox, then with VoiceOver on an iPhone
+and TalkBack on an Android phone, and write down what you notice. That is a start, not a replacement for other people.
+
+### On a phone
+
+Most visitors arrive on a phone, often from a LinkedIn link. Do the tasks above again on a phone, and also:
+
+- **Swipe through the home page** from the top (one item at a time, right swipe). Does each card start with its
+  name? Is anything read twice, or not read at all?
+- **Move by headings** (VoiceOver rotor or TalkBack reading controls, set to *Headings*). Do the headings alone tell
+  you what is on the page?
+- **Open the menu** and reach every link, including *Let's talk*. Then close it again.
+- **Set the phone's own text size to the largest** (and, separately, *Text size 200%* in *Display settings*). Is
+  anything cut off, covered by the header, or hard to tap?
+- **Turn the phone sideways.** Does the header still leave room to read?
+- Fill in the contact form with the on-screen keyboard. Does the page zoom in by itself when a field gets focus?
 
 ## After the test
 
