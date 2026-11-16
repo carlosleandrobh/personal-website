@@ -39,6 +39,8 @@ hidden. Nothing blocks a screen reader user from any task. What remains is frict
 | F11 | Contact form | The "0 / 5000" counter is not linked to the message field | The limit is not announced |
 | F12 | Hero | The availability ("Open to connections…") and the greeting come before the `h1` | Someone who jumps straight to the `h1` misses whether Carlos is available |
 | F13 | Experience, Education | Portuguese names (Drogaria Araujo, PUC Minas) are read with English pronunciation | Names are hard to recognise when heard |
+| F14 | Hero, 320 px screen at 200% text (found 16 Nov 2026) | The "See my work" button does not wrap, so the hero column grows to 412 px; `<main>` clips it and the heading is cut off ("busines…") | People with low vision on a small phone cannot read the main heading. The reflow test missed it because the clip stops sideways scrolling |
+| F15 | Repository cards with real GitHub data (found 16 Nov 2026) | "PL/SQL" and "T-SQL" are not in the glossary | "Words on this page" cannot explain them, and `e2e/words.spec.ts` fails when built from Supabase |
 
 ## Requirements and acceptance criteria
 
@@ -101,6 +103,15 @@ language tag (a `check` constraint such as `~ '^[a-z]{2,3}(-[A-Z]{2})?$'`). The 
 The migration keeps the existing `revoke … from anon, authenticated` pattern, and the pgTAP tests still pass.
 *Done when* "Drogaria Araujo" is exposed with `lang="pt-BR"` and a bad tag is rejected by the database and by
 `content push --dry-run`.
+
+**SR-14 The hero fits a small screen (F14).** The hero grid uses `minmax(0, 1fr)` columns (rule 11), and its two
+buttons may wrap their label onto a second line. The reflow tests also fail when an element is wider than the screen
+but hidden by a clip, not only when the page scrolls sideways. *Done when* at 320 px with 200% text and wide spacing
+no visible element on any page reaches past the right edge of the screen.
+
+**SR-15 Glossary covers the GitHub languages (F15).** Add "PL/SQL" and "T-SQL" (and "TSQL", the spelling GitHub uses
+for the language) to `src/lib/glossary.ts`. *Done when* `e2e/words.spec.ts` passes when built from Supabase as well as
+from the seed.
 
 ## Commands
 
@@ -169,7 +180,7 @@ New Zealand English in every string and comment. No `style=""`, no `on*=`, no in
 
 ## Success criteria
 
-1. Every item from SR-2 to SR-13 has a passing automated test, and `npm run test:a11y`, `uv run pytest` and the
+1. Every item from SR-2 to SR-15 has a passing automated test, and `npm run test:a11y`, `uv run pytest` and the
    pgTAP tests pass.
 2. The heading list on `/` and `/labs/` reads as clean titles with no new-tab hints or abbreviations.
 3. A person can tell, from the heading of each card alone, the item's name and then its status straight after it.
@@ -182,6 +193,7 @@ New Zealand English in every string and comment. No `style=""`, no `on*=`, no in
 3. **Hero (SR-12):** the availability line moves under the `h1`.
 4. **Real testing (SR-1):** Carlos tests with NVDA and VoiceOver first. A Blind Low Vision NZ tester comes later.
 5. **Portuguese names (SR-13):** in scope, with a new optional language column for company and institution.
+6. **Found during the work (SR-14, SR-15):** added to phase 3 on 16 Nov 2026.
 
 ## Open questions
 

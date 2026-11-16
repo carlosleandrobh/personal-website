@@ -114,6 +114,8 @@ const articleLd = {
             <button type="button" class="btn btn-secondary btn-sm mt-2 w-full justify-center" data-copy={url}>
               <Icon name="material-symbols:content-copy" class="size-4" aria-hidden="true" /><span data-copy-label>Copy link</span>
             </button>
+            <!-- Screen readers do not announce a change to a focused button's own text, so the result is also said here. -->
+            <p class="sr-only" role="status" data-copy-status></p>
           </div>
           <div class="card p-5">
             <p class="mb-3 font-display text-sm font-semibold text-fg">Read your way</p>

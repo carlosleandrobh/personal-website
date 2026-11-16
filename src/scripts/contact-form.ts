@@ -66,6 +66,9 @@ function init(form: HTMLFormElement) {
     const input = form.elements.namedItem(name);
     const line = form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
     const text = line?.querySelector('[data-error-text]');
+    // "Error: " is written only while there is an error: the field refers to this line all the time, hidden or not.
+    const prefix = line?.querySelector('[data-error-prefix]');
+    if (prefix) prefix.textContent = message ? 'Error: ' : '';
     if (input instanceof HTMLElement) {
       if (message) input.setAttribute('aria-invalid', 'true');
       else input.removeAttribute('aria-invalid');

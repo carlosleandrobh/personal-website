@@ -58,13 +58,25 @@ SR-1 manual test ── needs everything above merged and deployed
 - [ ] All checks pass; Carlos looks at the cards and the hero in light, dark and on a phone
 
 ### Phase 3: interactions (SR-2, 8, 10, 11), PR 3
-- [ ] T8: Welcome window speaks to screen reader users first
-- [ ] T9: Labs summary without repetition, count with the right plural
-- [ ] T10: "Link copied" is announced
-- [ ] T11: The message limit is announced on the contact form
+- [x] T8: Welcome window speaks to screen reader users first
+- [x] T9: Labs summary without repetition, count with the right plural
+- [x] T10: "Link copied" is announced
+- [x] T11: The message limit is announced on the contact form
+- [x] T14: The glossary explains PL/SQL and T-SQL (SR-15)
+
+- T13 moved to phase 3b (decided 16 Nov 2026: it turned out to be site-wide)
 
 ### Checkpoint 3
 - [ ] All checks pass; `/accessibility/` lists the new automated checks and a new review date
+
+### Phase 3b: nothing is cut off on a small screen with large text (SR-14), PR 4
+- [ ] T13a: The reflow tests catch content cut off at the right edge (all pages, 200% text and wide spacing)
+- [ ] T13b: Buttons wrap their label only when it would not fit (rule 11 changed, approved 16 Nov 2026)
+- [ ] T13c: Grids and tables fit: minmax(0, 1fr) columns on the hero and About; the privacy table scrolls in its own box
+- [ ] T13d: Fix whatever else T13a finds, page by page, then remove the known issue from /accessibility/
+
+### Checkpoint 3b
+- [ ] All checks pass; screenshots at 320 px with 200% text reviewed by Carlos
 
 ### Phase 4: real screen reader test (SR-1), Carlos
 - [ ] T12: Test with NVDA + Firefox and VoiceOver + Safari (iPhone); record results in `/accessibility/`

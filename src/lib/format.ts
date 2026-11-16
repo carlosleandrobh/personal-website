@@ -25,5 +25,8 @@ export function duration(start: string, end: string | null) {
   return [years && unit(years, 'year'), rest && unit(rest, 'month')].filter(Boolean).join(' ');
 }
 
+/** "1 experiment", "4 experiments": a number with its word in the singular or plural. */
+export const count = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 export const postUrl = (slug: string) => `/posts/${slug}/`;
 export const absolute = (path: string) => new URL(path, 'https://carlos.nz').toString();
