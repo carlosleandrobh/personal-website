@@ -94,10 +94,6 @@ for (const [phone, device] of PHONES) {
         });
 
         test(`${path}: every control that stands on its own is at least 44 px tall and wide`, async ({ page }) => {
-          // Known problem, not fixed yet: at 320 px with 200% text the LinkedIn share link on a post card
-          // (PostCard.astro) shrinks to 43 px wide, because "Read article" beside it takes the room. test.fail keeps
-          // the suite green until it is fixed, and turns red as soon as the link keeps its size, so remove it then.
-          test.fail(phone === 'iPhone SE' && size.prefs !== undefined && path === '/', 'post card share link shrinks to 43 px');
           await page.goto(path);
           expect(await smallTargets(page)).toEqual([]);
         });
