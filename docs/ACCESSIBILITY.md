@@ -93,7 +93,10 @@ Automated checks find only part of the barriers. For a change to layout or a com
     site is built for a screen reader, the keyboard and zoom, links to the screen reader guide
     (`/accessibility/#screen-reader`) and has a "Listen to this page" button. The statement also has
     `#hard-to-read`, for visitors who do not know these tools exist. Say "built for", never "tested with", until a
-    real test is listed in the statement. A fourth stop, "Go to reading
+    real test is listed in the statement. The "Display settings" buttons in the header and in that note carry the
+    accessibility symbol (`material-symbols:accessibility-new`, in the accent colour), the same one as the note's
+    heading and the statement, so a visitor looking for help recognises it. It opens the site's own settings: it is
+    never a third-party widget (rule 9), and the button's name stays "Display settings". A fourth stop, "Go to reading
     controls", exists only while the read-aloud player shows (rule 15); when the player is hidden it is not in the page.
 14. **The welcome window** (`WelcomeDialog.astro`, `src/scripts/welcome.ts`) is a native modal `<dialog>` that opens
     once, on a visitor's first visit. It is the only window that opens by itself, so keep it small and keep these rules:

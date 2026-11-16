@@ -753,3 +753,15 @@ test.describe('signposts: a visitor can tell the site is built for people who ca
     for (const name of ['VoiceOver', 'TalkBack', 'Narrator']) await expect(hard).toContainText(name);
   });
 });
+
+test('the Display settings buttons carry the accessibility symbol, the same one as the statement', async ({ page }) => {
+  const symbol = 'svg[data-icon="material-symbols:accessibility-new"]';
+  await page.goto('/');
+  await expect(page.locator('header [data-display-settings-open]').locator(symbol)).toHaveCount(1);
+  await expect(page.getByRole('region', { name: 'Made for everyone' }).getByRole('button', { name: 'Display settings' }).locator(symbol)).toHaveCount(1);
+  // The symbol is decoration: the button's name stays "Display settings".
+  await expect(page.locator('header [data-display-settings-open]')).toHaveAccessibleName('Display settings');
+  await page.goto('/accessibility/');
+  await expect(page.locator('main').locator(symbol).first()).toBeVisible();
+  await expect(page.locator('#hard-to-read').locator('xpath=..')).toContainText('the button with the accessibility symbol');
+});
