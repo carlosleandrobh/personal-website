@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { FIXTURE_ONLY, GLOSSARY, NOT_JARGON, knownWords } from '../src/lib/glossary';
+import { FIXTURE_ONLY, NOT_JARGON, knownWords } from '../src/lib/glossary';
 
 // "Words on this page": each page lists the abbreviations and technical terms it uses, with plain meanings, taken from
 // the glossary (src/lib/glossary.ts). A visitor never has to leave the page or hover for a tooltip to find out what HSQE is.
