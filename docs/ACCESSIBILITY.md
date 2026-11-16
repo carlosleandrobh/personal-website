@@ -20,6 +20,7 @@ npm run build                 # the checks below test the built site in dist/
 npm run test:contrast         # colour tokens in src/styles/global.css (text 4.5:1, borders and focus rings 3:1)
 npm run test:a11y             # Playwright + axe-core, keyboard, reflow at 320 px, reduced motion, forced colours,
                               # the welcome window, reading aloud and bigger targets (e2e/welcome.spec.ts)
+                              # and phones (e2e/mobile.spec.ts: iPhone SE and Pixel 7, touch, normal and 200% text)
 uv run pytest                 # includes the alt text rules for `cms post push`
 ```
 
@@ -120,6 +121,9 @@ Automated checks find only part of the barriers. For a change to layout or a com
 17. **The header scrolls away on short screens** (`max-height: 31.25rem`, in `global.css`; the header carries
     `data-site-header`). A laptop at 400% zoom shows about 320 x 200 CSS px, so a fixed 80 px header would cover 40% of it.
     Do not add other fixed or sticky bars that take real height without the same rule.
+    The phone menu lives inside the fixed header, so when it is taller than the screen below the 80 px bar (a small
+    phone with 200% text) it scrolls within itself (`max-h-[calc(100dvh-81px)] overflow-y-auto`) and every link stays
+    reachable by touch and keyboard. `e2e/mobile.spec.ts` checks this.
 18. **The page order is the reading order.** The tab order and the screen reader order follow the HTML, so the HTML
     must follow what is on screen. On a post the text comes first and the sidebar (share, listen, contents) after it:
     below the text on a phone, beside it on the right on a wide screen. Do not use CSS `order` to put something first on

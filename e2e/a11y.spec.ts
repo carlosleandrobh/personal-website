@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { cutOffAtTheRight, smallTargets } from './helpers';
 
 // Pages every visitor can reach. Post pages are discovered from /posts/, so new posts are covered automatically
 // (build with INCLUDE_DRAFTS=true when the fixtures only contain drafts).
@@ -131,36 +132,6 @@ test('skip link is the first focus stop and moves focus to main', async ({ page 
   await page.keyboard.press('Enter');
   expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
 });
-
-/**
- * Visible elements that reach past the right edge of the screen. `<main>` clips sideways overflow (overflow-x: clip),
- * so content that is too wide does not make the page scroll: it is cut off instead, and a scrollWidth check misses it.
- * An element inside a box that clips or scrolls and itself fits on the screen (a decorative arch in a card, a wide
- * table in its scrolling box) is not counted.
- */
-async function cutOffAtTheRight(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
-    const edge = document.documentElement.clientWidth + 1;
-    const fitsInClip = (el: Element) => {
-      for (let a = el.parentElement; a && a.tagName !== 'MAIN' && a !== document.body; a = a.parentElement) {
-        const ox = getComputedStyle(a).overflowX;
-        // A box that clips or scrolls (a wide table or code block, rule 8) and itself fits on the screen is fine.
-        if (['hidden', 'clip', 'auto', 'scroll'].includes(ox) && a.getBoundingClientRect().right <= edge) return true;
-      }
-      return false;
-    };
-    return [...document.querySelectorAll('main *')]
-      .filter((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 || r.height === 0 || r.right <= edge) return false;
-        if (el.closest('.sr-only, [hidden], template')) return false;
-        if (!el.checkVisibility({ visibilityProperty: true, opacityProperty: true })) return false;
-        return !fitsInClip(el);
-      })
-      .filter((el, _, all) => !all.some((other) => other !== el && el.contains(other))) // the innermost ones say most
-      .map((el) => `${el.tagName.toLowerCase()} "${(el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 40)}" ends at ${Math.round(el.getBoundingClientRect().right)} px`);
-  });
-}
 
 for (const path of ['/', '/labs/', '/projects/', '/posts/', '/contact/', '/privacy/', '/accessibility/', '/glossary/', '/about/easy-read/']) {
   test(`${path} reflows at 320 CSS px without horizontal scrolling`, async ({ page }) => {
@@ -740,23 +711,7 @@ test('every control that stands on its own is at least 44 px tall and wide', asy
   const small: string[] = [];
   for (const path of await pagesAndPosts(page)) {
     await page.goto(path);
-    const found = await page.evaluate(() => {
-      const list: string[] = [];
-      document.querySelectorAll<HTMLElement>('a[href], button, select, textarea, summary, input:not([type=hidden])').forEach((el) => {
-        if (el.closest('[aria-hidden="true"], [hidden], dialog:not([open])')) return;
-        if (el.matches('[data-card-link]')) return; // stretched over the whole card, so the card is the target
-        let box = el.getBoundingClientRect();
-        if (box.width <= 1 || box.height <= 1) return; // revealed only on focus, or for screen readers
-        const label = (el as HTMLInputElement).labels?.[0];
-        if (label && el.matches('input[type=checkbox], input[type=radio]')) box = label.getBoundingClientRect(); // the label is the target too
-        // A link inside a sentence is exempt: its height is set by the line, and the line is the context.
-        const block = el.closest('p, li, dd, dt, td, label');
-        const inSentence = el.matches('a') && getComputedStyle(el).display === 'inline' && block && (block.textContent ?? '').replace(el.textContent ?? '', '').trim().length > 3;
-        if (inSentence) return;
-        if (box.width < 44 || box.height < 44) list.push(`${Math.round(box.width)}x${Math.round(box.height)} ${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 30)}"`);
-      });
-      return [...new Set(list)];
-    });
+    const found = await smallTargets(page);
     small.push(...found.map((line) => `${path} ${line}`));
   }
   expect(small).toEqual([]);
