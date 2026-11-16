@@ -45,7 +45,7 @@ const { profile, experiences, education } = Astro.props;
               </div>
               <p class="flex shrink-0 flex-col items-start gap-1 md:items-end">
                 <span class:list={['pill font-mono font-medium', current ? 'bg-cta/15 text-[#92400e] dark:text-cta' : 'bg-surface-2 text-muted']}>
-                  {dateRange(job.start_date, job.end_date)}
+                  {dateRange(job.start_date, job.end_date)}<span class="sr-only">. </span>
                 </span>
                 <span class="text-sm text-subtle">{duration(job.start_date, job.end_date)}{job.location && ` · ${job.location}`}</span>
               </p>
@@ -82,7 +82,7 @@ const { profile, experiences, education } = Astro.props;
           <ul class="mt-5 grid gap-6 md:grid-cols-2">
             {education.map((e) => (
               <li>
-                <p class="font-display font-semibold text-fg">{e.degree}{e.in_progress && <span class="pill ml-2 bg-cta/15 align-middle text-[#92400e] dark:text-cta">In progress</span>}</p>
+                <p class="font-display font-semibold text-fg">{e.degree}{e.in_progress && <span class="pill ml-2 bg-cta/15 align-middle text-[#92400e] dark:text-cta"><span class="sr-only">. </span>In progress</span>}</p>
                 <p class="text-sm text-muted"><span lang={e.institution_lang ?? undefined}>{e.institution}</span>{e.location && ` · ${e.location}`}</p>
                 <p class="mt-1 font-mono text-sm text-subtle">{monthYear(e.start_date)} – {e.in_progress ? 'Present' : monthYear(e.end_date)}</p>
               </li>

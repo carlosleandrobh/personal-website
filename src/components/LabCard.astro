@@ -16,23 +16,25 @@ const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, '
 ---
 <article
   class="card card-interactive flex h-full flex-col p-6"
+  data-card
   data-lab
   data-category={lab.category}
   data-status={lab.status}
   data-search={[lab.name, lab.summary, lab.category, ...lab.tags].join(' ').toLowerCase()}
 >
-  <header class="flex items-start justify-between gap-3">
-    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-tint text-accent">
+  <!-- The name comes first, so a screen reader that jumps to the heading hears the status and category right after it. -->
+  <div class="flex items-center gap-3">
+    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-accent-tint text-accent" aria-hidden="true">
       <Icon name={safeIcon(lab.icon)} class="size-6" aria-hidden="true" />
     </span>
-    <div class="flex flex-col items-end gap-1">
-      <span class:list={['pill', status.cls]}><span class:list={['size-1.5 rounded-full', status.dot]} aria-hidden="true"></span>{status.label}</span>
-      <span class="text-sm text-subtle">{lab.category}{lab.started_on && ` · since ${monthYear(lab.started_on)}`}</span>
-    </div>
-  </header>
+    <H class="text-h3 font-bold">{lab.name}</H>
+  </div>
+  <p class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm" data-card-meta>
+    <span class:list={['pill', status.cls]}><span class:list={['size-1.5 rounded-full', status.dot]} aria-hidden="true"></span><span class="sr-only">Status: </span>{status.label}<span class="sr-only">.</span></span>
+    <span class="text-subtle">{lab.category}{lab.started_on && ` · since ${monthYear(lab.started_on)}`}</span>
+  </p>
 
-  <H class="mt-5 text-h3 font-bold">{lab.name}</H>
-  {lab.summary && <p class="mt-2 text-[0.9375rem] leading-6 text-muted">{lab.summary}</p>}
+  {lab.summary && <p class="mt-3 text-[0.9375rem] leading-6 text-muted">{lab.summary}</p>}
 
   {showLearned && lab.learned && (
     <div class="mt-4 rounded-xl border border-accent/20 bg-accent-tint p-4 text-sm">
@@ -57,12 +59,12 @@ const host = (() => { try { return new URL(lab.url).hostname.replace(/^www\./, '
       </a>
       {lab.notes_post_slug && (
         <a href={`/posts/${lab.notes_post_slug}/`} class="inline-flex min-h-11 items-center gap-1.5 text-muted hover:text-fg">
-          <Icon name="material-symbols:notes" class="size-4" aria-hidden="true" />Read notes
+          <Icon name="material-symbols:notes" class="size-4" aria-hidden="true" />Read notes<span class="sr-only"> on {lab.name}</span>
         </a>
       )}
       {lab.repo_url && (
         <a href={lab.repo_url} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center gap-1.5 text-muted hover:text-fg">
-          <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code<span class="sr-only"> (opens in a new tab)</span>
+          <Icon name="material-symbols:code" class="size-4" aria-hidden="true" />Code<span class="sr-only"> for {lab.name} (opens in a new tab)</span>
         </a>
       )}
     </div>

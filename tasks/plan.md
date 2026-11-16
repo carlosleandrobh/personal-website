@@ -49,10 +49,10 @@ SR-1 manual test ── needs everything above merged and deployed
 - [ ] Carlos approves applying the migration to Supabase, sets `company_lang: pt-BR` for Drogaria Araujo
 
 ### Phase 2: what the home page says (SR-3, 4, 5, 6, 7, 9, 12), PR 2
-- [ ] T4: Durations in whole words
-- [ ] T5: Cards put the heading first, keep heading names clean and name their links
-- [ ] T6: Availability under the main heading
-- [ ] T7: Clear separators for statuses, and the step number read once
+- [x] T4: Durations in whole words
+- [x] T5: Cards put the heading first, keep heading names clean and name their links
+- [x] T6: Availability under the main heading
+- [x] T7: Clear separators for statuses, and the step number read once
 
 ### Checkpoint 2
 - [ ] All checks pass; Carlos looks at the cards and the hero in light, dark and on a phone

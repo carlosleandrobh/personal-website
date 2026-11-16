@@ -238,6 +238,117 @@ test('company and institution names carry a valid language tag when they have on
   }
 });
 
+test('durations on the home page are in whole words, not "yrs" or "mo"', async ({ page }) => {
+  await page.goto('/');
+  const text = await page.locator('main').innerText();
+  expect(text).not.toMatch(/\b\d+\s*(yrs?|mo)\b/);
+  await expect(page.locator('#experience').getByText(/\b\d+ (years?|months?)\b/).first()).toBeVisible();
+});
+
+test.describe('cards read heading first', () => {
+  // A screen reader user who jumps from heading to heading (the H key) lands on the card's name and hears its status,
+  // category and date straight after it. Those used to come before the heading, so they were skipped.
+  for (const [path, selector] of [['/', 'article[data-card]'], ['/labs/', 'article[data-card]'], ['/projects/', 'article[data-card]'], ['/posts/', 'article[data-card]']] as const) {
+    test(`${path}: each card's heading comes before its details, in the page and on screen`, async ({ page }) => {
+      await page.goto(path);
+      const cards = page.locator(selector);
+      const count = await cards.count();
+      // The seed (CI) has cards on every one of these pages; real content may not have posts yet.
+      if (process.env.CONTENT_SOURCE === 'fixtures') expect(count, 'the page should show at least one card').toBeGreaterThan(0);
+      for (let i = 0; i < count; i++) {
+        const order = await cards.nth(i).evaluate((card) => {
+          const heading = card.querySelector('h2, h3')!;
+          const meta = card.querySelector('[data-card-meta]')!;
+          return {
+            headingFirstInPage: Boolean(heading.compareDocumentPosition(meta) & Node.DOCUMENT_POSITION_FOLLOWING),
+            headingFirstOnScreen: heading.getBoundingClientRect().top <= meta.getBoundingClientRect().top,
+            textBeforeHeading: [...card.querySelectorAll('*')]
+              .filter((el) => el.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING && !el.contains(heading))
+              .filter((el) => !el.closest('[aria-hidden="true"]'))
+              .map((el) => [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent!.trim()).join(''))
+              .join('').trim(),
+          };
+        });
+        expect(order).toEqual({ headingFirstInPage: true, headingFirstOnScreen: true, textBeforeHeading: '' });
+      }
+    });
+  }
+
+  test('no heading name repeats "(opens in a new tab)"; the repository link still says so', async ({ page }) => {
+    for (const path of ['/', '/projects/', '/labs/']) {
+      await page.goto(path);
+      for (const name of await page.locator('main :is(h1, h2, h3, h4)').allTextContents()) expect(name).not.toContain('new tab');
+    }
+    await page.goto('/projects/');
+    for (const link of await page.locator('article[data-card] :is(h2, h3) a[target="_blank"]').all()) {
+      await expect(link).toHaveAccessibleDescription('Opens on GitHub in a new tab');
+    }
+  });
+
+  test('lab card links say which lab they belong to, and start with the words on screen', async ({ page }) => {
+    await page.goto('/labs/');
+    const links = page.locator('article[data-lab] a').filter({ hasText: /^(Code|Read notes)/ });
+    if (process.env.CONTENT_SOURCE === 'fixtures') expect(await links.count()).toBeGreaterThan(0);
+    for (const link of await links.all()) {
+      const name = await link.evaluate((a) => a.closest('article')!.querySelector('h2, h3')!.textContent!.trim());
+      const visible = (await link.evaluate((a) => [...a.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim()));
+      const accessible = (await link.textContent())!.replace(/\s+/g, ' ').trim();
+      expect(accessible.startsWith(visible)).toBe(true);
+      expect(accessible).toContain(name);
+    }
+  });
+});
+
+test('the availability line comes straight after the main heading', async ({ page }) => {
+  // Someone who jumps to the h1 hears whether Carlos is available without reading back up the page.
+  await page.goto('/');
+  const next = await page.locator('main h1').evaluate((h1) => h1.nextElementSibling?.hasAttribute('data-availability') ?? false);
+  const shown = await page.locator('main [data-availability]').count();
+  expect(next || shown === 0).toBe(true);
+  if (process.env.CONTENT_SOURCE === 'fixtures') expect(next).toBe(true); // the seed profile is available
+});
+
+test.describe('statuses read as sentences', () => {
+  /** The text a screen reader reads: screen-reader-only text included, anything aria-hidden left out. */
+  const spoken = (page: Page, selector: string) =>
+    page.locator(selector).evaluateAll((els) => els.map((el) => {
+      const copy = el.cloneNode(true) as Element;
+      copy.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+      return (copy.textContent ?? '').replace(/\s+/g, ' ').trim();
+    }));
+
+  test('certifications say "Status:" or "Progress:" after the name', async ({ page }) => {
+    await page.goto('/');
+    const items = await spoken(page, 'section[aria-labelledby="now-title"] li');
+    for (const item of items) expect(item).toMatch(/\. (Status|Progress): \S/);
+  });
+
+  test('a status pill and the text beside it are separated', async ({ page }) => {
+    await page.goto('/');
+    // e.g. "Self-hosted Always changing" used to run together; the two parts must be separated by a full stop.
+    const footers = await page.locator('section[aria-labelledby="now-title"] article > p:last-child').evaluateAll((els) =>
+      els.map((p) => {
+        const parts = [...p.children].filter((c) => !c.classList.contains('sr-only')).map((c) => c.textContent!.replace(/\s+/g, ' ').trim());
+        return { parts, text: (p.textContent ?? '').replace(/\s+/g, ' ').trim() };
+      }));
+    for (const { parts, text } of footers) {
+      if (parts.length === 2) expect(text).toBe(`${parts[0]}. ${parts[1]}`);
+    }
+    for (const line of await spoken(page, '#experience header > p:last-child')) {
+      expect(line).toMatch(/^.+(\d{4}|Present)\. \d+ (year|month)/);
+    }
+    for (const line of await spoken(page, '#experience li li > p:first-child')) {
+      if (line.includes('In progress')) expect(line).toMatch(/\. In progress/);
+    }
+  });
+
+  test('the hero figure says "Business and Technology", and the steps are numbered once', async ({ page }) => {
+    await page.goto('/');
+    expect((await spoken(page, 'main figure'))[0]).toContain('Business and Technology');
+    for (const step of await spoken(page, 'section[aria-labelledby="spectrum-title"] ol > li')) expect(step).not.toMatch(/^\d/);
+  });
+});
+
 test('no animation keeps running with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
