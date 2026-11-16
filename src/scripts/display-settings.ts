@@ -32,7 +32,12 @@ if (dialog && typeof dialog.showModal === 'function' && openers.length) {
 
   dialog.addEventListener('change', (event) => {
     const input = event.target;
-    if (input instanceof HTMLInputElement && input.checked && isPrefKey(input.name)) setPref(input.name, input.value);
+    if (input instanceof HTMLInputElement && input.checked && isPrefKey(input.name)) {
+      setPref(input.name, input.value);
+      // A bigger text size makes the window much longer while it keeps its scroll position, so the option just chosen
+      // ended up far out of view on a phone. Bring it back.
+      input.scrollIntoView({ block: 'nearest' });
+    }
   });
 
   dialog.querySelector('[data-reset]')?.addEventListener('click', () => {

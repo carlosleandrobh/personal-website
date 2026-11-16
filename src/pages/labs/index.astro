@@ -50,9 +50,9 @@ const counts = {
           <button type="button" class="pill border border-line bg-surface text-muted aria-pressed:border-fg aria-pressed:bg-fg aria-pressed:text-bg" data-lab-category={c} aria-pressed="false">{c}</button>
         ))}
         <span class="mx-2 hidden h-5 w-px bg-line sm:inline-block" aria-hidden="true"></span>
-        <label class="flex items-center gap-2 text-sm text-muted">
+        <label class="flex flex-wrap items-center gap-2 text-sm text-muted">
           Status
-          <select class="field min-h-11 w-auto py-1.5 text-sm" data-lab-status>
+          <select class="field min-h-11 w-auto py-1.5 text-base" data-lab-status>
             <option value="">All</option>
             <option value="live">Live</option>
             <option value="testing">Testing</option>
