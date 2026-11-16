@@ -58,6 +58,23 @@ if (synth && player) {
     if (box.top < 0 || box.bottom > innerHeight) block.scrollIntoView({ block: 'center', behavior: 'auto' });
   };
 
+  // The player is fixed at the bottom of the screen, and on a phone with large text it is a third of the screen tall.
+  // Its height goes into --listen-player-space, so the page keeps that much room at the bottom, both at the end of the
+  // page and when the browser scrolls to the focused element (WCAG 2.4.11). A CSS variable set from script is allowed by
+  // the CSP; only style="" in the HTML is not.
+  new ResizeObserver(() => {
+    document.documentElement.style.setProperty('--listen-player-space', `${Math.ceil(player.getBoundingClientRect().height)}px`);
+  }).observe(player);
+  // The browser does not scroll to an element that is already partly on screen, even when it sits behind the player.
+  // Scroll just enough to bring it out from under it.
+  document.addEventListener('focusin', (event) => {
+    const target = event.target;
+    if (player.hidden || !(target instanceof Element) || player.contains(target)) return;
+    if (getComputedStyle(player).position !== 'fixed') return; // on a short screen the player scrolls with the page
+    const covered = target.getBoundingClientRect().bottom - player.getBoundingClientRect().top;
+    if (covered > 0 && target !== document.body) window.scrollBy({ top: covered + 16, behavior: 'instant' });
+  });
+
   const show = () => {
     const wanted = state !== 'idle' || document.documentElement.dataset.aloud === 'on';
     player.hidden = !wanted;

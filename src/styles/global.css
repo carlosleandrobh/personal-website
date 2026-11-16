@@ -145,7 +145,9 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    scroll-padding-top: 6rem;
+    /* The header bar is 80 px whatever the text size (Header.astro uses px), so the room above a jump target is too:
+       6rem became 192 px at 200% text and left a fifth of a phone screen empty. */
+    scroll-padding-top: calc(80px + 1rem);
   }
   @media (prefers-reduced-motion: no-preference) {
     html:not([data-motion='reduce']) { scroll-behavior: smooth; }
@@ -440,7 +442,9 @@ html[data-targets='large'] label:has(> input:is([type='checkbox'], [type='radio'
 [data-listen-current] { outline: 3px solid var(--accent); outline-offset: 6px; border-radius: 4px; }
 @media (forced-colors: active) { [data-listen-current] { outline-color: Highlight; } }
 /* Room at the bottom so the player never covers the last lines of the page. */
-body.has-listen-player { padding-bottom: 7rem; }
+body.has-listen-player { padding-bottom: calc(var(--listen-player-space, 6rem) + 2rem); }
+/* Room for the player when the browser scrolls to the focused element, so focus never lands under it (WCAG 2.4.11). */
+html:has(body.has-listen-player) { scroll-padding-bottom: calc(var(--listen-player-space, 6rem) + 1rem); }
 
 /* "Reduce motion" in the panel behaves like the device setting. */
 html[data-motion='reduce'] *,
@@ -474,7 +478,17 @@ html[data-motion='reduce'] ::after {
 @media (max-height: 31.25rem) {
   [data-site-header] { position: absolute; }
   html { scroll-padding-top: 0.5rem; }
+  /* The read-aloud player too (rule 17): on a phone turned sideways it covered most of the screen. It sits at the end
+     of the page instead, where "Go to reading controls" still takes the keyboard to it. */
+  [data-listen-player] { position: static; margin: 1rem; max-width: none; }
+  body.has-listen-player { padding-bottom: 0; }
+  html:has(body.has-listen-player) { scroll-padding-bottom: 0; }
 }
+
+/* An open window (welcome, Display settings) keeps the page behind it still: scrolling past the end of the window used
+   to move the page, so the visitor was somewhere else when it closed. */
+html:has(dialog[open]) { overflow: hidden; }
+dialog { overscroll-behavior: contain; }
 
 @media print {
   header, footer, .no-print { display: none !important; }

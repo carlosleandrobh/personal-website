@@ -45,7 +45,7 @@ const { active } = Astro.props;
     </div>
   </div>
 
-  <div id="mobile-menu" class="hidden border-t border-line bg-surface md:hidden" data-menu>
+  <div id="mobile-menu" class="hidden max-h-[calc(100dvh-81px)] overflow-y-auto overscroll-contain border-t border-line bg-surface md:hidden" data-menu>
     <nav aria-label="Mobile" class="container-site py-4">
       <ul class="flex flex-col font-display text-base font-semibold">
         {SITE.nav.map((item) => (
