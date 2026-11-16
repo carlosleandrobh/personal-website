@@ -226,6 +226,18 @@ test('the greeting is marked as te reo Māori', async ({ page }) => {
   await expect(page.locator('[lang="mi"]').first()).toHaveText('Kia ora');
 });
 
+test('company and institution names carry a valid language tag when they have one', async ({ page }) => {
+  await page.goto('/');
+  // Every language tag in the experience timeline and the quick facts follows the rule the database enforces.
+  const tags = await page.locator('#experience [lang], #about [lang]').evaluateAll((els) => els.map((el) => el.getAttribute('lang')));
+  for (const tag of tags) expect(tag).toMatch(/^[a-z]{2,3}(-[A-Z]{2})?$/);
+  // The seed content (used in CI) marks one Portuguese company name, so a screen reader pronounces it in Portuguese.
+  if (process.env.CONTENT_SOURCE === 'fixtures') {
+    await expect(page.locator('#experience [lang="pt-BR"]')).toHaveText('Drogaria Araujo');
+    await expect(page.locator('#experience').getByText('Redvespa Consultants')).not.toHaveAttribute('lang', /.*/);
+  }
+});
+
 test('no animation keeps running with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');

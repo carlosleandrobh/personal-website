@@ -6,6 +6,7 @@ push triggers as few rebuilds as possible.
 
 import datetime as dt
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +42,7 @@ TABLES: dict[str, list[str]] = {
     'experiences': [
         'role',
         'company',
+        'company_lang',
         'company_url',
         'context',
         'location',
@@ -51,7 +53,16 @@ TABLES: dict[str, list[str]] = {
         'tags',
         'is_visible',
     ],
-    'education': ['degree', 'institution', 'location', 'start_date', 'end_date', 'in_progress', 'is_visible'],
+    'education': [
+        'degree',
+        'institution',
+        'institution_lang',
+        'location',
+        'start_date',
+        'end_date',
+        'in_progress',
+        'is_visible',
+    ],
     'labs': [
         'position',
         'slug',
@@ -89,6 +100,32 @@ PROFILE_FIELDS = [
 ]
 REPO_FIELDS = ['is_visible', 'featured']  # the rest of github_repos comes from GitHub
 
+# The language of a name that is not English, so screen readers pronounce it properly (e.g. pt-BR).
+# Same rule as the check constraints in supabase/migrations/20261116000000_name_language.sql.
+LANG_FIELDS = {'experiences': 'company_lang', 'education': 'institution_lang'}
+_LANG_TAG = re.compile(r'[a-z]{2,3}(-[A-Z]{2})?')
+
+
+def valid_lang(tag: Any) -> bool:
+    """A language tag such as pt or pt-BR, or nothing (the name is in the page language)."""
+    return tag is None or (isinstance(tag, str) and _LANG_TAG.fullmatch(tag) is not None)
+
+
+def lang_errors(table: str, rows: list[dict[str, Any]] | None) -> list[str]:
+    """Language tags the database would reject, found before anything is sent (also in a dry run)."""
+    field = LANG_FIELDS.get(table)
+    if not field:
+        return []
+    errors = []
+    for row in rows or []:
+        if not valid_lang(row.get(field)):
+            label = row.get('company') or row.get('degree') or 'row'
+            where = f'#{row["id"]}' if row.get('id') is not None else f'(new row "{label}")'
+            hint = 'is not a language tag (use e.g. pt or pt-BR, or null)'
+            errors.append(f'{table} {where}: {field} "{row.get(field)}" {hint}')
+    return errors
+
+
 HEADER = """\
 # carlos.nz — editable site content (everything except posts). New Zealand English.
 # Edit, then: uv run cms content push --dry-run   (preview)   ->   uv run cms content push
@@ -96,6 +133,7 @@ HEADER = """\
 # unless you push with --prune (or set is_visible: false to hide a row).
 # Icons: Material Symbols names, e.g. material-symbols:dns-outline.
 # Dates: YYYY-MM-DD; end_date: null means current.
+# company_lang / institution_lang: language of a name that is not English (pt-BR), else null.
 # github_repos: only is_visible / featured can be changed (the rest comes from GitHub).
 """
 
@@ -223,6 +261,7 @@ def push(
     )
 
     problems = [f'{table}: {e}' for table, plan in plans for e in plan['errors']]
+    problems += [e for table in LANG_FIELDS for e in lang_errors(table, doc.get(table))]
     if problems:
         raise ValueError('Nothing was saved:\n  ' + '\n  '.join(problems))
 

@@ -15,10 +15,11 @@ const current = experiences.find((e) => e.end_date === null);
 const studying = education.find((e) => e.in_progress);
 const facts = [
   { icon: 'material-symbols:location-on-outline', label: 'Based in', value: profile.location },
-  current && { icon: 'material-symbols:work-outline', label: 'Currently', value: `${current.role} · ${current.company}` },
-  studying && { icon: 'material-symbols:school-outline', label: 'Studying', value: `${studying.degree} · ${studying.institution}` },
+  current && { icon: 'material-symbols:work-outline', label: 'Currently', value: current.role, name: current.company, lang: current.company_lang },
+  studying && { icon: 'material-symbols:school-outline', label: 'Studying', value: studying.degree, name: studying.institution, lang: studying.institution_lang },
   { icon: 'material-symbols:hub-outline', label: 'Experience', value: `${profile.years_experience}+ years across business and technology` },
-].filter(Boolean) as { icon: string; label: string; value: string }[];
+// `name` is a company or institution; `lang` marks it when it is not English, so screen readers pronounce it properly.
+].filter(Boolean) as { icon: string; label: string; value: string; name?: string; lang?: string | null }[];
 ---
 {about && (
   <section id="about" class="container-site pb-20 lg:pb-24" aria-labelledby="about-title">
@@ -51,7 +52,7 @@ const facts = [
               </span>
               <span>
                 <span class="block text-sm text-subtle">{fact.label}</span>
-                <span class="block font-display font-semibold leading-snug text-fg">{fact.value}</span>
+                <span class="block font-display font-semibold leading-snug text-fg">{fact.value}{fact.name && <> · <span lang={fact.lang ?? undefined}>{fact.name}</span></>}</span>
               </span>
             </li>
           ))}

@@ -49,6 +49,8 @@ export interface Certification {
 export interface Experience {
   role: string;
   company: string;
+  /** Language of the company name when it is not English, e.g. 'pt-BR'. Optional so a build against an older database still works. */
+  company_lang?: string | null;
   company_url: string | null;
   context: string | null;
   location: string | null;
@@ -62,6 +64,8 @@ export interface Experience {
 export interface Education {
   degree: string;
   institution: string;
+  /** Language of the institution name when it is not English, e.g. 'pt-BR'. */
+  institution_lang?: string | null;
   location: string | null;
   start_date: string | null;
   end_date: string | null;

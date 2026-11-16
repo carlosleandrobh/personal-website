@@ -112,3 +112,45 @@ def test_removed_rows_are_kept_unless_pruned(fake_db, tmp_path):
     assert fake_db.tables['labs']
     content.push(fake_db, path=path, prune=True)
     assert fake_db.tables['labs'] == []
+
+
+def test_name_language_can_be_pushed(fake_db, tmp_path):
+    path = tmp_path / 'site-content.yaml'
+    content.pull(fake_db, path)
+    doc = content.load_yaml(path.read_text())
+    assert doc['experiences'][0]['company_lang'] is None
+    doc['experiences'][0]['company_lang'] = 'pt-BR'
+    doc['education'] = [{'degree': 'Bacharelado', 'institution': 'Universidade', 'institution_lang': 'pt'}]
+    path.write_text(content.dump_yaml(doc))
+    log, writes = content.push(fake_db, path=path)
+    assert writes == 2
+    assert log == ['experiences #7: update company_lang', 'education: add "Bacharelado"']
+    assert fake_db.tables['experiences'][0]['company_lang'] == 'pt-BR'
+    assert fake_db.tables['education'][0]['institution_lang'] == 'pt'
+
+
+def test_a_malformed_language_tag_stops_the_push_even_in_a_dry_run(fake_db, tmp_path):
+    path = tmp_path / 'site-content.yaml'
+    content.pull(fake_db, path)
+    doc = content.load_yaml(path.read_text())
+    doc['experiences'][0]['company_lang'] = 'portuguese'
+    doc['education'] = [{'degree': 'Degree', 'institution': 'Somewhere', 'institution_lang': 'pt_br'}]
+    path.write_text(content.dump_yaml(doc))
+    for dry_run in (True, False):
+        try:
+            content.push(fake_db, path=path, dry_run=dry_run)
+        except ValueError as error:
+            message = str(error)
+        else:
+            raise AssertionError('the push should have stopped')
+        assert 'Nothing was saved' in message
+        assert 'experiences #7: company_lang "portuguese"' in message
+        assert 'education (new row "Degree"): institution_lang "pt_br"' in message
+    assert not fake_db.writes
+
+
+def test_language_tag_rule_matches_the_database():
+    assert all(content.valid_lang(tag) for tag in ['pt', 'pt-BR', 'mi', 'haw', None])
+    assert not any(
+        content.valid_lang(tag) for tag in ['portuguese', 'pt_br', 'PT-BR', 'pt-br', '', 'pt-BR-x']
+    )
