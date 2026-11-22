@@ -41,7 +41,7 @@ jobs:
           if [ -n "$SUPABASE_SECRET_KEY" ]; then echo "::notice::Building from Supabase."
           else echo "::warning::Supabase secrets not set — building from supabase/seed/content.json (stage 1)."; fi
 
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         if: env.SUPABASE_SECRET_KEY != ''
       - name: Sync GitHub repositories (Python)
         if: env.SUPABASE_SECRET_KEY != ''
@@ -122,7 +122,7 @@ jobs:
             uv.lock
             .python-version
             README.md
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         if: env.LINKEDIN_TOKEN_KEY != '' && env.SUPABASE_SECRET_KEY != ''
